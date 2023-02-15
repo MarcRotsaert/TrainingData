@@ -108,7 +108,8 @@ if __name__ == "__main__":
     path = r"C:\Users\marcr\Polar\Polar\data\polar-user-data-export"
     import glob
 
-    files = glob.glob(os.path.join(path, "training-session-2019-12*.json"))
+    files = glob.glob(os.path.join(path, "training-session-2019-*.json"))
+    pointcoll = []
     for fi in files:
         # "training-session-2014-12-07-263916482-2cbe9312-6b71-4693-8519-a9a860a23cbc.json"
         filename = fi.split("\\")[-1]
@@ -124,66 +125,8 @@ if __name__ == "__main__":
             print(alaps)
             print(samples)
             print(resume)
+        pointcoll.append(session.return_routecentre())
         print(filename + ":" + str(session.return_routecentre()))
         # print(filename + ":" + str(session.return_location()))
-    xx
-    # print(type(temp))
-    # print(temp)
-    # print(len(data))
-    # print(data.keys())
-    # print(data.keys())
-    # Trainses()
-
-    # data["exercises"][0]
-    # data["exercises"][0]["sport"]
-
-    # data["exercises"][0]["laps"][1]
-    # data["exercises"][0]["samples"]["recordedRoute"][10]["latitude"]
-    # data["exercises"][0]["samples"]["speed"][10]["value"]
-    # data["exercises"][0]["samples"]["speed"][10]["dateTime"]
-    # data["exercises"][0]["samples"]["distance"]
-    # data["exercises"][0]["samples"]["heartRate"]
-    # lat = data["exercises"][0]["latitude"]
-    # lon = data["exercises"][0]["longitude"]
-
-    # # point = Point(lon, lat)
-
-    # locations = {
-    #     "develden": [85575, 440076],
-    #     "baanbras": [85085, 449400],
-    #     "kopjesloop": [85055, 448570],
-    #     "schiehaven": [90775, 435330],
-    #     "wippolder": [86255, 446810],
-    # }
-
-    # """
-    # point = gpd.points_from_xy([lon], [lat], crs="EPSG:4326")
-    # pointrd = point.to_crs("EPSG:28992")
-    # for loc in locations:
-    #     pointloc = shp.Point(locations[loc][0], locations[loc][1])
-    #     print(pointloc.distance(pointrd[0]))
-    # """
-
-    # route = data["exercises"][0]["samples"]["recordedRoute"]
-    # rlon = []
-    # rlat = []
-    # for dpoint in route:
-    #     rlon.append(dpoint["longitude"])
-    #     rlat.append(dpoint["latitude"])
-    # rpoints = gpd.points_from_xy(rlon, rlat, crs="EPSG:4326")
-    # rpointsrd = rpoints.to_crs("EPSG:28992")
-
-    # #
-    # for loc in locations:
-    #     pointloc = shp.Point(locations[loc][0], locations[loc][1])
-    #     print(pointloc.distance(rpointsrd[-1]))
-
-    # # centroid of route
-    # rpolyrd = shp.Polygon([[p.x, p.y] for p in rpointsrd])
-    # # rpolyrd = rpoly.to_crs("EPSG:28992")
-    # print(rpolyrd.centroid)
-    # for loc in locations:
-    #     pointloc = shp.Point(locations[loc][0], locations[loc][1])
-    #     print(pointloc.distance(rpolyrd.centroid))
-
-    # dir(point)
+    gdf = gpd.GeoDataFrame(geometry=pointcoll, crs="EPSG:28992")
+    gdf.to_file("C:/temp/polartest.shp")
