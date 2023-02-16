@@ -20,7 +20,6 @@ class MongoAdapter:
         return self.client
 
     def getCollection(self):
-
         db = self.client[self.dbname]
         # db = self.client[dbName]
         return db[self.collection]
@@ -77,12 +76,17 @@ class MongoPolar(MongoAdapter):
         curs = self.simplequery("exercises.sport", "RUNNING")
         return curs
 
+    def put_jsonresume(self, path, fname):
+        sess = pj.Trainses(path, fname)
+        resume = sess.return_resume()
+        self.insertOne(resume)
+
 
 if __name__ == "__main__":
     # mongad = MongoAdapter("guess_who", "mongo-1")
     mongad = MongoPolar("polartest", "polardb")
     mongad.showConnections()
-    mongad.getCollecion()
+    mongad.getCollection()
     xx
     session = pj.Trainses(
         r"C:\Users\marcr\Polar\Polar\data\polar-user-data-export",
@@ -91,6 +95,7 @@ if __name__ == "__main__":
 
     res = mongad.find_docssport()
     print(res)
+    mongad.insertOne(res)
     xx
     # mongad = MongoAdapter("polartest", "mongo-1")
     # coll = mongad.getCollection("polartest", "mongo-1")

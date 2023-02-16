@@ -18,22 +18,18 @@ class Trainses:
         try:
             self.laps = data["exercises"][0].pop("laps")
         except KeyError:
-            pass
+            self.laps = None
         try:
             self.alaps = data["exercises"][0].pop("autoLaps")
         except KeyError:
-            pass
+            self.alaps = None
         data.update({"fname": self.file})
-        self.resume = data
+        self.abstract = data
         self.data = True
 
     def _returninit(self):
         if not self.data:
             self.read_json()
-
-    def return_resume(self):
-        self._returninit()
-        return self.resume
 
     def return_laps(self):
         self._returninit()
@@ -43,9 +39,16 @@ class Trainses:
         self._returninit()
         return self.alaps
 
+    def return_resume(self):
+        self._returninit()
+        resume = self.abstract
+        loc = self.return_location()
+        resume.update({"location": loc, "laps": self.laps, "autolaps": self.alaps})
+        return resume
+
     def return_sport(self):
         self._returninit()
-        return self.resume["sport"]
+        return self.abstract["sport"]
 
     def return_samples(self):
         self._returninit()
@@ -53,7 +56,11 @@ class Trainses:
 
     def return_route(self):
         self._returninit()
-        return self.samples["recordedRoute"]
+        try:
+            route = self.samples["recordedRoute"]
+        except KeyError:
+            route = None
+        return route
 
     def return_heartrate(self):
         self._returninit()
@@ -85,17 +92,20 @@ class Trainses:
             "menmoerhoeve": [[104258, 394390], 200],
             "sola": [[395744, -72146], 15000],
         }
-        location = None
-        pnts = self.return_pointsel([5, -5])
+        if self.return_route() == None:
+            location = None
+        else:
+            location = None
+            pnts = self.return_pointsel([5, -5])
 
-        for loc in deflocs:
-            pointloc = shp.Point(deflocs[loc][0][0], deflocs[loc][0][1])
+            for loc in deflocs:
+                pointloc = shp.Point(deflocs[loc][0][0], deflocs[loc][0][1])
 
-            diststart = pointloc.distance(pnts[0])
-            distend = pointloc.distance(pnts[-1])
-            maxdist = deflocs[loc][1]
-            if diststart < maxdist or distend < maxdist:
-                location = loc
+                diststart = pointloc.distance(pnts[0])
+                distend = pointloc.distance(pnts[-1])
+                maxdist = deflocs[loc][1]
+                if diststart < maxdist or distend < maxdist:
+                    location = loc
         return location
 
     def return_routecentre(self):
@@ -108,6 +118,9 @@ class Trainses:
 if __name__ == "__main__":
     path = r"C:\Users\marcr\Polar\Polar\data\polar-user-data-export"
     import glob
+
+    file = "training-session-2015-01-27-263888906-e598a192-26c4-468f-8d44-442e0020127b.json"
+    session = Trainses(path, file)
 
     files = glob.glob(os.path.join(path, "training-session-2022-*.json"))
     pointcoll = []
