@@ -58,19 +58,41 @@ class MongoAdapter:
         cursor = collection.find({keyn: valn})
         return cursor
 
+    def morecomplexquery(self, query):
+        # {"distance":{"$gt":"7000"}}
+        collection = self.getCollection()
+        cursor = collection.find(query)
+        return cursor
+
     def deleteDocument(self, document):
         collection = self.getCollection()
         collection.delete_one(document)
 
 
+class MongoPolar(MongoAdapter):
+    def __init__(self, mongoDB, collection):
+        super().__init__(mongoDB, collection)
+
+    def find_docssport(self):
+        curs = self.simplequery("exercises.sport", "RUNNING")
+        return curs
+
+
 if __name__ == "__main__":
     # mongad = MongoAdapter("guess_who", "mongo-1")
+    mongad = MongoPolar("polartest", "polardb")
+    mongad.showConnections()
+    mongad.getCollecion()
+    xx
     session = pj.Trainses(
         r"C:\Users\marcr\Polar\Polar\data\polar-user-data-export",
         "training-session-2013-12-29-263917040-9e3eaf26-016e-4401-b268-402cb95f389c.json",
     )
 
-    mongad = MongoAdapter("polartest", "mongo-1")
+    res = mongad.find_docssport()
+    print(res)
+    xx
+    # mongad = MongoAdapter("polartest", "mongo-1")
     # coll = mongad.getCollection("polartest", "mongo-1")
     mongad.showConnections()
     if False:
@@ -83,7 +105,10 @@ if __name__ == "__main__":
     print("____________________________________")
 
     # curs = mongad.simplequery("exportVersion", "1.6")
-    curs = mongad.simplequery("lowerLimit", 165)
+    curs = mongad.morecomplexquery({"latitude": {"$gt": 0}})
+    curs = mongad.morecomplexquery({"physicalInformationSnapshot.sex": "MALE"})
+    # curs = mongad.morecomplexquery({"exercises[0].distance": 8960.0})
+    curs = mongad.morecomplexquery({"exercises.speed.avg": {"$gt": 14}})
     # print(dir(curs))
     for c in curs:
         print(c)

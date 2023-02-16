@@ -78,11 +78,12 @@ class Trainses:
         deflocs = {
             "de velden": [[85575, 440076], 100],
             "baanbras": [[85085, 449400], 100],
-            "kopjesloop": [[85055, 448570], 75],
+            "kopjesloop": [[85055, 448570], 50],
             "schiehaven": [[90775, 435330], 600],
             "wippolder": [[86255, 446810], 150],
             "bergenopzoom": [[81385, 389191], 400],
             "menmoerhoeve": [[104258, 394390], 200],
+            "sola": [[395744, -72146], 15000],
         }
         location = None
         pnts = self.return_pointsel([5, -5])
@@ -108,23 +109,24 @@ if __name__ == "__main__":
     path = r"C:\Users\marcr\Polar\Polar\data\polar-user-data-export"
     import glob
 
-    files = glob.glob(os.path.join(path, "training-session-2019-*.json"))
+    files = glob.glob(os.path.join(path, "training-session-2022-*.json"))
     pointcoll = []
     for fi in files:
         # "training-session-2014-12-07-263916482-2cbe9312-6b71-4693-8519-a9a860a23cbc.json"
         filename = fi.split("\\")[-1]
         session = Trainses(path, filename)
-        if False:
-            resume = session.return_resume()
-            samples = session.return_samples()
-            laps = session.return_laps()
+        if True:
+            # resume = session.return_resume()
+            # print(resume)
+            # xx
+            # samples = session.return_samples()
+            # laps = session.return_laps()
+            # print(laps)
             alaps = session.return_autolaps()
+            print(alaps)
 
             print(session.return_location())
-            print(laps)
-            print(alaps)
             print(samples)
-            print(resume)
         pointcoll.append(session.return_routecentre())
         print(filename + ":" + str(session.return_routecentre()))
         # print(filename + ":" + str(session.return_location()))
