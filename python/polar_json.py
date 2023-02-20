@@ -2,13 +2,18 @@ import os
 import json
 import geopandas as gpd
 import shapely as shp
+import numpy as np
+from matplotlib import pyplot as pp
+
+# import seaborn
 
 
 class Trainses:
     def __init__(self, path, file):
         self.path = path
         self.file = file
-        self.data = False
+        self.read_json()
+        self.data = True
 
     def read_json(self):
         with open(os.path.join(self.path, self.file)) as g:
@@ -38,7 +43,7 @@ class Trainses:
             self.alaps = None
         data.update({"fname": self.file})
 
-        param = ["speed", "heartrate", "ascent", "decent"]
+        param = ["speed", "heartrate", "ascent", "decent", "sport"]
         for par in param:
             if par in data:
                 data.update({par: data["exercises"][0][par]})
@@ -59,37 +64,47 @@ class Trainses:
         self._returninit()
         return self.alaps
 
-    def return_resume(self):
-        self._returninit()
-        resume = self.abstract
-        loc = self.return_location()
-        resume.update({"location": loc, "laps": self.laps, "autolaps": self.alaps})
-        return resume
-
     def return_sport(self):
         self._returninit()
-        return self.abstract["exercises"][0]["sport"]
+        return self.abstract["sport"]
+
+
+class SampleAnalyzerBasic:
+    def __init__(self, samples: dict):
+        self.samples = samples
 
     def return_samples(self):
-        self._returninit()
+        # self._returninit()
         return self.samples
 
-    def return_route(self):
-        self._returninit()
+    def return_s_heartrate(self):
+        return self.samples["heartRate"]
+
+    def return_s_routecentre(self):
+        rpointsrd = self.return_s_pointsel()
+        rpolyrd = shp.Polygon([[p.x, p.y] for p in rpointsrd])
+        # rpolyrd = rpoly.to_crs("EPSG:28992")
+        return rpolyrd.centroid
+
+    def return_s_route(self):
+        # self._returninit()
         try:
             route = self.samples["recordedRoute"]
         except KeyError:
             route = None
         return route
 
-    def return_heartrate(self):
-        self._returninit()
+    def return_s_speed(self):
+        return self.samples["speed"]
+
+    def return_s_heartrate(self):
+        # self._returninit()
         return self.samples["heartRate"]
 
-    def return_pointsel(self, pnr=None):
+    def return_s_pointsel(self, pnr=None):
         rlat = []
         rlon = []
-        route = self.return_route()
+        route = self.return_s_route()
         if pnr == None:
             pnr = range(len(route))
 
@@ -101,7 +116,7 @@ class Trainses:
         pointsrd = points.to_crs("EPSG:28992")
         return pointsrd
 
-    def return_location(self):
+    def return_s_location(self):
         deflocs = {
             "de velden": [[85575, 440076], 100],
             "baanbras": [[85085, 449400], 100],
@@ -113,11 +128,11 @@ class Trainses:
             "sola": [[395744, -72146], 15000],
             "meijendel": [[82905, 460500], 300],
         }
-        if self.return_route() == None:
+        if self.return_s_route() == None:
             location = None
         else:
             location = None
-            pnts = self.return_pointsel([5, -5])
+            pnts = self.return_s_pointsel([5, -5])
 
             for loc in deflocs:
                 pointloc = shp.Point(deflocs[loc][0][0], deflocs[loc][0][1])
@@ -128,11 +143,29 @@ class Trainses:
                     location = loc
         return location
 
-    def return_routecentre(self):
-        rpointsrd = self.return_pointsel()
-        rpolyrd = shp.Polygon([[p.x, p.y] for p in rpointsrd])
-        # rpolyrd = rpoly.to_crs("EPSG:28992")
-        return rpolyrd.centroid
+    def plot(self, param):
+        fig = pp.figure()
+        values = [item["value"] for item in self.samples[param]]
+        pp.plot(values)
+        pp.show()
+
+
+class SamAnalExtra(SampleAnalyzerBasic):
+    def __init__(self, samples):
+        super(SamAnalExtra, self).__init__(samples)
+        print(self.return_s_heartrate())
+
+    def return_idxlowmovement(self):
+        speed = self.return_s_speed()
+        speedlist = [sp["value"] for sp in speed]
+        speed_arr = np.array(speedlist)
+        i_b = np.argwhere(speed_arr > 7)[0][0]
+        i_e = np.where(speed_arr > 7)[0][-1]
+        if i_e == speed_arr.shape[0] - 1:
+            i_e = None
+        if i_b == 0:
+            i_e = None
+        return i_b, i_e
 
 
 if __name__ == "__main__":
@@ -141,14 +174,18 @@ if __name__ == "__main__":
 
     file = "training-session-2015-01-27-263888906-e598a192-26c4-468f-8d44-442e0020127b.json"
     session = Trainses(path, file)
-
+    session = SampleAnalyzerBasic(session.samples)
+    session = SamAnalExtra(session.samples)
+    X = session.filter_lowmovement()
     files = glob.glob(os.path.join(path, "training-session-2022-*.json"))
     pointcoll = []
     for fi in files:
         # "training-session-2014-12-07-263916482-2cbe9312-6b71-4693-8519-a9a860a23cbc.json"
         filename = fi.split("\\")[-1]
         session = Trainses(path, filename)
-        if True:
+        session = SamAnalExtra(session.samples)
+        session.plot("speed")
+        if False:
             # resume = session.return_resume()
             # print(resume)
             # xx
@@ -158,10 +195,10 @@ if __name__ == "__main__":
             alaps = session.return_autolaps()
             print(alaps)
 
-            print(session.return_location())
+            print(session.return_s_location())
             print(samples)
-        pointcoll.append(session.return_routecentre())
-        print(filename + ":" + str(session.return_routecentre()))
-        # print(filename + ":" + str(session.return_location()))
+        pointcoll.append(session.return_s_routecentre())
+        print(filename + ":" + str(session.return_s_routecentre()))
+        # print(filename + ":" + str(session.return_s_location()))
     gdf = gpd.GeoDataFrame(geometry=pointcoll, crs="EPSG:28992")
     gdf.to_file("C:/temp/polartest.shp")
