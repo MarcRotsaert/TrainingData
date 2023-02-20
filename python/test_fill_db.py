@@ -5,7 +5,7 @@ import glob
 from nosql_adapter import MongoPolar
 import polar_json as pj
 
-mongad = MongoPolar("polartest2", "polardb")
+mongad = MongoPolar("polartest3", "polardb")
 path = r"C:\Users\marcr\Polar\Polar\data\polar-user-data-export"
 files = glob.glob(os.path.join(path, "training-session-2015-*.json"))
 pointcoll = []

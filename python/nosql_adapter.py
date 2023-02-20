@@ -29,6 +29,10 @@ class MongoAdapter:
         collection = self.getCollection()
         collection.insert_one(dictToInsert)
 
+    def updateOne(self, objid, dictToUpdate):
+        collection = self.getCollection()
+        collection.update_one({"_id": objid}, {"$set": dictToUpdate})
+
     def deleteCollection(self):
         # collection = self.getCollection("polar", collectionName)
         collection = self.getCollection()
@@ -72,13 +76,17 @@ class MongoPolar(MongoAdapter):
     def __init__(self, mongoDB, collection):
         super().__init__(mongoDB, collection)
 
-    def find_docssport(self):
+    def find_docsrunning(self):
         curs = self.simplequery("exercises.sport", "RUNNING")
         return curs
 
     def put_jsonresume(self, path, fname):
         sess = pj.Trainses(path, fname)
-        resume = sess.return_resume()
+        resume = sess.abstract
+        SamAnal = pj.SampleAnalyzerBasic(sess.samples)
+        loc = SamAnal.return_s_location()
+        resume.update({"location": loc, "laps": sess.laps, "autolaps": sess.alaps})
+        # resume = sess.return_resume()
         self.insertOne(resume)
 
 
@@ -87,7 +95,17 @@ if __name__ == "__main__":
     mongad = MongoPolar("polartest", "polardb")
     mongad.showConnections()
     mongad.getCollection()
-    xx
+    docs = mongad.returnDocs()
+    ids = docs[0]["_id"]
+    print(ids)
+    # mongad.showDocs()
+    # mongad.updateOne(ids, {"exercises.distance": 10000})
+    mongad.updateOne(ids, {"exportVersion": "69.0"})
+    mongad.updateOne(ids, {"trainingtype": "blasting"})
+    docs = mongad.returnDocs()
+    ids = docs[0]["_id"]
+    print(ids)
+
     session = pj.Trainses(
         r"C:\Users\marcr\Polar\Polar\data\polar-user-data-export",
         "training-session-2013-12-29-263917040-9e3eaf26-016e-4401-b268-402cb95f389c.json",
@@ -105,7 +123,6 @@ if __name__ == "__main__":
         mongad.insertOne(resume)
 
     # mongad.insertOne({"ja": [1]})
-    docs = mongad.returnDocs()
 
     print("____________________________________")
 
