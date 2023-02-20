@@ -14,7 +14,20 @@ class Trainses:
         with open(os.path.join(self.path, self.file)) as g:
             temp = g.read()
         data = json.loads(temp)
-        self.samples = data["exercises"][0].pop("samples")
+        self.add_data(data)
+
+    def add_data_db(self, datadb):
+        self.laps = datadb.pop("laps")
+        self.alaps = datadb.pop("autolaps")
+        self.abstract = datadb
+        self.data = True
+
+    def add_data(self, data):
+        self.data = data
+        try:
+            self.samples = data["exercises"][0].pop("samples")
+        except:
+            pass
         try:
             self.laps = data["exercises"][0].pop("laps")
         except KeyError:
@@ -24,6 +37,13 @@ class Trainses:
         except KeyError:
             self.alaps = None
         data.update({"fname": self.file})
+
+        param = ["speed", "heartrate", "ascent", "decent"]
+        for par in param:
+            if par in data:
+                data.update({par: data["exercises"][0][par]})
+
+        data.pop("exercises")
         self.abstract = data
         self.data = True
 
@@ -48,7 +68,7 @@ class Trainses:
 
     def return_sport(self):
         self._returninit()
-        return self.abstract["sport"]
+        return self.abstract["exercises"][0]["sport"]
 
     def return_samples(self):
         self._returninit()
@@ -91,6 +111,7 @@ class Trainses:
             "bergenopzoom": [[81385, 389191], 400],
             "menmoerhoeve": [[104258, 394390], 200],
             "sola": [[395744, -72146], 15000],
+            "meijendel": [[82905, 460500], 300],
         }
         if self.return_route() == None:
             location = None
@@ -100,7 +121,6 @@ class Trainses:
 
             for loc in deflocs:
                 pointloc = shp.Point(deflocs[loc][0][0], deflocs[loc][0][1])
-
                 diststart = pointloc.distance(pnts[0])
                 distend = pointloc.distance(pnts[-1])
                 maxdist = deflocs[loc][1]
