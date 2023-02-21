@@ -100,21 +100,22 @@ if __name__ == "__main__":
     print(ids)
     # mongad.showDocs()
     # mongad.updateOne(ids, {"exercises.distance": 10000})
-    mongad.updateOne(ids, {"exportVersion": "69.0"})
-    mongad.updateOne(ids, {"trainingtype": "blasting"})
+    if False:
+        mongad.updateOne(ids, {"exportVersion": "69.0"})
+        mongad.updateOne(ids, {"trainingtype": "blasting"})
     docs = mongad.returnDocs()
     ids = docs[0]["_id"]
     print(ids)
 
-    session = pj.Trainses(
-        r"C:\Users\marcr\Polar\Polar\data\polar-user-data-export",
-        "training-session-2013-12-29-263917040-9e3eaf26-016e-4401-b268-402cb95f389c.json",
-    )
+    # session = pj.Trainses(
+    #     r"C:\Users\marcr\Polar\Polar\data\polar-user-data-export",
+    #     "training-session-2013-12-29-263917040-9e3eaf26-016e-4401-b268-402cb95f389c.json",
+    # )
 
-    res = mongad.find_docssport()
-    print(res)
-    mongad.insertOne(res)
-    xx
+    # res = mongad.find_docssport()
+    # print(res)
+    # mongad.insertOne(res)
+    # xx
     # mongad = MongoAdapter("polartest", "mongo-1")
     # coll = mongad.getCollection("polartest", "mongo-1")
     mongad.showConnections()
@@ -131,7 +132,9 @@ if __name__ == "__main__":
     curs = mongad.morecomplexquery({"physicalInformationSnapshot.sex": "MALE"})
     # curs = mongad.morecomplexquery({"exercises[0].distance": 8960.0})
     curs = mongad.morecomplexquery({"exercises.speed.avg": {"$gt": 14}})
+    curs = mongad.morecomplexquery(
+        {"exercises.speed.avg": {"$gt": 14}, "exercises.heartRate.avg": {"$gt": 140}}
+    )
     # print(dir(curs))
     for c in curs:
-        print(c)
-    x
+        print(c["exercises"][0]["heartRate"]["avg"])

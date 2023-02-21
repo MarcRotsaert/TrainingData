@@ -1,5 +1,6 @@
 import os
 import json
+from typing import Iterable, Union
 import geopandas as gpd
 import shapely as shp
 import numpy as np
@@ -69,6 +70,64 @@ class Trainses:
         return self.abstract["sport"]
 
 
+class LapAnalyzerBasic:
+    """
+    basic class for automatic and manual laps
+    """
+
+    def __init__(self, laps: dict):
+
+        self.laps = self._reshapelaps(laps)
+
+    def _reshapelaps(self, laps):
+        param = ["distance", "duration", "heartRate", "speed", "ascent", "descent"]
+        result = {}
+        for par in param:
+            try:
+                temp = {par: [la[par] for la in laps]}
+            except KeyError:
+                temp = {par: None}
+            result.update(temp)
+        return result
+
+    def print_nrlaps(self):
+        print(len(self.laps["speed"]))
+
+    def compare_hr_sp(self):
+        if self.laps["heartRate"] == None or self.laps["speed"] == None:
+            print("no heartrate or speed")
+            # return
+        else:
+            heartr = self.laps["heartRate"]
+            speed = self.laps["speed"]
+            avgspeed = [sp["avg"] for sp in speed]
+            avgheartr = [hr["avg"] for hr in heartr]
+
+            print(np.corrcoef(avgspeed, avgheartr)[0, 1])
+
+
+class LapAnalyzerManual(LapAnalyzerBasic):
+    def __init__(self, laps):
+        super(LapAnalyzerManual, self).__init__(laps)
+
+    def return_startuprunoutlaps(self):
+        su_speed = 13.5
+        idx_su = []
+        i1 = 0
+        while (
+            self.laps["speed"][i1]["avg"] < su_speed
+            and i1 < len(self.laps["speed"]) - 1
+        ):
+            idx_su.append(i1)
+            i1 += 1
+        idx_ro = []
+        i2 = len(self.laps["speed"]) - 1
+        while self.laps["speed"][i2]["avg"] < su_speed and i2 > i1:
+            idx_ro.append(i2)
+            i2 -= 1
+        return idx_su, idx_ro
+
+
 class SampleAnalyzerBasic:
     def __init__(self, samples: dict):
         self.samples = samples
@@ -101,7 +160,9 @@ class SampleAnalyzerBasic:
         # self._returninit()
         return self.samples["heartRate"]
 
-    def return_s_pointsel(self, pnr=None):
+    # def return_s_pointsel(self, pnr=None):
+    def return_s_pointsel(self, pnr: Union[None, Iterable] = None):
+        # get points
         rlat = []
         rlon = []
         route = self.return_s_route()
@@ -153,9 +214,10 @@ class SampleAnalyzerBasic:
 class SamAnalExtra(SampleAnalyzerBasic):
     def __init__(self, samples):
         super(SamAnalExtra, self).__init__(samples)
-        print(self.return_s_heartrate())
+        # print(self.return_s_heartrate())
 
     def return_idxlowmovement(self):
+        # return index of  low activity at beginning and end of a
         speed = self.return_s_speed()
         speedlist = [sp["value"] for sp in speed]
         speed_arr = np.array(speedlist)
@@ -172,19 +234,36 @@ if __name__ == "__main__":
     path = r"C:\Users\marcr\Polar\Polar\data\polar-user-data-export"
     import glob
 
-    file = "training-session-2015-01-27-263888906-e598a192-26c4-468f-8d44-442e0020127b.json"
+    file = "training-session-2022-08-28-7472610630-322188f8-2d0a-43c6-b85f-7e797fc0ebb2.json"
+
     session = Trainses(path, file)
-    session = SampleAnalyzerBasic(session.samples)
-    session = SamAnalExtra(session.samples)
-    X = session.filter_lowmovement()
+    session = LapAnalyzerManual(session.laps)
+    print(session.return_startuprunoutlaps())
+    if False:
+        session = SampleAnalyzerBasic(session.samples)
+        session = SamAnalExtra(session.samples)
+        X = session.filter_lowmovement()
+
+        # if True:
+        x
     files = glob.glob(os.path.join(path, "training-session-2022-*.json"))
     pointcoll = []
     for fi in files:
         # "training-session-2014-12-07-263916482-2cbe9312-6b71-4693-8519-a9a860a23cbc.json"
         filename = fi.split("\\")[-1]
+        print(filename)
         session = Trainses(path, filename)
-        session = SamAnalExtra(session.samples)
-        session.plot("speed")
+        if True:
+            if session.laps != None:
+                # session = LapAnalyzerBasic(session.laps)
+                # session.print_nrlaps()
+                # session.compare_hr_sp()
+                session = LapAnalyzerManual(session.laps)
+                print(session.return_startuprunoutlaps())
+            print("_______________________________")
+        if False:
+            session = SamAnalExtra(session.samples)
+            session.plot("speed")
         if False:
             # resume = session.return_resume()
             # print(resume)
@@ -196,9 +275,10 @@ if __name__ == "__main__":
             print(alaps)
 
             print(session.return_s_location())
-            print(samples)
-        pointcoll.append(session.return_s_routecentre())
-        print(filename + ":" + str(session.return_s_routecentre()))
-        # print(filename + ":" + str(session.return_s_location()))
-    gdf = gpd.GeoDataFrame(geometry=pointcoll, crs="EPSG:28992")
-    gdf.to_file("C:/temp/polartest.shp")
+            print(session.samples)
+        if False:
+            pointcoll.append(session.return_s_routecentre())
+            print(filename + ":" + str(session.return_s_routecentre()))
+            # print(filename + ":" + str(session.return_s_location()))
+            gdf = gpd.GeoDataFrame(geometry=pointcoll, crs="EPSG:28992")
+            gdf.to_file("C:/temp/polartest.shp")
