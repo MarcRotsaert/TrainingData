@@ -76,13 +76,12 @@ class LapAnalyzerBasic:
     """
 
     def __init__(self, laps: dict):
-
+        self.param = ["distance", "duration", "heartRate", "speed", "ascent", "descent"]
         self.laps = self._reshapelaps(laps)
 
     def _reshapelaps(self, laps):
-        param = ["distance", "duration", "heartRate", "speed", "ascent", "descent"]
         result = {}
-        for par in param:
+        for par in self.param:
             try:
                 temp = {par: [la[par] for la in laps]}
             except KeyError:
@@ -106,9 +105,9 @@ class LapAnalyzerBasic:
             print(np.corrcoef(avgspeed, avgheartr)[0, 1])
 
 
-class LapAnalyzerManual(LapAnalyzerBasic):
+class ManualLapAnalyzer(LapAnalyzerBasic):
     def __init__(self, laps):
-        super(LapAnalyzerManual, self).__init__(laps)
+        super(ManualLapAnalyzer, self).__init__(laps)
 
     def return_startuprunoutlaps(self):
         su_speed = 13.5
@@ -126,6 +125,44 @@ class LapAnalyzerManual(LapAnalyzerBasic):
             idx_ro.append(i2)
             i2 -= 1
         return idx_su, idx_ro
+
+    def return_lapswithoutsu(self):
+        su = self.return_startuprunoutlaps()
+        su = su[0] + su[1]
+        su.sort()
+        su.reverse()
+        laps = self.laps.copy()
+        for k in laps:
+            for i_la in su:
+                try:
+                    laps[k].pop(i_la)
+                except AttributeError:  # None values
+                    break
+        return laps
+
+    def identify_interval(self):
+        dspeed_int = 2.5
+
+        laps = self.return_lapswithoutsu()
+
+        speed = np.array([sp["avg"] for sp in laps["speed"]])
+        if speed.shape[0] < 5:
+            result = "no interval, crit. 1"
+        else:
+            dspeed = speed[1:] - speed[0:-1]
+            dspeed[(dspeed < dspeed_int) & (dspeed > -dspeed_int)] = 0
+            dspeed[dspeed > dspeed_int] = 1
+            dspeed[dspeed < -dspeed_int] = -1
+            deriv = dspeed[1:] + dspeed[0:-1]
+            if sum(deriv) == 0:
+                result = "interval"
+            else:
+                if len(speed) > 7 and len(dspeed[dspeed == -1]) / len(dspeed) > 1 / 3:
+                    result = "interval, check"
+                else:
+                    result = "no interval, under investigation"
+        return result
+        # for la in laps:
 
 
 class SampleAnalyzerBasic:
@@ -231,14 +268,21 @@ class SamAnalExtra(SampleAnalyzerBasic):
 
 
 if __name__ == "__main__":
+    # xx
     path = r"C:\Users\marcr\Polar\Polar\data\polar-user-data-export"
     import glob
 
-    file = "training-session-2022-08-28-7472610630-322188f8-2d0a-43c6-b85f-7e797fc0ebb2.json"
+    if False:
+        file = "training-session-2015-01-07-263888486-2d791dc2-1ee2-4964-bb44-558579c19c6f.json"
 
-    session = Trainses(path, file)
-    session = LapAnalyzerManual(session.laps)
-    print(session.return_startuprunoutlaps())
+        session = Trainses(path, file)
+        session = ManualLapAnalyzer(session.laps)
+        print(session.return_startuprunoutlaps())
+        # laps = session.return_lapswithoutsu()
+        result = session.identify_interval()
+        print(result)
+
+    # xx
     if False:
         session = SampleAnalyzerBasic(session.samples)
         session = SamAnalExtra(session.samples)
@@ -253,13 +297,19 @@ if __name__ == "__main__":
         filename = fi.split("\\")[-1]
         print(filename)
         session = Trainses(path, filename)
+
         if True:
             if session.laps != None:
                 # session = LapAnalyzerBasic(session.laps)
                 # session.print_nrlaps()
-                # session.compare_hr_sp()
-                session = LapAnalyzerManual(session.laps)
-                print(session.return_startuprunoutlaps())
+                session = ManualLapAnalyzer(session.laps)
+                # print(session.return_startuprunoutlaps())
+                # print(session.return_startuprunoutlaps())
+                # laps = session.return_lapswithoutsu()
+                result = session.identify_interval()
+                print(result)
+                session.compare_hr_sp()
+
             print("_______________________________")
         if False:
             session = SamAnalExtra(session.samples)
