@@ -76,7 +76,15 @@ class LapAnalyzerBasic:
     """
 
     def __init__(self, laps: dict):
-        self.param = ["distance", "duration", "heartRate", "speed", "ascent", "descent"]
+        self.param = [
+            "distance",
+            "duration",
+            "cadence",
+            "heartRate",
+            "speed",
+            "ascent",
+            "descent",
+        ]
         self.laps = self._reshapelaps(laps)
 
     def _reshapelaps(self, laps):
@@ -103,6 +111,19 @@ class LapAnalyzerBasic:
             avgheartr = [hr["avg"] for hr in heartr]
 
             print(np.corrcoef(avgspeed, avgheartr)[0, 1])
+
+    def identify_easyrun(self, max_speed=14.0):
+
+        # laps = self.return_lapswithoutsu()
+
+        speed = np.array([sp["avg"] for sp in self.laps["speed"]])
+        if any(speed > max_speed):
+            result = False
+        else:
+            result = True
+
+        return result
+        # for la in laps:
 
 
 class ManualLapAnalyzer(LapAnalyzerBasic):
@@ -162,7 +183,24 @@ class ManualLapAnalyzer(LapAnalyzerBasic):
                 else:
                     result = "no interval, under investigation"
         return result
-        # for la in laps:
+
+    def identify_sprints(self, max_time=20.0, min_cadence=98):
+        # laps = self.return_lapswithoutsu()
+
+        sprints = []
+        for lnr in range(len(self.laps["duration"])):
+            lapdur_str = self.laps["duration"][lnr]
+            # lapcadence_max = self.laps["cadence"][lnr]["max"]
+            lapdur = float(lapdur_str.lstrip("PT").rstrip("S"))
+            if lapdur < max_time:  # and lapcadence_max > min_cadence:
+                sprints.append(lnr)
+
+        if len(sprints) > 3:
+            result = True
+        else:
+            result = False
+
+        return result
 
 
 class SampleAnalyzerBasic:
@@ -277,9 +315,9 @@ if __name__ == "__main__":
 
         session = Trainses(path, file)
         session = ManualLapAnalyzer(session.laps)
-        print(session.return_startuprunoutlaps())
+        # print(session.return_startuprunoutlaps())
         # laps = session.return_lapswithoutsu()
-        result = session.identify_interval()
+        result = session.identify_easyrun()
         print(result)
 
     # xx
@@ -298,7 +336,7 @@ if __name__ == "__main__":
         print(filename)
         session = Trainses(path, filename)
 
-        if True:
+        if False:
             if session.laps != None:
                 # session = LapAnalyzerBasic(session.laps)
                 # session.print_nrlaps()
@@ -306,9 +344,25 @@ if __name__ == "__main__":
                 # print(session.return_startuprunoutlaps())
                 # print(session.return_startuprunoutlaps())
                 # laps = session.return_lapswithoutsu()
-                result = session.identify_interval()
                 print(result)
                 session.compare_hr_sp()
+        if True:
+            if session.laps != None:
+                sessionl = ManualLapAnalyzer(session.laps)
+                result = sessionl.identify_interval()
+                print(result)
+
+                result = sessionl.identify_sprints()
+                print("sprints? " + str(result))
+
+            if session.alaps != None:
+                try:
+                    sessiona = ManualLapAnalyzer(session.alaps)
+                    sessiona = ManualLapAnalyzer(session.alaps)
+                    result = sessiona.identify_easyrun()
+                    print("easyrun?" + str(result))
+                except:
+                    pass
 
             print("_______________________________")
         if False:
