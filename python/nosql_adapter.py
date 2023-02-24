@@ -1,12 +1,13 @@
 import sys
 from pymongo import MongoClient
+from typing import NoReturn, ClassVar
 
 sys.path.append(r"C:\Users\marcr\Polar\Polar\python")
 import polar_json as pj
 
 
 class MongoAdapter:
-    def __init__(self, mongoDB, collection):
+    def __init__(self, mongoDB: str, collection: str):
         self.client = MongoClient(
             host="localhost:27017",
             serverSelectionTimeoutMS=3000,
@@ -19,27 +20,29 @@ class MongoAdapter:
     def getClient(self):
         return self.client
 
+    def showConnections(self):
+        client = self.getClient()
+        print(client)
+
     def getCollection(self):
         db = self.client[self.dbname]
         # db = self.client[dbName]
         return db[self.collection]
 
-    def insertOne(self, dictToInsert):
-        # collection = self.getCollection("polar", "resume")
+    def insertOne(self, dictToInsert: dict) -> NoReturn:
         collection = self.getCollection()
         collection.insert_one(dictToInsert)
 
-    def updateOne(self, objid, dictToUpdate):
+    def updateOne(self, objid: str, dictToUpdate: dict) -> NoReturn:
         collection = self.getCollection()
         collection.update_one({"_id": objid}, {"$set": dictToUpdate})
 
-    def deleteCollection(self):
+    def deleteCollection(self) -> NoReturn:
         # collection = self.getCollection("polar", collectionName)
         collection = self.getCollection()
         collection.drop()
 
-    def showDocs(self):
-        # collection = self.getCollection("polar", collectionName)
+    def showDocs(self) -> NoReturn:
         collection = self.getCollection()
         cursor = collection.find({})
         for doc in cursor:
@@ -51,23 +54,17 @@ class MongoAdapter:
         cursor = collection.find({})
         return cursor
 
-    def showConnections(self):
-        client = self.getClient()
-        print(client)
-
     def simplequery(self, keyn, valn):
-        # collection = self.getCollection("polar", collectionName)
         collection = self.getCollection()
         cursor = collection.find({keyn: valn})
         return cursor
 
     def morecomplexquery(self, query):
-        # {"distance":{"$gt":"7000"}}
         collection = self.getCollection()
-        cursor = collection.find(query)
+        cursor = collection.find(query)  # {"distance":{"$gt":"7000"}}
         return cursor
 
-    def deleteDocument(self, document):
+    def deleteDocument(self, document) -> NoReturn:
         collection = self.getCollection()
         collection.delete_one(document)
 
@@ -77,7 +74,7 @@ class MongoPolar(MongoAdapter):
         super().__init__(mongoDB, collection)
 
     def find_docsrunning(self):
-        curs = self.simplequery("exercises.sport", "RUNNING")
+        curs = self.simplequery("sport", "RUNNING")
         return curs
 
     def put_jsonresume(self, path, fname):
@@ -94,7 +91,7 @@ if __name__ == "__main__":
     # mongad = MongoAdapter("guess_who", "mongo-1")
     mongad = MongoPolar("polartest", "polardb")
     mongad.showConnections()
-    mongad.getCollection()
+    coll = mongad.getCollection()
     docs = mongad.returnDocs()
     ids = docs[0]["_id"]
     print(ids)

@@ -44,7 +44,7 @@ class Trainses:
             self.alaps = None
         data.update({"fname": self.file})
 
-        param = ["speed", "heartrate", "ascent", "decent", "sport"]
+        param = ["speed", "heartrate", "ascent", "descent", "sport"]
         for par in param:
             if par in data:
                 data.update({par: data["exercises"][0][par]})
@@ -70,7 +70,15 @@ class Trainses:
         return self.abstract["sport"]
 
 
-class LapAnalyzerBasic:
+class Trainses_mongo(Trainses):
+    def __init__(self, datadb):
+        self.laps = datadb.pop("laps")
+        self.alaps = datadb.pop("autolaps")
+        self.abstract = datadb
+        self.data = True
+
+
+class RLapAnalyzerBasic:
     """
     basic class for automatic and manual laps
     """
@@ -109,11 +117,9 @@ class LapAnalyzerBasic:
             speed = self.laps["speed"]
             avgspeed = [sp["avg"] for sp in speed]
             avgheartr = [hr["avg"] for hr in heartr]
-
-            print(np.corrcoef(avgspeed, avgheartr)[0, 1])
+            return np.corrcoef(avgspeed, avgheartr)[0, 1]
 
     def identify_easyrun(self, max_speed=14.0):
-
         # laps = self.return_lapswithoutsu()
 
         speed = np.array([sp["avg"] for sp in self.laps["speed"]])
@@ -126,9 +132,9 @@ class LapAnalyzerBasic:
         # for la in laps:
 
 
-class ManualLapAnalyzer(LapAnalyzerBasic):
+class RManualLapAnalyzer(RLapAnalyzerBasic):
     def __init__(self, laps):
-        super(ManualLapAnalyzer, self).__init__(laps)
+        super(RManualLapAnalyzer, self).__init__(laps)
 
     def return_startuprunoutlaps(self):
         su_speed = 13.5
@@ -162,7 +168,7 @@ class ManualLapAnalyzer(LapAnalyzerBasic):
         return laps
 
     def identify_interval(self):
-        dspeed_int = 2.5
+        dspeed_int = 3
 
         laps = self.return_lapswithoutsu()
 
@@ -174,14 +180,21 @@ class ManualLapAnalyzer(LapAnalyzerBasic):
             dspeed[(dspeed < dspeed_int) & (dspeed > -dspeed_int)] = 0
             dspeed[dspeed > dspeed_int] = 1
             dspeed[dspeed < -dspeed_int] = -1
-            deriv = dspeed[1:] + dspeed[0:-1]
-            if sum(deriv) == 0:
-                result = "interval"
+            if np.count_nonzero(dspeed == 0) / len(dspeed) > 0.25:
+                result = "no interval, under investigation, crit 1"
             else:
-                if len(speed) > 7 and len(dspeed[dspeed == -1]) / len(dspeed) > 1 / 3:
-                    result = "interval, check"
+                deriv = dspeed[1:] + dspeed[0:-1]
+                if sum(deriv) == 0:
+                    # print(deriv)
+                    result = "interval"
                 else:
-                    result = "no interval, under investigation"
+                    if (
+                        len(speed) > 7
+                        and len(dspeed[dspeed == -1]) / len(dspeed) > 1 / 3
+                    ):
+                        result = "interval, check"
+                    else:
+                        result = "no interval, under investigation, crit 2"
         return result
 
     def identify_sprints(self, max_time=20.0, min_cadence=98):
@@ -306,19 +319,21 @@ class SamAnalExtra(SampleAnalyzerBasic):
 
 
 if __name__ == "__main__":
-    # xx
     path = r"C:\Users\marcr\Polar\Polar\data\polar-user-data-export"
     import glob
 
-    if False:
-        file = "training-session-2015-01-07-263888486-2d791dc2-1ee2-4964-bb44-558579c19c6f.json"
+    # xx
+    if True:
+        file = "training-session-2015-04-01-263883170-2a29bb10-c783-4fa8-953a-f571e53512be.json"
 
         session = Trainses(path, file)
-        session = ManualLapAnalyzer(session.laps)
+        session = RManualLapAnalyzer(session.laps)
         # print(session.return_startuprunoutlaps())
         # laps = session.return_lapswithoutsu()
         result = session.identify_easyrun()
+        result = session.identify_interval()
         print(result)
+        xx
 
     # xx
     if False:
@@ -338,9 +353,9 @@ if __name__ == "__main__":
 
         if False:
             if session.laps != None:
-                # session = LapAnalyzerBasic(session.laps)
+                # session = RLapAnalyzerBasic(session.laps)
                 # session.print_nrlaps()
-                session = ManualLapAnalyzer(session.laps)
+                session = RManualLapAnalyzer(session.laps)
                 # print(session.return_startuprunoutlaps())
                 # print(session.return_startuprunoutlaps())
                 # laps = session.return_lapswithoutsu()
@@ -348,7 +363,7 @@ if __name__ == "__main__":
                 session.compare_hr_sp()
         if True:
             if session.laps != None:
-                sessionl = ManualLapAnalyzer(session.laps)
+                sessionl = RManualLapAnalyzer(session.laps)
                 result = sessionl.identify_interval()
                 print(result)
 
@@ -357,8 +372,8 @@ if __name__ == "__main__":
 
             if session.alaps != None:
                 try:
-                    sessiona = ManualLapAnalyzer(session.alaps)
-                    sessiona = ManualLapAnalyzer(session.alaps)
+                    sessiona = RManualLapAnalyzer(session.alaps)
+                    sessiona = RManualLapAnalyzer(session.alaps)
                     result = sessiona.identify_easyrun()
                     print("easyrun?" + str(result))
                 except:
