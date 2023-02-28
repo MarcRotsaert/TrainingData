@@ -89,7 +89,7 @@ class MongoPolar(MongoAdapter):
 
 if __name__ == "__main__":
     # mongad = MongoAdapter("guess_who", "mongo-1")
-    mongad = MongoPolar("polartest", "polardb")
+    mongad = MongoPolar("polartest3", "polardb")
     mongad.showConnections()
     coll = mongad.getCollection()
     docs = mongad.returnDocs()
@@ -125,13 +125,17 @@ if __name__ == "__main__":
     print("____________________________________")
 
     # curs = mongad.simplequery("exportVersion", "1.6")
-    curs = mongad.morecomplexquery({"latitude": {"$gt": 0}})
-    curs = mongad.morecomplexquery({"physicalInformationSnapshot.sex": "MALE"})
+    # curs = mongad.morecomplexquery({"latitude": {"$gt": 0}})
+    # curs = mongad.morecomplexquery({"physicalInformationSnapshot.sex": "MALE"})
     # curs = mongad.morecomplexquery({"exercises[0].distance": 8960.0})
-    curs = mongad.morecomplexquery({"exercises.speed.avg": {"$gt": 14}})
+    # curs = mongad.morecomplexquery({"exercises.speed.avg": {"$gt": 14}})
+    # curs = mongad.morecomplexquery(
+    #     {"exercises.speed.avg": {"$gt": 14}, "exercises.heartRate.avg": {"$gt": 140}}
+    # )
     curs = mongad.morecomplexquery(
-        {"exercises.speed.avg": {"$gt": 14}, "exercises.heartRate.avg": {"$gt": 140}}
+        {"trainingtype.interval": "interval, check", "trainingtype.easyrun": True}
     )
+    curs = mongad.simplequery("trainingtype.interval", "interval, check")
     # print(dir(curs))
     for c in curs:
-        print(c["exercises"][0]["heartRate"]["avg"])
+        print(c["fname"])

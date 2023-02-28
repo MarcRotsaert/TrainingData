@@ -46,8 +46,12 @@ class Trainses:
 
         param = ["speed", "heartrate", "ascent", "descent", "sport"]
         for par in param:
-            if par in data:
+            # if par in data:
+            if par in data["exercises"][0]:
                 data.update({par: data["exercises"][0][par]})
+
+                # if par == "sport":
+                #    xx
 
         data.pop("exercises")
         self.abstract = data
@@ -94,6 +98,7 @@ class RLapAnalyzerBasic:
             "descent",
         ]
         self.laps = self._reshapelaps(laps)
+        self.paces = {"maxeasy": 14, "minroadrace": 15.3, "maxruninout": 13.5}
 
     def _reshapelaps(self, laps):
         result = {}
@@ -102,8 +107,25 @@ class RLapAnalyzerBasic:
                 temp = {par: [la[par] for la in laps]}
             except KeyError:
                 temp = {par: None}
+            except TypeError:
+                continue
             result.update(temp)
         return result
+
+    def return_paraslist(self, par, *arg):
+        temp = self.laps[par]
+        values = []
+        if len(arg) == 0:
+            values = [la for la in temp]
+        else:
+            for la in temp:
+                try:
+                    values.append(la[arg[0]])
+                except KeyError:
+                    values.append(-999)
+            # values = [la[arg[0]] for la in temp]
+
+        return values
 
     def print_nrlaps(self):
         print(len(self.laps["speed"]))
@@ -113,15 +135,58 @@ class RLapAnalyzerBasic:
             print("no heartrate or speed")
             # return
         else:
-            heartr = self.laps["heartRate"]
-            speed = self.laps["speed"]
-            avgspeed = [sp["avg"] for sp in speed]
-            avgheartr = [hr["avg"] for hr in heartr]
+            avgheartr = self.return_paraslist("heartRate", "avg")
+            avgspeed = self.return_paraslist("speed", "avg")
+            # heartr = self.laps["heartRate"]
+            # speed = self.laps["speed"]
+            # avgspeed = [sp["avg"] for sp in speed]
+            # avgheartr = [hr["avg"] for hr in heartr]
+            # xx
             return np.corrcoef(avgspeed, avgheartr)[0, 1]
 
-    def identify_easyrun(self, max_speed=14.0):
-        # laps = self.return_lapswithoutsu()
+    def return_speedvariability(self, ignorelaps=[]):
+        speed = np.array(self.return_paraslist("speed"))
+        speed = np.delete(speed, ignorelaps)
+        stdspeed = np.std(speed)
+        maxspeed = np.max(speed)
+        minspeed = np.max(speed)
+        return stdv, maxspeed, minspeed
 
+    def return_heartratevariability(self, ignorelaps=[]):
+        hrt = np.array(self.return_paraslist("heartRate"))
+        hrt = np.delete(hrt, ignorelaps)
+        stdv = np.std(hrt)
+        maxhrt = np.max(hrt)
+        minhrt = np.max(hrt)
+        return stdhrt, maxhrt, minhrt
+
+    def identify_roadrace(self, ignorelaps=[], min_speed=None):
+        # self.print_nrlaps()
+        if min_speed == None:
+            min_speed = self.paces["minroadrace"]
+        speedarr = np.array(self.return_paraslist("speed", "avg"))
+        speedarr = np.delete(speedarr, ignorelaps)
+        if len(speedarr) == 0:
+            result = False
+        else:
+            print(speedarr)
+            if all(speedarr > min_speed):
+                all(speedarr)
+                result = True
+            else:
+                result = False
+        # else:
+        # params = self.return_speedvariability()
+        # if all(np.array(self.return_paraslist('speed'))>min_speed)
+        #     if std
+        return result
+
+    def identify_easyrun(self, max_speed=None):
+
+        if max_speed == None:
+            max_speed = self.paces["maxeasy"]
+
+        # laps = self.return_lapswithoutsu()
         speed = np.array([sp["avg"] for sp in self.laps["speed"]])
         if any(speed > max_speed):
             result = False
@@ -132,20 +197,38 @@ class RLapAnalyzerBasic:
         # for la in laps:
 
 
+class RAutoLapAnalyzer(RLapAnalyzerBasic):
+    def __init__(self, alaps):
+        super(RAutoLapAnalyzer, self).__init__(alaps)
+
+
 class RManualLapAnalyzer(RLapAnalyzerBasic):
     def __init__(self, laps):
         super(RManualLapAnalyzer, self).__init__(laps)
 
-    def return_startuprunoutlaps(self):
-        su_speed = 13.5
+    def return_startuprunoutlaps(self, su_speed=None):
+        if su_speed == None:
+            su_speed = self.paces["maxruninout"]
+        # su_speed = 13.5
         idx_su = []
         i1 = 0
-        while (
-            self.laps["speed"][i1]["avg"] < su_speed
-            and i1 < len(self.laps["speed"]) - 1
-        ):
-            idx_su.append(i1)
-            i1 += 1
+        # code hieronder kan niet omgaan met een lege dictionaryin laps["speed"]
+        for speed in self.laps["speed"]:
+
+            # [i1]["avg"] < su_speed
+            # and i1 < len(self.laps["speed"]) - 1
+            # ):
+            if len(speed) == 0:
+                idx_su.append(i1)
+                i1 += 1
+                continue
+            else:
+                if speed["avg"] > su_speed:
+                    break
+                else:
+                    idx_su.append(i1)
+                    i1 += 1
+
         idx_ro = []
         i2 = len(self.laps["speed"]) - 1
         while self.laps["speed"][i2]["avg"] < su_speed and i2 > i1:
@@ -322,17 +405,29 @@ if __name__ == "__main__":
     path = r"C:\Users\marcr\Polar\Polar\data\polar-user-data-export"
     import glob
 
-    # xx
     if True:
-        file = "training-session-2015-04-01-263883170-2a29bb10-c783-4fa8-953a-f571e53512be.json"
+        file = "training-session-2015-04-18-263883440-3be46e75-6a93-4746-a320-96c9660f809c.json"
+        session = Trainses(path, file)
+        # alaps = session.return_alaps()
+        lapses = RAutoLapAnalyzer(session.alaps)
+        result = lapses.identify_roadrace()
+        xx
+    if True:
+        file = "training-session-2015-04-18-263883440-3be46e75-6a93-4746-a320-96c9660f809c.json"
 
         session = Trainses(path, file)
-        session = RManualLapAnalyzer(session.laps)
+        laps = session.return_laps()
+        lapses = RManualLapAnalyzer(session.laps)
+        xx
         # print(session.return_startuprunoutlaps())
         # laps = session.return_lapswithoutsu()
-        result = session.identify_easyrun()
-        result = session.identify_interval()
-        print(result)
+        # result = session.identify_easyrun()
+        # result = session.identify_interval()
+
+        # su_laps = lapses.return_startuprunoutlaps()
+        # ignorelaps = su_laps[0] + su_laps[1]
+        # result = lapses.identify_roadrace(ignorelaps)
+        # print(result)
         xx
 
     # xx

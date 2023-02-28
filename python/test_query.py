@@ -6,6 +6,6 @@ curs = mong.morecomplexquery(
 )
 x = 0
 for c in curs:
-    print(c)
+    print(c["fname"])
     x += 1
 print(x)

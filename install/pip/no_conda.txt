@@ -19,3 +19,6 @@ geopandas
 django
 schedule
 Flask
+pyexcel
+pyexcel-xlsx
+pyexcel-xls
