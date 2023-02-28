@@ -7,11 +7,11 @@ import polar_json as pj
 import time
 from matplotlib import pyplot as pp
 
-mongad = MongoPolar("polartest3", "polardb")
 path = r"C:\Users\marcr\Polar\Polar\data\polar-user-data-export"
 files = glob.glob(os.path.join(path, "training-session-2015-*.json"))
-pointcoll = []
 
+mongad = MongoPolar("polartest3", "polardb")
+pointcoll = []
 # items = mongad.returnDocs()
 if False:
     items2 = mongad.simplequery("kiloCalories", 0)
@@ -36,9 +36,15 @@ if False:
             time.sleep(1)
             pp.close()
 
+if True:
+    items2 = mongad.getbyField("interval")
+    for it in items2:
+        print(it)
+    xx
 
 if True:
-    items2 = mongad.simplequery("interval", "interval")
+    items2 = mongad.morecomplexquery({"trainingtype.interval": "interval"})
+    items2 = mongad.morecomplexquery({"trainingtype.interval": "interval"})
 
     for it in items2:
         fname = it["fname"]
@@ -49,10 +55,10 @@ if True:
         Samp.plot("speed")
         time.sleep(1)
         pp.close()
-        if ("hr_reliability" in it) and (it["hr_reliability"] == "good"):
-            Samp.plot("heartRate")
-            time.sleep(1)
-            pp.close()
+        # if ("hr_reliability" in it) and (it["hr_reliability"] == "good"):
+        #     Samp.plot("heartRate")
+        #     time.sleep(1)
+        #     pp.close()
 
 if False:
     items2 = mongad.simplequery("interval", "interval")
@@ -65,8 +71,3 @@ if False:
         if laps != None:
             for la in laps:
                 print(la)
-
-# mongad.morecomplexquery()
-
-# for it in items:
-#    print(it["location"])

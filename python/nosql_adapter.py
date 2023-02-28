@@ -37,6 +37,13 @@ class MongoAdapter:
         collection = self.getCollection()
         collection.update_one({"_id": objid}, {"$set": dictToUpdate})
 
+    def deleteField(self, objid: str, fieldToDelete: str) -> NoReturn:
+        collection = self.getCollection()
+        temp = collection.update_one({"_id": objid}, {"$unset": {fieldToDelete: ""}})
+        print(temp.raw_result)
+        # xx
+        # collection.update({"_id": objid}, {"$pull": null})
+
     def deleteCollection(self) -> NoReturn:
         # collection = self.getCollection("polar", collectionName)
         collection = self.getCollection()
@@ -64,6 +71,11 @@ class MongoAdapter:
         cursor = collection.find(query)  # {"distance":{"$gt":"7000"}}
         return cursor
 
+    def getbyField(self, fieldname: str) -> list:
+        collection = self.getCollection()
+        items = collection.find({fieldname: {"$exists": True}})
+        return items
+
     def deleteDocument(self, document) -> NoReturn:
         collection = self.getCollection()
         collection.delete_one(document)
@@ -77,7 +89,7 @@ class MongoPolar(MongoAdapter):
         curs = self.simplequery("sport", "RUNNING")
         return curs
 
-    def put_jsonresume(self, path, fname):
+    def put_jsonresume(self, path: str, fname: str) -> NoReturn:
         sess = pj.Trainses(path, fname)
         resume = sess.abstract
         SamAnal = pj.SampleAnalyzerBasic(sess.samples)
@@ -90,13 +102,33 @@ class MongoPolar(MongoAdapter):
 if __name__ == "__main__":
     # mongad = MongoAdapter("guess_who", "mongo-1")
     mongad = MongoPolar("polartest3", "polardb")
-    mongad.showConnections()
-    coll = mongad.getCollection()
-    docs = mongad.returnDocs()
-    ids = docs[0]["_id"]
-    print(ids)
-    # mongad.showDocs()
-    # mongad.updateOne(ids, {"exercises.distance": 10000})
+    if False:
+        mongad.showConnections()
+        coll = mongad.getCollection()
+        docs = mongad.returnDocs()
+        ids = docs[0]["_id"]
+        print(ids)
+        # mongad.showDocs()
+
+    if True:
+        docs = mongad.find_docsrunning()
+        for it in docs:
+            print(it["fname"])
+
+    if False:
+        # remove fields
+        items1 = mongad.getbyField("hr_reliability")
+        for it in items1:
+            mongad.deleteField(it["_id"], "hr_reliability")
+
+        items2 = mongad.getbyField("hr_reliability")
+        i = 0
+        for it in items2:
+            i += 1
+        print(i)
+        xx
+        # mongad.updateOne(ids, {"exercises.distance": 10000})
+
     if False:
         mongad.updateOne(ids, {"exportVersion": "69.0"})
         mongad.updateOne(ids, {"trainingtype": "blasting"})
@@ -123,19 +155,19 @@ if __name__ == "__main__":
     # mongad.insertOne({"ja": [1]})
 
     print("____________________________________")
-
-    # curs = mongad.simplequery("exportVersion", "1.6")
-    # curs = mongad.morecomplexquery({"latitude": {"$gt": 0}})
-    # curs = mongad.morecomplexquery({"physicalInformationSnapshot.sex": "MALE"})
-    # curs = mongad.morecomplexquery({"exercises[0].distance": 8960.0})
-    # curs = mongad.morecomplexquery({"exercises.speed.avg": {"$gt": 14}})
-    # curs = mongad.morecomplexquery(
-    #     {"exercises.speed.avg": {"$gt": 14}, "exercises.heartRate.avg": {"$gt": 140}}
-    # )
-    curs = mongad.morecomplexquery(
-        {"trainingtype.interval": "interval, check", "trainingtype.easyrun": True}
-    )
-    curs = mongad.simplequery("trainingtype.interval", "interval, check")
-    # print(dir(curs))
-    for c in curs:
-        print(c["fname"])
+    if False:
+        # curs = mongad.simplequery("exportVersion", "1.6")
+        # curs = mongad.morecomplexquery({"latitude": {"$gt": 0}})
+        # curs = mongad.morecomplexquery({"physicalInformationSnapshot.sex": "MALE"})
+        # curs = mongad.morecomplexquery({"exercises[0].distance": 8960.0})
+        # curs = mongad.morecomplexquery({"exercises.speed.avg": {"$gt": 14}})
+        # curs = mongad.morecomplexquery(
+        #     {"exercises.speed.avg": {"$gt": 14}, "exercises.heartRate.avg": {"$gt": 140}}
+        # )
+        curs = mongad.morecomplexquery(
+            {"trainingtype.interval": "interval, check", "trainingtype.easyrun": True}
+        )
+        curs = mongad.simplequery("trainingtype.interval", "interval, check")
+        # print(dir(curs))
+        for c in curs:
+            print(c["fname"])
