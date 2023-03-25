@@ -52,6 +52,7 @@ result = mongad.morecomplexquery(
         ]
     }
 )
+
 for res in result:
     session = pj.Trainses_mongo(res)
     # print(res)
@@ -63,8 +64,8 @@ for res in result:
     laps = session.return_laps()
     if laps != None:
         lapses = pj.RManualLapAnalyzer(laps)
-        su = lapses.return_startuprunoutlaps()
-        result = lapses.return_accelartion(ignorelaps=su[0] + su[1])
+        su = lapses.determine_startuprunoutlaps()
+        result = lapses.determine_accelartion(ignorelaps=su[0] + su[1])
         # result = lapses.return_accelartion()
         print(result)
         print(sum(result))

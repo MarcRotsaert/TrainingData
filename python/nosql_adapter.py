@@ -97,11 +97,11 @@ class MongoPolar(MongoAdapter):
         # initiate collection
         super().__init__(mongoDB, collection)
 
-    def print_resumeclass(self):
+    def print_resumeattributes(self):
         # print content resume.
         print(Base_nosql.resume)
 
-    def find_docsrunning(self):
+    def return_docsrunning(self):
         curs = self.simplequery("sport", "RUNNING")
         return curs
 

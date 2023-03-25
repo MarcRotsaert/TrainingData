@@ -6,6 +6,8 @@ from typing import Iterable, Union
 import geopandas as gpd
 import shapely as shp
 import numpy as np
+from polar_base import Base_polar_json
+
 from matplotlib import pyplot as pp
 
 # import seaborn
@@ -48,12 +50,8 @@ class Trainses:
 
         param = ["speed", "heartrate", "ascent", "descent", "sport"]
         for par in param:
-            # if par in data:
             if par in data["exercises"][0]:
                 data.update({par: data["exercises"][0][par]})
-
-                # if par == "sport":
-                #    xx
 
         data.pop("exercises")
         self.abstract = data
@@ -86,26 +84,13 @@ class Trainses_mongo(Trainses):
 
 class RLapAnalyzerBasic:
     """
-    basic class for automatic and manual laps
+    basic class for analyzing manual/automatic laps
     """
 
     def __init__(self, laps: dict):
-        self.param = [
-            "distance",
-            "duration",
-            "cadence",
-            "heartRate",
-            "speed",
-            "ascent",
-            "descent",
-        ]
+        self.param = Base_polar_json.classattr["lap_param"]
+        self.paces = Base_polar_json.classattr["lap_paces"]
         self.laps = self._reshapelaps(laps)
-        self.paces = {
-            "maxeasy": 14,
-            "minroadrace": 15.3,
-            "maxruninout": 13.2,
-            "dspeedinterval": 3,
-        }
 
     def _reshapelaps(self, laps):
         result = {}
@@ -151,7 +136,7 @@ class RLapAnalyzerBasic:
             # xx
             return np.corrcoef(avgspeed, avgheartr)[0, 1]
 
-    def return_speedvariability(self, ignorelaps=[]):
+    def determine_speedvariability(self, ignorelaps=[]):
         speed = np.array(self.return_paraslist("speed", "avg"))
         speed = np.delete(speed, ignorelaps)
         stdspeed = np.std(speed)
@@ -159,7 +144,7 @@ class RLapAnalyzerBasic:
         minspeed = np.max(speed)
         return stdspeed, maxspeed, minspeed
 
-    def return_accelaration(self, ignorelaps=[]):  # , mindspeed=0.400):
+    def determine_accelaration(self, ignorelaps=[]):  # , mindspeed=0.400):
         speed = np.array(self.return_paraslist("speed", "avg"))
         speed = np.delete(speed, ignorelaps)
         dspeed = speed[1:] - speed[0:-1]
@@ -168,7 +153,7 @@ class RLapAnalyzerBasic:
         # dspeed[dspeed < -mindspeed] = -1
         return dspeed
 
-    def return_heartratevariability(self, ignorelaps=[]):
+    def determine_heartratevariability(self, ignorelaps=[]):
         hrt = np.array(self.return_paraslist("heartRate"))
         hrt = np.delete(hrt, ignorelaps)
         stdv = np.std(hrt)
@@ -228,11 +213,15 @@ class RManualLapAnalyzer(RLapAnalyzerBasic):
     def return_duration(duration):
         return self.laps["duration"]
 
-    def return_startuprunoutlaps(self, su_speed=None):
+    def determine_startuprunoutlaps(self, su_speed=None):
         if su_speed == None:
             su_speed = self.paces["maxruninout"]
         idx_su = []
         i1 = 0
+
+        if not self.laps["speed"]:
+            # empty self.laps
+            return None
         # code hieronder kan niet omgaan met een lege dictionaryin laps["speed"]
         for speed in self.laps["speed"]:
 
@@ -257,8 +246,10 @@ class RManualLapAnalyzer(RLapAnalyzerBasic):
             i2 -= 1
         return idx_su, idx_ro
 
-    def return_lapswithoutsu(self):
-        su = self.return_startuprunoutlaps()
+    def determine_lapswithoutsu(self):
+        su = self.determine_startuprunoutlaps()
+        if not su:
+            return None
         su = su[0] + su[1]
         su.sort()
         su.reverse()
@@ -273,8 +264,9 @@ class RManualLapAnalyzer(RLapAnalyzerBasic):
 
     def identify_interval(self):
         dspeed_int = self.paces["dspeedinterval"]
-
-        laps = self.return_lapswithoutsu()
+        laps = self.determine_lapswithoutsu()
+        if not laps:
+            return None
 
         speed = np.array([sp["avg"] for sp in laps["speed"]])
         sprint = self.identify_sprints()
@@ -331,6 +323,7 @@ class RManualLapAnalyzer(RLapAnalyzerBasic):
 class SampleAnalyzerBasic:
     def __init__(self, samples: dict):
         self.samples = samples
+        self.locations = Base_polar_json.classattr["sample_loc"]
 
     def return_samples(self):
         # self._returninit()
@@ -339,11 +332,38 @@ class SampleAnalyzerBasic:
     def return_s_heartrate(self):
         return self.samples["heartRate"]
 
-    def return_s_routecentre(self):
+    def determine_s_routecentre(self):
         rpointsrd = self.return_s_pointsel()
         rpolyrd = shp.Polygon([[p.x, p.y] for p in rpointsrd])
         # rpolyrd = rpoly.to_crs("EPSG:28992")
         return rpolyrd.centroid
+
+    def determine_s_location(self):
+        deflocs = {
+            "de velden": [[85575, 440076], 100],
+            "baanbras": [[85085, 449400], 100],
+            "kopjesloop": [[85055, 448570], 50],
+            "schiehaven": [[90775, 435330], 600],
+            "wippolder": [[86255, 446810], 150],
+            "bergenopzoom": [[81385, 389191], 400],
+            "menmoerhoeve": [[104258, 394390], 200],
+            "sola": [[395744, -72146], 15000],
+            "meijendel": [[82905, 460500], 300],
+        }
+        if self.return_s_route() == None:
+            location = None
+        else:
+            location = None
+            pnts = self.return_s_pointsel([5, -5])
+
+            for loc in deflocs:
+                pointloc = shp.Point(deflocs[loc][0][0], deflocs[loc][0][1])
+                diststart = pointloc.distance(pnts[0])
+                distend = pointloc.distance(pnts[-1])
+                maxdist = deflocs[loc][1]
+                if diststart < maxdist or distend < maxdist:
+                    location = loc
+        return location
 
     def return_s_route(self):
         # self._returninit()
@@ -376,33 +396,6 @@ class SampleAnalyzerBasic:
         points = gpd.points_from_xy(rlon, rlat, crs="EPSG:4326")
         pointsrd = points.to_crs("EPSG:28992")
         return pointsrd
-
-    def return_s_location(self):
-        deflocs = {
-            "de velden": [[85575, 440076], 100],
-            "baanbras": [[85085, 449400], 100],
-            "kopjesloop": [[85055, 448570], 50],
-            "schiehaven": [[90775, 435330], 600],
-            "wippolder": [[86255, 446810], 150],
-            "bergenopzoom": [[81385, 389191], 400],
-            "menmoerhoeve": [[104258, 394390], 200],
-            "sola": [[395744, -72146], 15000],
-            "meijendel": [[82905, 460500], 300],
-        }
-        if self.return_s_route() == None:
-            location = None
-        else:
-            location = None
-            pnts = self.return_s_pointsel([5, -5])
-
-            for loc in deflocs:
-                pointloc = shp.Point(deflocs[loc][0][0], deflocs[loc][0][1])
-                diststart = pointloc.distance(pnts[0])
-                distend = pointloc.distance(pnts[-1])
-                maxdist = deflocs[loc][1]
-                if diststart < maxdist or distend < maxdist:
-                    location = loc
-        return location
 
     def plot(self, param):
         fig = pp.figure()
@@ -461,11 +454,11 @@ if __name__ == "__main__":
         session = Trainses(path, file)
         laps = session.return_laps()
         lapses = RManualLapAnalyzer(laps)
-        result = lapses.return_startuprunoutlaps()
+        result = lapses.determine_startuprunoutlaps()
         print(lapses.identify_interval())
         samses = SamAnalExtra(session.samples)
         samses.plot("speed")
-        xx
+        # xx
 
     if True:
         file = "training-session-2015-01-14-263888618-3d72bde3-4957-4db4-8fa6-662a180a2d23.json"
@@ -473,14 +466,14 @@ if __name__ == "__main__":
         # alaps = session.return_alaps()
         lapses = RAutoLapAnalyzer(session.alaps)
         result = lapses.identify_roadrace()
-        xx
+        # xx
     if True:
         file = "training-session-2015-04-18-263883440-3be46e75-6a93-4746-a320-96c9660f809c.json"
 
         session = Trainses(path, file)
         laps = session.return_laps()
         lapses = RManualLapAnalyzer(session.laps)
-        xx
+        # xx
         # print(session.return_startuprunoutlaps())
         # laps = session.return_lapswithoutsu()
         # result = session.identify_easyrun()
@@ -490,7 +483,7 @@ if __name__ == "__main__":
         # ignorelaps = su_laps[0] + su_laps[1]
         # result = lapses.identify_roadrace(ignorelaps)
         # print(result)
-        xx
+        # xx
 
     # xx
     if False:
