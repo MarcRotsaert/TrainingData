@@ -1,9 +1,82 @@
 import polar_json as pj
 import nosql_adapter as mongodb
+import time
 
+path = r"C:\temp\polartest\polar-user-data-export"
 mongad = mongodb.MongoPolar("polartest3", "polardb")
-result = mongad.morecomplexquery({"location": "baanbras"})
+# result = mongad.morecomplexquery({"location": "baanbras"})
 
+
+# for res in result:
+#     session = pj.Trainses_mongo(res)
+#     # print(res)
+#     if "trainingtype" in session.abstract:
+#         print(session.abstract["trainingtype"])
+#     else:
+#         print("no type")
+#     continue
+
+# xx
+if False:
+    result = mongad.morecomplexquery({"trainingtype": {"$exists": False}})
+    for res in result:
+        session = pj.Trainses_mongo(res)
+        # print(res)
+        if "trainingtype" in session.abstract:
+            print(session.abstract["trainingtype"])
+        else:
+            print("no type")
+        # continue
+        laps = session.return_laps()
+        if laps != None:
+            lapses = pj.RManualLapAnalyzer(laps)
+            su = lapses.return_startuprunoutlaps()
+            result = lapses.return_accelartion(ignorelaps=su[0] + su[1])
+            print(result)
+            print(sum(result))
+            fname = session.abstract["fname"]
+            ses = pj.Trainses(path, fname)
+            samses = pj.SamAnalExtra(ses.samples)
+            samses.plot("speed")
+            time.sleep(1)
+
+
+result = mongad.morecomplexquery(
+    {
+        "$and": [
+            {"trainingtype.interval": {"$ne": "interval"}},
+            {"trainingtype.interval": {"$ne": "interval, check"}},
+            {"trainingtype.interval": {"$ne": "interval, check2"}},
+            {"trainingtype.easyrun": {"$ne": True}},
+            {"trainingtype.sprint": {"$ne": True}},
+        ]
+    }
+)
+for res in result:
+    session = pj.Trainses_mongo(res)
+    # print(res)
+    if "trainingtype" in session.abstract:
+        print(session.abstract["trainingtype"])
+    else:
+        print("no type")
+    # continue
+    laps = session.return_laps()
+    if laps != None:
+        lapses = pj.RManualLapAnalyzer(laps)
+        su = lapses.return_startuprunoutlaps()
+        result = lapses.return_accelartion(ignorelaps=su[0] + su[1])
+        # result = lapses.return_accelartion()
+        print(result)
+        print(sum(result))
+        fname = session.abstract["fname"]
+        print(fname)
+        ses = pj.Trainses(path, fname)
+        samses = pj.SamAnalExtra(ses.samples)
+        samses.plot("speed")
+        time.sleep(1)
+
+
+xx
 # for res in result:
 #     session = pj.Trainses_mongo(res)
 #     laps = session.return_laps()

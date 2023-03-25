@@ -1,12 +1,18 @@
+"""
+Skin over mongodb nosql database.
+"""
+
 import sys
 from pymongo import MongoClient
 from typing import NoReturn, ClassVar
 
 sys.path.append(r"C:\Users\marcr\Polar\Polar\python")
 import polar_json as pj
+from polar_base import Base_nosql
 
 
 class MongoAdapter:
+    # Baseclass Mongo
     def __init__(self, mongoDB: str, collection: str):
         self.client = MongoClient(
             host="localhost:27017",
@@ -82,14 +88,26 @@ class MongoAdapter:
 
 
 class MongoPolar(MongoAdapter):
+    """
+    Mongo-extension for Polar.
+    Data for
+    """
+
     def __init__(self, mongoDB, collection):
+        # initiate collection
         super().__init__(mongoDB, collection)
+
+    def print_resumeclass(self):
+        # print content resume.
+        print(Base_nosql.resume)
 
     def find_docsrunning(self):
         curs = self.simplequery("sport", "RUNNING")
         return curs
 
     def put_jsonresume(self, path: str, fname: str) -> NoReturn:
+
+        # Add JSON-file to a collection
         sess = pj.Trainses(path, fname)
         resume = sess.abstract
         SamAnal = pj.SampleAnalyzerBasic(sess.samples)

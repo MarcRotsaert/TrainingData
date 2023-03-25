@@ -1,3 +1,5 @@
+# Processing data
+
 import os
 import json
 from typing import Iterable, Union
@@ -98,7 +100,12 @@ class RLapAnalyzerBasic:
             "descent",
         ]
         self.laps = self._reshapelaps(laps)
-        self.paces = {"maxeasy": 14, "minroadrace": 15.3, "maxruninout": 13.5}
+        self.paces = {
+            "maxeasy": 14,
+            "minroadrace": 15.3,
+            "maxruninout": 13.2,
+            "dspeedinterval": 3,
+        }
 
     def _reshapelaps(self, laps):
         result = {}
@@ -145,12 +152,21 @@ class RLapAnalyzerBasic:
             return np.corrcoef(avgspeed, avgheartr)[0, 1]
 
     def return_speedvariability(self, ignorelaps=[]):
-        speed = np.array(self.return_paraslist("speed"))
+        speed = np.array(self.return_paraslist("speed", "avg"))
         speed = np.delete(speed, ignorelaps)
         stdspeed = np.std(speed)
         maxspeed = np.max(speed)
         minspeed = np.max(speed)
-        return stdv, maxspeed, minspeed
+        return stdspeed, maxspeed, minspeed
+
+    def return_accelaration(self, ignorelaps=[]):  # , mindspeed=0.400):
+        speed = np.array(self.return_paraslist("speed", "avg"))
+        speed = np.delete(speed, ignorelaps)
+        dspeed = speed[1:] - speed[0:-1]
+        # dspeed[(dspeed > -mindspeed) & (dspeed < mindspeed)] = 0
+        # dspeed[dspeed > mindspeed] = 1
+        # dspeed[dspeed < -mindspeed] = -1
+        return dspeed
 
     def return_heartratevariability(self, ignorelaps=[]):
         hrt = np.array(self.return_paraslist("heartRate"))
@@ -206,10 +222,15 @@ class RManualLapAnalyzer(RLapAnalyzerBasic):
     def __init__(self, laps):
         super(RManualLapAnalyzer, self).__init__(laps)
 
+    def return_distance(self):
+        return self.laps["distance"]
+
+    def return_duration(duration):
+        return self.laps["duration"]
+
     def return_startuprunoutlaps(self, su_speed=None):
         if su_speed == None:
             su_speed = self.paces["maxruninout"]
-        # su_speed = 13.5
         idx_su = []
         i1 = 0
         # code hieronder kan niet omgaan met een lege dictionaryin laps["speed"]
@@ -251,20 +272,25 @@ class RManualLapAnalyzer(RLapAnalyzerBasic):
         return laps
 
     def identify_interval(self):
-        dspeed_int = 3
+        dspeed_int = self.paces["dspeedinterval"]
 
         laps = self.return_lapswithoutsu()
 
         speed = np.array([sp["avg"] for sp in laps["speed"]])
+        sprint = self.identify_sprints()
+        easyrun = self.identify_easyrun()
+
         if speed.shape[0] < 5:
             result = "no interval, crit. 1"
+        elif sprint or easyrun:
+            result = "no interval, crit. 2"
         else:
             dspeed = speed[1:] - speed[0:-1]
             dspeed[(dspeed < dspeed_int) & (dspeed > -dspeed_int)] = 0
             dspeed[dspeed > dspeed_int] = 1
             dspeed[dspeed < -dspeed_int] = -1
             if np.count_nonzero(dspeed == 0) / len(dspeed) > 0.25:
-                result = "no interval, under investigation, crit 1"
+                result = "no interval, crit. 3, under investigation."
             else:
                 deriv = dspeed[1:] + dspeed[0:-1]
                 if sum(deriv) == 0:
@@ -272,12 +298,15 @@ class RManualLapAnalyzer(RLapAnalyzerBasic):
                     result = "interval"
                 else:
                     if (
-                        len(speed) > 7
+                        len(speed) > 8
                         and len(dspeed[dspeed == -1]) / len(dspeed) > 1 / 3
                     ):
-                        result = "interval, check"
+                        result = "interval, check1"
+
+                    elif len(speed) == 5 and len(dspeed[dspeed == -1]) == 2:
+                        result = "interval, check2"
                     else:
-                        result = "no interval, under investigation, crit 2"
+                        result = "no interval, crit. 4, under investigation"
         return result
 
     def identify_sprints(self, max_time=20.0, min_cadence=98):
@@ -377,8 +406,13 @@ class SampleAnalyzerBasic:
 
     def plot(self, param):
         fig = pp.figure()
+        # try:
         values = [item["value"] for item in self.samples[param]]
         pp.plot(values)
+        # except:
+        #    xx
+        # pp.ylim(8, 22)
+        pp.grid()
         pp.show()
 
 
@@ -405,8 +439,36 @@ if __name__ == "__main__":
     path = r"C:\Users\marcr\Polar\Polar\data\polar-user-data-export"
     import glob
 
-    if True:
+    if False:
         file = "training-session-2015-04-18-263883440-3be46e75-6a93-4746-a320-96c9660f809c.json"
+        session = Trainses(path, file)
+        # alaps = session.return_alaps()
+        lapses = RAutoLapAnalyzer(session.alaps)
+        result = lapses.return_accelartion()
+        print(result)
+        print(sum(result))
+        xx
+    if True:
+        file = "training-session-2019-10-30-4009640085-5105bf47-b37c-47c3-a96c-d74653ae0d5a.json"
+        # training-session-2015-06-26-263879702-2d485ab0-ef26-4100-b2ae-1ca9c5f144d6.json
+        # training-session-2015-07-03-263876996-e9c14b6c-bc80-4c10-b335-91081c2552e7.json
+        # training-session-2015-09-20-263873564-7f116bac-8756-4f54-a5a0-9272ec0f44ee.json
+        # training-session-2015-09-22
+        # training-session-2015-09-29-263860670-b456e24e-4325-411f-b2c6-3e3a3bc29de6.json
+        # training-session-2015-10-24-263861018-3690058d-71c0-47c3-8539-e7b67e8099fe.json
+
+        # training-session-2015-10-17-263860916-1b563b91-c4f4-4991-878c-5c1225f84b2c.json
+        session = Trainses(path, file)
+        laps = session.return_laps()
+        lapses = RManualLapAnalyzer(laps)
+        result = lapses.return_startuprunoutlaps()
+        print(lapses.identify_interval())
+        samses = SamAnalExtra(session.samples)
+        samses.plot("speed")
+        xx
+
+    if True:
+        file = "training-session-2015-01-14-263888618-3d72bde3-4957-4db4-8fa6-662a180a2d23.json"
         session = Trainses(path, file)
         # alaps = session.return_alaps()
         lapses = RAutoLapAnalyzer(session.alaps)
