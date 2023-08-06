@@ -1,5 +1,5 @@
 """
-Skin over mongodb nosql database.
+Skin over mongodb nosql database voor Polar.
 """
 
 import sys
@@ -106,12 +106,11 @@ class MongoPolar(MongoAdapter):
         return curs
 
     def put_jsonresume(self, path: str, fname: str) -> NoReturn:
-
         # Add JSON-file to a collection
         sess = pj.Trainses(path, fname)
         resume = sess.abstract
         SamAnal = pj.SampleAnalyzerBasic(sess.samples)
-        loc = SamAnal.return_s_location()
+        loc = SamAnal.determine_s_location()
         resume.update({"location": loc, "laps": sess.laps, "autolaps": sess.alaps})
         # resume = sess.return_resume()
         self.insertOne(resume)
@@ -119,21 +118,23 @@ class MongoPolar(MongoAdapter):
 
 if __name__ == "__main__":
     # mongad = MongoAdapter("guess_who", "mongo-1")
-    mongad = MongoPolar("polartest3", "polardb")
+    mongad = MongoPolar("polartest4", "polar2018")
+    mongad.print_resumeattributes()
     if False:
         mongad.showConnections()
         coll = mongad.getCollection()
         docs = mongad.returnDocs()
         ids = docs[0]["_id"]
+        xx
         print(ids)
         # mongad.showDocs()
 
-    if True:
-        docs = mongad.find_docsrunning()
+    if False:
+        docs = mongad.return_docsrunning()
         for it in docs:
             print(it["fname"])
 
-    if False:
+    if True:
         # remove fields
         items1 = mongad.getbyField("hr_reliability")
         for it in items1:
@@ -144,7 +145,7 @@ if __name__ == "__main__":
         for it in items2:
             i += 1
         print(i)
-        xx
+        # xx
         # mongad.updateOne(ids, {"exercises.distance": 10000})
 
     if False:

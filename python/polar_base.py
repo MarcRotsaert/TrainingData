@@ -50,6 +50,8 @@ class Base_nosql:
         "database": "person",
         "collection": "year",
         "session": "training",
+        "field": "",
+        "docs": "",
     }
 
     resume = {

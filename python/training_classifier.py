@@ -8,10 +8,9 @@ import time
 
 class MongoRunningClassifier:
     def __init__(self, dbase, collection):
-
         self.mongo = mongodb.MongoPolar(dbase, collection)
         self.sport = "RUNNING"
-        self.trainingtype Base_training_classifier.trainingtypes
+        self.trainingtypes = Base_training_classifier.trainingtypes
 
     def print_trainingtypes(self):
         print(self.trainingtypes)
@@ -37,7 +36,6 @@ class MongoRunningClassifier:
         traingen = self._generator_training()
         intervaltr = {}
         for training in traingen:
-
             if training.laps != None:
                 lapses = pj.RManualLapAnalyzer(training.laps)
                 if (len(lapses.laps) != 0) & (lapses.laps["speed"] != None):
@@ -45,7 +43,7 @@ class MongoRunningClassifier:
                     print(lapses.laps["speed"])
                     print(len(lapses.laps))
                     # try:
-                    su_laps = lapses.return_startuprunoutlaps()
+                    su_laps = lapses.determine_startuprunoutlaps()
                     ignorelaps = su_laps[0] + su_laps[1]
                     x = lapses.identify_interval()
                     # if x == True:
@@ -76,7 +74,7 @@ class MongoRunningClassifier:
             if training.laps != None:
                 lapses = pj.RManualLapAnalyzer(training.laps)
                 if (len(lapses.laps) != 0) & (lapses.laps["speed"] != None):
-                    su_laps = lapses.return_startuprunoutlaps()
+                    su_laps = lapses.determine_startuprunoutlaps()
                     ignorelaps = su_laps[0] + su_laps[1]
                     x = lapses.identify_roadrace(ignorelaps)
                     if x == True:
