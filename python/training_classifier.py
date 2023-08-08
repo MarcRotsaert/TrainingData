@@ -15,7 +15,7 @@ class MongoRunningClassifier:
     def print_trainingtypes(self):
         print(self.trainingtypes)
 
-    def return_sesion(self, training):
+    def return_session(self, training):
         return pj.Trainses_mongo(training)
 
     def _generator_training(self):

@@ -20,8 +20,8 @@ class MongoAdapter:
             username="student",
             password="miw3",
         )
-        self.dbname = mongoDB
-        self.collection = collection
+        self.dbname: str = mongoDB
+        self.collection: str = collection
 
     def getClient(self):
         return self.client
@@ -30,8 +30,11 @@ class MongoAdapter:
         client = self.getClient()
         print(client)
 
+    def getDatabase(self):
+        return self.client[self.dbname]
+
     def getCollection(self):
-        db = self.client[self.dbname]
+        db = self.getDatabase()
         # db = self.client[dbName]
         return db[self.collection]
 
@@ -67,16 +70,6 @@ class MongoAdapter:
         cursor = collection.find({})
         return cursor
 
-    def simplequery(self, keyn, valn):
-        collection = self.getCollection()
-        cursor = collection.find({keyn: valn})
-        return cursor
-
-    def morecomplexquery(self, query):
-        collection = self.getCollection()
-        cursor = collection.find(query)  # {"distance":{"$gt":"7000"}}
-        return cursor
-
     def getbyField(self, fieldname: str) -> list:
         collection = self.getCollection()
         items = collection.find({fieldname: {"$exists": True}})
@@ -87,7 +80,22 @@ class MongoAdapter:
         collection.delete_one(document)
 
 
-class MongoPolar(MongoAdapter):
+class MongoQuery(MongoAdapter):
+    # def __init__(self, mongoDB, collection):
+    #    super().__init__(mongoDB, collection)
+
+    def simplequery(self, keyn, valn):
+        collection = self.getCollection()
+        cursor = collection.find({keyn: valn})
+        return cursor
+
+    def morecomplexquery(self, query):
+        collection = self.getCollection()
+        cursor = collection.find(query)  # {"distance":{"$gt":"7000"}}
+        return cursor
+
+
+class MongoPolar(MongoQuery):
     """
     Mongo-extension for Polar.
     Data for
@@ -95,6 +103,8 @@ class MongoPolar(MongoAdapter):
 
     def __init__(self, mongoDB, collection):
         # initiate collection
+        # MongoAdapter.__init__(self, mongoDB, collection)
+        # MongoQuery.__init__(self, mongoDB, collection)
         super().__init__(mongoDB, collection)
 
     def print_resumeattributes(self):
@@ -120,16 +130,16 @@ if __name__ == "__main__":
     # mongad = MongoAdapter("guess_who", "mongo-1")
     mongad = MongoPolar("polartest4", "polar2018")
     mongad.print_resumeattributes()
-    if False:
+    if True:
         mongad.showConnections()
         coll = mongad.getCollection()
         docs = mongad.returnDocs()
         ids = docs[0]["_id"]
-        xx
+        # xx
         print(ids)
         # mongad.showDocs()
 
-    if False:
+    if True:
         docs = mongad.return_docsrunning()
         for it in docs:
             print(it["fname"])
@@ -174,7 +184,7 @@ if __name__ == "__main__":
     # mongad.insertOne({"ja": [1]})
 
     print("____________________________________")
-    if False:
+    if True:
         # curs = mongad.simplequery("exportVersion", "1.6")
         # curs = mongad.morecomplexquery({"latitude": {"$gt": 0}})
         # curs = mongad.morecomplexquery({"physicalInformationSnapshot.sex": "MALE"})

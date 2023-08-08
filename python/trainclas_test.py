@@ -3,7 +3,7 @@ import nosql_adapter as mongodb
 import time
 
 path = r"C:\temp\polartest\polar-user-data-export"
-mongad = mongodb.MongoPolar("polartest3", "polardb")
+mongad = mongodb.MongoPolar("polartest4", "polardb")
 # result = mongad.morecomplexquery({"location": "baanbras"})
 
 
@@ -103,7 +103,6 @@ for res in result:
         print(session.abstract["fname"])
         print(session.abstract["location"])
         try:
-
             int_identity = lapses.identify_interval()
             print(int_identity)
             if int_identity == "interval" or int_identity == "interval, check":

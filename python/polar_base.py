@@ -8,8 +8,7 @@ class Trainses:
 
 
 class Base_polar_json(Trainses):
-
-    classattr = {
+    run_classattr = {
         "lap_paces": {
             "maxeasy": 14,
             "minroadrace": 15.3,
