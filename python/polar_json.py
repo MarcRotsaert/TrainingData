@@ -88,8 +88,8 @@ class RLapAnalyzerBasic:
     """
 
     def __init__(self, laps: dict):
-        self.param = Base_polar_json.classattr["lap_param"]
-        self.paces = Base_polar_json.classattr["lap_paces"]
+        self.param = Base_polar_json.run_classattr["lap_param"]
+        self.paces = Base_polar_json.run_classattr["lap_paces"]
         self.laps = self._reshapelaps(laps)
 
     def _reshapelaps(self, laps):
@@ -183,7 +183,6 @@ class RLapAnalyzerBasic:
         return result
 
     def identify_easyrun(self, max_speed=None):
-
         if max_speed == None:
             max_speed = self.paces["maxeasy"]
 
@@ -224,7 +223,6 @@ class RManualLapAnalyzer(RLapAnalyzerBasic):
             return None
         # code hieronder kan niet omgaan met een lege dictionaryin laps["speed"]
         for speed in self.laps["speed"]:
-
             # [i1]["avg"] < su_speed
             # and i1 < len(self.laps["speed"]) - 1
             # ):
@@ -323,7 +321,7 @@ class RManualLapAnalyzer(RLapAnalyzerBasic):
 class SampleAnalyzerBasic:
     def __init__(self, samples: dict):
         self.samples = samples
-        self.locations = Base_polar_json.classattr["sample_loc"]
+        self.locations = Base_polar_json.run_classattr["sample_loc"]
 
     def return_samples(self):
         # self._returninit()

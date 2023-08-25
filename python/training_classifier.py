@@ -1,5 +1,4 @@
-# Setting training data in Mongo DB.
-#
+# Determine training type en set info in Mongo DB.
 import polar_json as pj
 import nosql_adapter as mongodb
 from polar_base import Base_training_classifier
@@ -22,7 +21,7 @@ class MongoRunningClassifier:
         # yield all trainingen, from self.sport
         trainingen = self.mongo.simplequery("sport", self.sport)
         for training in trainingen:
-            yield self.return_sesion(training)
+            yield self.return_session(training)
 
     def set_roadrace(self):
         fnamerr = self._return_roadrace()
@@ -42,8 +41,11 @@ class MongoRunningClassifier:
                     print(training.abstract["fname"])
                     print(lapses.laps["speed"])
                     print(len(lapses.laps))
-                    # try:
-                    su_laps = lapses.determine_startuprunoutlaps()
+                    try:
+                        # TODO solution for empty laps (laps without information)
+                        su_laps = lapses.determine_startuprunoutlaps()
+                    except KeyError:
+                        continue
                     ignorelaps = su_laps[0] + su_laps[1]
                     x = lapses.identify_interval()
                     # if x == True:
@@ -74,7 +76,11 @@ class MongoRunningClassifier:
             if training.laps != None:
                 lapses = pj.RManualLapAnalyzer(training.laps)
                 if (len(lapses.laps) != 0) & (lapses.laps["speed"] != None):
-                    su_laps = lapses.determine_startuprunoutlaps()
+                    try:
+                        # TODO solution for empty laps (laps without information)
+                        su_laps = lapses.determine_startuprunoutlaps()
+                    except KeyError:
+                        continue
                     ignorelaps = su_laps[0] + su_laps[1]
                     x = lapses.identify_roadrace(ignorelaps)
                     if x == True:
@@ -85,6 +91,7 @@ class MongoRunningClassifier:
             alapses = pj.RAutoLapAnalyzer(training.alaps)
             if len(alapses.laps) != 0:
                 try:
+                    # TODO solution for empty laps (laps without information)
                     x = alapses.identify_roadrace()
                 except:
                     continue  # print("not good!")
@@ -103,8 +110,11 @@ class MongoRunningClassifier:
         for training in traingen:
             lapses = pj.RAutoLapAnalyzer(training.alaps)
             if len(lapses.laps) != 0:
-                if lapses.identify_easyrun():
-                    easyrun.append(training.abstract["fname"])
+                try:
+                    if lapses.identify_easyrun():
+                        easyrun.append(training.abstract["fname"])
+                except KeyError:
+                    continue
         return easyrun
 
     def set_easyrun(self):
@@ -136,7 +146,7 @@ class MongoRunningClassifier:
 
 
 if __name__ == "__main__":
-    classif = MongoRunningClassifier("polartest4", "polar2018")
+    classif = MongoRunningClassifier("polartest4", "polar2014")
 
     classif.set_interval()
     road_races = classif.mongo.simplequery("trainingtype.interval", "interval, check1")
