@@ -5,14 +5,14 @@ import nosql_adapter as mongodb
 
 class TestMongoAdapter(unittest.TestCase):
     @classmethod
-    def setUp(self):
-        self.dbase = "polartest4"
-        self.collections = range(2012, 2021)
-        self.testyear = "polar2014"
-        self.adapter = mongodb.MongoAdapter(self.dbase, self.testyear)
+    def setUp(cls):
+        cls.dbase = "polartest4"
+        cls.collections = range(2012, 2021)
+        cls.testyear = "polar2014"
+        cls.adapter = mongodb.MongoAdapter(cls.dbase, cls.testyear)
 
     def test_connection(self):
-        self.assertIsInstance(adapter.client, MongoClient)
+        self.assertIsInstance(self.adapter.client, MongoClient)
 
     def test_returndocs(self):
         docs = self.adapter.returnDocs()

@@ -12,17 +12,33 @@ from matplotlib import pyplot as pp
 from shapely.geometry.point import Point
 from geopandas.array import GeometryArray
 
+from abc import ABC
+
 # import seaborn
 
 
-class Trainses:
+class TrainsesBaseClass(ABC):
+    def return_laps(self):
+        raise NotImplementedError
+
+    def return_autolaps(self):
+        raise NotImplementedError
+
+    def return_sport(self):
+        raise NotImplementedError
+
+
+class Trainses(TrainsesBaseClass):
     def __init__(self, path: str, file: str):
         self.path = path
         self.file = file
-        self.read_json()
+        self._read_json()
         self.data = True
+        self.laps = []
+        self.alaps = []
+        self.abstract = None
 
-    def read_json(self) -> None:
+    def _read_json(self) -> None:
         with open(os.path.join(self.path, self.file)) as g:
             temp = g.read()
         data = json.loads(temp)
@@ -38,7 +54,7 @@ class Trainses:
         self.data = data
         try:
             self.samples = data["exercises"][0].pop("samples")
-        except:
+        except Exception:
             pass
         try:
             self.laps = data["exercises"][0].pop("laps")
@@ -77,10 +93,10 @@ class Trainses:
 
 
 class Trainses_mongo(Trainses):
-    def __init__(self, datadb):
-        self.laps = datadb.pop("laps")
-        self.alaps = datadb.pop("autolaps")
-        self.abstract = datadb
+    def __init__(self, mongorecord):
+        self.laps = mongorecord.pop("laps")
+        self.alaps = mongorecord.pop("autolaps")
+        self.abstract = mongorecord
         self.data = True
 
 

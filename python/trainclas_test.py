@@ -8,7 +8,7 @@ mongad = mongodb.MongoPolar("polartest4", "polardb")
 
 
 # for res in result:
-#     session = pj.Trainses_mongo(res)
+#     session = pj.Trainses_mongo(path, rest)
 #     # print(res)
 #     if "trainingtype" in session.abstract:
 #         print(session.abstract["trainingtype"])

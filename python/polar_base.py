@@ -2,9 +2,9 @@
 
 
 class Trainses:
-    trainingtypes = ["easy", "interval", "roadrace", "sprint"]
-    datatypes = ["laps", "autolaps", "samples"]
-    sports = ["RUNNING", "CYCLING", "OTHER"]
+    TRAININGTYPES = ["easy", "interval", "roadrace", "sprint"]
+    DATATYPES = ["laps", "autolaps", "samples"]
+    SPORT = ["RUNNING", "CYCLING", "OTHER"]
 
 
 class Base_polar_json(Trainses):
@@ -45,7 +45,7 @@ class Base_training_classifier(Trainses):
 
 
 class Base_nosql:
-    datatypes = {
+    DATATYPES = {
         "database": "person",
         "collection": "year",
         "session": "training",
@@ -53,7 +53,7 @@ class Base_nosql:
         "docs": "",
     }
 
-    resume = {
+    RESUME = {
         "abstract": "session.abstract",
         "laps": "session.laps",
         "autolaps": "session:autolaps",

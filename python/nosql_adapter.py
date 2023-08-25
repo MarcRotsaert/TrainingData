@@ -5,9 +5,8 @@ Skin over mongodb nosql database voor Polar.
 import sys
 from pymongo import MongoClient
 import pymongo
-from typing import NoReturn, ClassVar
 
-sys.path.append(r"C:\Users\marcr\Polar\Polar\python")
+
 import polar_json as pj
 from polar_base import Base_nosql
 
@@ -107,15 +106,15 @@ class MongoPolar(MongoQuery):
         # MongoQuery.__init__(self, mongoDB, collection)
         super().__init__(mongoDB, collection)
 
-    def print_resumeattributes(self) -> NoReturn:
+    def print_resumeattributes(self) -> None:
         # print content resume.
-        print(Base_nosql.resume)
+        print(Base_nosql.RESUME)
 
     def return_docsrunning(self) -> pymongo.cursor.Cursor:
         curs = self.simplequery("sport", "RUNNING")
         return curs
 
-    def put_jsonresume(self, path: str, fname: str) -> NoReturn:
+    def put_jsonresume(self, path: str, fname: str) -> None:
         # Add JSON-file to a collection
         sess = pj.Trainses(path, fname)
         resume = sess.abstract
