@@ -59,13 +59,16 @@ class MongoAdapter:
         collection.drop()
 
     def showDocs(self) -> NoReturn:
-        collection = self.getCollection()
-        cursor = collection.find({})
+        cursor = self._cursorDocs()
         for doc in cursor:
             print(doc)
 
-    def returnDocs(self):
-        # collection = self.getCollection("polar", collectionName)
+    def returnDocs(self) -> list:
+        cursor = self._cursorDocs()
+        docs = [doc for doc in cursor]
+        return docs
+
+    def _cursorDocs(self):
         collection = self.getCollection()
         cursor = collection.find({})
         return cursor

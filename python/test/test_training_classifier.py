@@ -3,11 +3,15 @@ from training_classifier import MongoRunningClassifier as mrc
 
 
 class TestRunningClassifier(unittest.TestCase):
-    def setUp(self):
-        self.dbase = "polartest4"
-        self.collections = range(2011, 2013)
+    @classmethod
+    def setUp(cls):
+        cls.dbase = "polartest4"
+        cls.collections = range(2011, 2013)
+        # cls.adapter = mongodb.MongoAdapter(self.dbase, self.testyear)
 
     def test_class_init(self):
         for year in self.collections:
-            self.assertIsEqual(session.sport, "RUNNING")
             session = mrc(self.dbase, year)
+            self.assertEqual(session.sport, "RUNNING")
+            assertEqual(session, True)
+    def 
