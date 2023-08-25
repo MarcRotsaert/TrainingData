@@ -4,6 +4,7 @@ Skin over mongodb nosql database voor Polar.
 
 import sys
 from pymongo import MongoClient
+import pymongo
 from typing import NoReturn, ClassVar
 
 sys.path.append(r"C:\Users\marcr\Polar\Polar\python")
@@ -23,62 +24,58 @@ class MongoAdapter:
         self.dbname: str = mongoDB
         self.collection: str = collection
 
-    def getClient(self):
+    def getClient(self) -> MongoClient:
         return self.client
 
-    def showConnections(self):
+    def showConnections(self) -> None:
         client = self.getClient()
         print(client)
 
-    def getDatabase(self):
+    def _getDatabase(self) -> pymongo.database.Database:
         return self.client[self.dbname]
 
-    def getCollection(self):
-        db = self.getDatabase()
-        # db = self.client[dbName]
+    def getCollection(self) -> pymongo.collection.Collection:
+        db = self._getDatabase()
         return db[self.collection]
 
-    def insertOne(self, dictToInsert: dict) -> NoReturn:
+    def insertOne(self, dictToInsert: dict) -> None:
         collection = self.getCollection()
         collection.insert_one(dictToInsert)
 
-    def updateOne(self, objid: str, dictToUpdate: dict) -> NoReturn:
+    def updateOne(self, objid: str, dictToUpdate: dict) -> None:
         collection = self.getCollection()
         collection.update_one({"_id": objid}, {"$set": dictToUpdate})
 
-    def deleteField(self, objid: str, fieldToDelete: str) -> NoReturn:
+    def deleteField(self, objid: str, fieldToDelete: str) -> None:
         collection = self.getCollection()
         temp = collection.update_one({"_id": objid}, {"$unset": {fieldToDelete: ""}})
         print(temp.raw_result)
-        # xx
-        # collection.update({"_id": objid}, {"$pull": null})
 
-    def deleteCollection(self) -> NoReturn:
-        # collection = self.getCollection("polar", collectionName)
+    def deleteCollection(self) -> None:
         collection = self.getCollection()
         collection.drop()
 
-    def showDocs(self) -> NoReturn:
+    def showDocs(self) -> None:
         cursor = self._cursorDocs()
         for doc in cursor:
             print(doc)
 
-    def returnDocs(self) -> list:
+    def returnDocs(self) -> list[dict]:
         cursor = self._cursorDocs()
         docs = [doc for doc in cursor]
         return docs
 
-    def _cursorDocs(self):
+    def _cursorDocs(self) -> pymongo.cursor.Cursor:
         collection = self.getCollection()
         cursor = collection.find({})
         return cursor
 
-    def getbyField(self, fieldname: str) -> list:
+    def getbyField(self, fieldname: str) -> list[dict]:
         collection = self.getCollection()
         items = collection.find({fieldname: {"$exists": True}})
         return items
 
-    def deleteDocument(self, document) -> NoReturn:
+    def deleteDocument(self, document) -> None:
         collection = self.getCollection()
         collection.delete_one(document)
 
@@ -87,12 +84,12 @@ class MongoQuery(MongoAdapter):
     # def __init__(self, mongoDB, collection):
     #    super().__init__(mongoDB, collection)
 
-    def simplequery(self, keyn, valn):
+    def simplequery(self, keyn: any, valn: any) -> pymongo.cursor.Cursor:
         collection = self.getCollection()
         cursor = collection.find({keyn: valn})
         return cursor
 
-    def morecomplexquery(self, query):
+    def morecomplexquery(self, query: dict[any]) -> pymongo.cursor.Cursor:
         collection = self.getCollection()
         cursor = collection.find(query)  # {"distance":{"$gt":"7000"}}
         return cursor
@@ -104,17 +101,17 @@ class MongoPolar(MongoQuery):
     Data for
     """
 
-    def __init__(self, mongoDB, collection):
+    def __init__(self, mongoDB: str, collection: str):
         # initiate collection
         # MongoAdapter.__init__(self, mongoDB, collection)
         # MongoQuery.__init__(self, mongoDB, collection)
         super().__init__(mongoDB, collection)
 
-    def print_resumeattributes(self):
+    def print_resumeattributes(self) -> NoReturn:
         # print content resume.
         print(Base_nosql.resume)
 
-    def return_docsrunning(self):
+    def return_docsrunning(self) -> pymongo.cursor.Cursor:
         curs = self.simplequery("sport", "RUNNING")
         return curs
 

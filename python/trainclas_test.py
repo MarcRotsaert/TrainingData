@@ -65,8 +65,7 @@ for res in result:
     if laps != None:
         lapses = pj.RManualLapAnalyzer(laps)
         su = lapses.determine_startuprunoutlaps()
-        result = lapses.determine_accelartion(ignorelaps=su[0] + su[1])
-        # result = lapses.return_accelartion()
+        result = lapses._determine_accelaration(ignorelaps=su[0] + su[1])
         print(result)
         print(sum(result))
         fname = session.abstract["fname"]

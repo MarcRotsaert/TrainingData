@@ -3,27 +3,28 @@ import polar_json as pj
 import nosql_adapter as mongodb
 from polar_base import Base_training_classifier
 import time
+from typing import Generator
 
 
 class MongoRunningClassifier:
-    def __init__(self, dbase, collection):
+    def __init__(self, dbase: str, collection: str):
         self.mongo = mongodb.MongoPolar(dbase, collection)
         self.sport = "RUNNING"
         self.trainingtypes = Base_training_classifier.trainingtypes
 
-    def print_trainingtypes(self):
+    def print_trainingtypes(self) -> None:
         print(self.trainingtypes)
 
-    def return_session(self, training):
+    def _return_session(self, training) -> pymongo.cursor.Cursor:
         return pj.Trainses_mongo(training)
 
-    def _generator_training(self):
+    def _generator_training(self) -> Generator:
         # yield all trainingen, from self.sport
         trainingen = self.mongo.simplequery("sport", self.sport)
         for training in trainingen:
-            yield self.return_session(training)
+            yield self._return_session(training)
 
-    def set_roadrace(self):
+    def set_roadrace(self) -> None:
         fnamerr = self._return_roadrace()
         for fname in fnamerr:
             result = self.mongo.simplequery("fname", fname)
@@ -31,7 +32,7 @@ class MongoRunningClassifier:
                 objid = res["_id"]
                 self.mongo.updateOne(objid, {"trainingtype.roadrace": True})
 
-    def _return_interval(self):
+    def _return_interval(self) -> list[str]:
         traingen = self._generator_training()
         intervaltr = {}
         for training in traingen:
@@ -58,7 +59,7 @@ class MongoRunningClassifier:
                     # pass
         return intervaltr
 
-    def set_interval(self):
+    def set_interval(self) -> None:
         trainingen = self._return_interval()
         for fname in trainingen:
             result = self.mongo.simplequery("fname", fname)
@@ -68,7 +69,7 @@ class MongoRunningClassifier:
                     objid, {"trainingtype.interval": trainingen[fname]}
                 )
 
-    def _return_roadrace(self):
+    def _return_roadrace(self) -> list[str]:
         traingen = self._generator_training()
         race_alaps = []
         race_laps = []
@@ -103,7 +104,7 @@ class MongoRunningClassifier:
         set2 = set(race_alaps)
         return set1.union(set2)
 
-    def _return_easyrun(self):
+    def _return_easyrun(self) -> list[str]:
         traingen = self._generator_training()
         easyrun = []
 
@@ -117,7 +118,7 @@ class MongoRunningClassifier:
                     continue
         return easyrun
 
-    def set_easyrun(self):
+    def set_easyrun(self) -> None:
         fnamerr = self._return_easyrun()
         for fname in fnamerr:
             result = self.mongo.simplequery("fname", fname)
@@ -125,7 +126,7 @@ class MongoRunningClassifier:
                 objid = res["_id"]
                 self.mongo.updateOne(objid, {"trainingtype.easyrun": True})
 
-    def _return_sprint(self):
+    def _return_sprint(self) -> list[str]:
         traingen = self._generator_training()
         sprint = []
         for training in traingen:
@@ -136,7 +137,7 @@ class MongoRunningClassifier:
                         sprint.append(training.abstract["fname"])
         return sprint
 
-    def set_sprint(self):
+    def set_sprint(self) -> list[str]:
         fnamerr = self._return_sprint()
         for fname in fnamerr:
             result = self.mongo.simplequery("fname", fname)

@@ -1,38 +1,40 @@
-# Processing data
+# Processing data export polar data json files
 
 import os
 import json
-from typing import Iterable, Union
+from typing import Tuple, Iterable, Union
 import geopandas as gpd
 import shapely as shp
 import numpy as np
 from polar_base import Base_polar_json
 
 from matplotlib import pyplot as pp
+from shapely.geometry.point import Point
+from geopandas.array import GeometryArray
 
 # import seaborn
 
 
 class Trainses:
-    def __init__(self, path, file):
+    def __init__(self, path: str, file: str):
         self.path = path
         self.file = file
         self.read_json()
         self.data = True
 
-    def read_json(self):
+    def read_json(self) -> None:
         with open(os.path.join(self.path, self.file)) as g:
             temp = g.read()
         data = json.loads(temp)
         self.add_data(data)
 
-    def add_data_db(self, datadb):
+    def add_data_db(self, datadb: dict) -> None:
         self.laps = datadb.pop("laps")
         self.alaps = datadb.pop("autolaps")
         self.abstract = datadb
         self.data = True
 
-    def add_data(self, data):
+    def add_data(self, data: dict):
         self.data = data
         try:
             self.samples = data["exercises"][0].pop("samples")
@@ -57,19 +59,19 @@ class Trainses:
         self.abstract = data
         self.data = True
 
-    def _returninit(self):
+    def _returninit(self) -> None:
         if not self.data:
             self.read_json()
 
-    def return_laps(self):
+    def return_laps(self) -> list[dict]:
         self._returninit()
         return self.laps
 
-    def return_autolaps(self):
+    def return_autolaps(self) -> list[dict]:
         self._returninit()
         return self.alaps
 
-    def return_sport(self):
+    def return_sport(self) -> str:
         self._returninit()
         return self.abstract["sport"]
 
@@ -92,7 +94,7 @@ class RLapAnalyzerBasic:
         self.paces = Base_polar_json.run_classattr["lap_paces"]
         self.laps = self._reshapelaps(laps)
 
-    def _reshapelaps(self, laps):
+    def _reshapelaps(self, laps) -> dict:
         result = {}
         for par in self.param:
             try:
@@ -104,7 +106,7 @@ class RLapAnalyzerBasic:
             result.update(temp)
         return result
 
-    def return_paraslist(self, par, *arg):
+    def return_paraslist(self, par: str, *arg: str) -> list[float]:
         temp = self.laps[par]
         values = []
         if len(arg) == 0:
@@ -119,10 +121,10 @@ class RLapAnalyzerBasic:
 
         return values
 
-    def print_nrlaps(self):
+    def print_nrlaps(self) -> None:
         print(len(self.laps["speed"]))
 
-    def compare_hr_sp(self):
+    def compare_hr_sp(self) -> Tuple[float, float] | str:
         if self.laps["heartRate"] == None or self.laps["speed"] == None:
             print("no heartrate or speed")
             # return
@@ -136,7 +138,9 @@ class RLapAnalyzerBasic:
             # xx
             return np.corrcoef(avgspeed, avgheartr)[0, 1]
 
-    def determine_speedvariability(self, ignorelaps=[]):
+    def determine_speedvariability(
+        self, ignorelaps: list[int] = []
+    ) -> (float, float, float):
         speed = np.array(self.return_paraslist("speed", "avg"))
         speed = np.delete(speed, ignorelaps)
         stdspeed = np.std(speed)
@@ -144,7 +148,9 @@ class RLapAnalyzerBasic:
         minspeed = np.max(speed)
         return stdspeed, maxspeed, minspeed
 
-    def determine_accelaration(self, ignorelaps=[]):  # , mindspeed=0.400):
+    def _determine_accelaration(
+        self, ignorelaps: list[int] = []
+    ) -> np.array:  # , mindspeed=0.400):
         speed = np.array(self.return_paraslist("speed", "avg"))
         speed = np.delete(speed, ignorelaps)
         dspeed = speed[1:] - speed[0:-1]
@@ -153,7 +159,9 @@ class RLapAnalyzerBasic:
         # dspeed[dspeed < -mindspeed] = -1
         return dspeed
 
-    def determine_heartratevariability(self, ignorelaps=[]):
+    def determine_heartratevariability(
+        self, ignorelaps: list[int] = []
+    ) -> (float, float, float):
         hrt = np.array(self.return_paraslist("heartRate"))
         hrt = np.delete(hrt, ignorelaps)
         stdv = np.std(hrt)
@@ -161,8 +169,9 @@ class RLapAnalyzerBasic:
         minhrt = np.max(hrt)
         return stdhrt, maxhrt, minhrt
 
-    def identify_roadrace(self, ignorelaps=[], min_speed=None):
-        # self.print_nrlaps()
+    def identify_roadrace(
+        self, ignorelaps: list = [], min_speed: float or None = None
+    ) -> bool:
         if min_speed == None:
             min_speed = self.paces["minroadrace"]
         speedarr = np.array(self.return_paraslist("speed", "avg"))
@@ -182,7 +191,7 @@ class RLapAnalyzerBasic:
         #     if std
         return result
 
-    def identify_easyrun(self, max_speed=None):
+    def identify_easyrun(self, max_speed: float or None = None) -> bool:
         if max_speed == None:
             max_speed = self.paces["maxeasy"]
 
@@ -206,13 +215,13 @@ class RManualLapAnalyzer(RLapAnalyzerBasic):
     def __init__(self, laps):
         super(RManualLapAnalyzer, self).__init__(laps)
 
-    def return_distance(self):
+    def return_distance(self) -> list[float]:
         return self.laps["distance"]
 
-    def return_duration(duration):
+    def return_duration(self) -> list[str]:
         return self.laps["duration"]
 
-    def determine_startuprunoutlaps(self, su_speed=None):
+    def determine_startuprunoutlaps(self, su_speed=None) -> list[list, list]:
         if su_speed == None:
             su_speed = self.paces["maxruninout"]
         idx_su = []
@@ -244,7 +253,7 @@ class RManualLapAnalyzer(RLapAnalyzerBasic):
             i2 -= 1
         return idx_su, idx_ro
 
-    def determine_lapswithoutsu(self):
+    def determine_lapswithoutsu(self) -> Union[dict, None]:
         su = self.determine_startuprunoutlaps()
         if not su:
             return None
@@ -260,7 +269,7 @@ class RManualLapAnalyzer(RLapAnalyzerBasic):
                     break
         return laps
 
-    def identify_interval(self):
+    def identify_interval(self) -> Union[str, None]:
         dspeed_int = self.paces["dspeedinterval"]
         laps = self.determine_lapswithoutsu()
         if not laps:
@@ -299,9 +308,7 @@ class RManualLapAnalyzer(RLapAnalyzerBasic):
                         result = "no interval, crit. 4, under investigation"
         return result
 
-    def identify_sprints(self, max_time=20.0, min_cadence=98):
-        # laps = self.return_lapswithoutsu()
-
+    def identify_sprints(self, max_time: float = 20.0, min_cadence: int = 98) -> bool:
         sprints = []
         for lnr in range(len(self.laps["duration"])):
             lapdur_str = self.laps["duration"][lnr]
@@ -323,47 +330,14 @@ class SampleAnalyzerBasic:
         self.samples = samples
         self.locations = Base_polar_json.run_classattr["sample_loc"]
 
-    def return_samples(self):
+    def return_samples(self) -> dict[dict]:
         # self._returninit()
         return self.samples
 
-    def return_s_heartrate(self):
+    def return_s_heartrate(self) -> list[dict]:
         return self.samples["heartRate"]
 
-    def determine_s_routecentre(self):
-        rpointsrd = self.return_s_pointsel()
-        rpolyrd = shp.Polygon([[p.x, p.y] for p in rpointsrd])
-        # rpolyrd = rpoly.to_crs("EPSG:28992")
-        return rpolyrd.centroid
-
-    def determine_s_location(self):
-        deflocs = {
-            "de velden": [[85575, 440076], 100],
-            "baanbras": [[85085, 449400], 100],
-            "kopjesloop": [[85055, 448570], 50],
-            "schiehaven": [[90775, 435330], 600],
-            "wippolder": [[86255, 446810], 150],
-            "bergenopzoom": [[81385, 389191], 400],
-            "menmoerhoeve": [[104258, 394390], 200],
-            "sola": [[395744, -72146], 15000],
-            "meijendel": [[82905, 460500], 300],
-        }
-        if self.return_s_route() == None:
-            location = None
-        else:
-            location = None
-            pnts = self.return_s_pointsel([5, -5])
-
-            for loc in deflocs:
-                pointloc = shp.Point(deflocs[loc][0][0], deflocs[loc][0][1])
-                diststart = pointloc.distance(pnts[0])
-                distend = pointloc.distance(pnts[-1])
-                maxdist = deflocs[loc][1]
-                if diststart < maxdist or distend < maxdist:
-                    location = loc
-        return location
-
-    def return_s_route(self):
+    def return_s_route(self) -> Union[list[dict], None]:
         # self._returninit()
         try:
             route = self.samples["recordedRoute"]
@@ -371,7 +345,7 @@ class SampleAnalyzerBasic:
             route = None
         return route
 
-    def return_s_speed(self):
+    def return_s_speed(self) -> list[dict]:
         return self.samples["speed"]
 
     def return_s_heartrate(self):
@@ -379,7 +353,9 @@ class SampleAnalyzerBasic:
         return self.samples["heartRate"]
 
     # def return_s_pointsel(self, pnr=None):
-    def return_s_pointsel(self, pnr: Union[None, Iterable] = None):
+    def return_s_pointsel(
+        self, pnr: Union[None, Iterable[int]] = None
+    ) -> GeometryArray:
         # get points
         rlat = []
         rlon = []
@@ -395,7 +371,40 @@ class SampleAnalyzerBasic:
         pointsrd = points.to_crs("EPSG:28992")
         return pointsrd
 
-    def plot(self, param):
+    def determine_s_routecentre(self) -> Point:
+        rpointsrd = self.return_s_pointsel()
+        rpolyrd = shp.Polygon([[p.x, p.y] for p in rpointsrd])
+        # rpolyrd = rpoly.to_crs("EPSG:28992")
+        return rpolyrd.centroid
+
+    def determine_s_location(self) -> Union[str, None]:
+        deflocs = {
+            "de velden": [[85575, 440076], 100],
+            "baanbras": [[85085, 449400], 100],
+            "kopjesloop": [[85055, 448570], 50],
+            "schiehaven": [[90775, 435330], 600],
+            "wippolder": [[86255, 446810], 150],
+            "bergenopzoom": [[81385, 389191], 400],
+            "menmoerhoeve": [[104258, 394390], 200],
+            "sola": [[395744, -72146], 15000],
+            "meijendel": [[82905, 460500], 300],
+        }
+        if self.return_s_route() is None:
+            location = None
+        else:
+            location = None
+            pnts = self.return_s_pointsel([5, -5])
+
+            for loc in deflocs:
+                pointloc = shp.Point(deflocs[loc][0][0], deflocs[loc][0][1])
+                diststart = pointloc.distance(pnts[0])
+                distend = pointloc.distance(pnts[-1])
+                maxdist = deflocs[loc][1]
+                if diststart < maxdist or distend < maxdist:
+                    location = loc
+        return location
+
+    def plot(self, param: str) -> None:
         fig = pp.figure()
         # try:
         values = [item["value"] for item in self.samples[param]]
@@ -408,11 +417,11 @@ class SampleAnalyzerBasic:
 
 
 class SamAnalExtra(SampleAnalyzerBasic):
-    def __init__(self, samples):
+    def __init__(self, samples: dict[dict]):
         super(SamAnalExtra, self).__init__(samples)
         # print(self.return_s_heartrate())
 
-    def return_idxlowmovement(self):
+    def return_idxlowmovement(self) -> Tuple[Union[int, None], Union[int, None]]:
         # return index of  low activity at beginning and end of a
         speed = self.return_s_speed()
         speedlist = [sp["value"] for sp in speed]
@@ -440,8 +449,8 @@ if __name__ == "__main__":
         print(sum(result))
         xx
     if True:
-        file = "training-session-2019-10-30-4009640085-5105bf47-b37c-47c3-a96c-d74653ae0d5a.json"
-        # training-session-2015-06-26-263879702-2d485ab0-ef26-4100-b2ae-1ca9c5f144d6.json
+        # file = "training-session-2019-10-30-4009640085-5105bf47-b37c-47c3-a96c-d74653ae0d5a.json"
+        file = "training-session-2015-06-26-263879702-2d485ab0-ef26-4100-b2ae-1ca9c5f144d6.json"
         # training-session-2015-07-03-263876996-e9c14b6c-bc80-4c10-b335-91081c2552e7.json
         # training-session-2015-09-20-263873564-7f116bac-8756-4f54-a5a0-9272ec0f44ee.json
         # training-session-2015-09-22
@@ -452,6 +461,8 @@ if __name__ == "__main__":
         session = Trainses(path, file)
         laps = session.return_laps()
         lapses = RManualLapAnalyzer(laps)
+
+        x = lapses.return_paraslist("speed")
         result = lapses.determine_startuprunoutlaps()
         print(lapses.identify_interval())
         samses = SamAnalExtra(session.samples)
