@@ -42,6 +42,7 @@ class TestMongoQuery(unittest.TestCase):
         cursor = self.adapter.morecomplexquery(
             {
                 "$and": [
+                    {"trainingtype": {"$exists": True}},
                     {"trainingtype.interval": {"$ne": "interval"}},
                     {"trainingtype.interval": {"$ne": "interval, check"}},
                     {"trainingtype.interval": {"$ne": "interval, check2"}},
@@ -51,4 +52,4 @@ class TestMongoQuery(unittest.TestCase):
             }
         )
         training = [res for res in cursor]
-        self.assertEqual(len(training), 182)
+        self.assertEqual(len(training), 154)
