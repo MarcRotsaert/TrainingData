@@ -17,74 +17,41 @@ from abc import ABC
 # import seaborn
 
 
-class TrainsesBaseClass(ABC):
-    def return_laps(self):
-        raise NotImplementedError
-
-    def return_autolaps(self):
-        raise NotImplementedError
-
-    def return_sport(self):
-        raise NotImplementedError
-
-
-class Trainses(TrainsesBaseClass):
-    def __init__(self, path: str, file: str):
-        self.path = path
-        self.file = file
-        self.laps = []
-        self.alaps = []
-        self.abstract = {}
-        self._read_json()
-        self.data = True
-
-    def _read_json(self) -> None:
-        with open(os.path.join(self.path, self.file)) as g:
-            temp = g.read()
-        data = json.loads(temp)
-        self.add_data(data)
-
-    def add_data_db(self, datadb: dict) -> None:
-        self.laps = datadb.pop("laps")
-        self.alaps = datadb.pop("autolaps")
-        self.abstract = datadb
-        self.data = True
-
+class Trainses:
     def add_data(self, data: dict):
         self.data = data
-        try:
-            self.samples = data["exercises"][0].pop("samples")
-        except Exception:
-            pass
-        try:
-            self.laps = data["exercises"][0].pop("laps")
-        except KeyError:
-            self.laps = None
-        try:
-            self.alaps = data["exercises"][0].pop("autoLaps")
-        except KeyError:
-            self.alaps = None
-        data.update({"fname": self.file})
 
-        param = ["speed", "heartrate", "ascent", "descent", "sport"]
-        for par in param:
-            if par in data["exercises"][0]:
-                data.update({par: data["exercises"][0][par]})
+        if "exercises" in data:
+            try:
+                self.samples = data["exercises"][0].pop("samples")
+            except Exception:
+                pass
+            try:
+                self.laps = data["exercises"][0].pop("laps")
+            except KeyError:
+                self.laps = None
+            try:
+                self.alaps = data["exercises"][0].pop("autoLaps")
+            except KeyError:
+                self.alaps = None
+            param = ["speed", "heartrate", "ascent", "descent", "sport"]
+            for par in param:
+                if par in data["exercises"][0]:
+                    data.update({par: data["exercises"][0][par]})
+            data.pop("exercises")
+        else:
+            self.laps = data.pop("laps")
+            self.alaps = data.pop("autolaps")
 
-        data.pop("exercises")
         self.abstract = data
         self.data = True
 
-    def _returninit(self) -> None:
-        if not self.data:
-            self.read_json()
-
     def return_laps(self) -> list[dict]:
-        self._returninit()
+        # self._returninit()
         return self.laps
 
     def return_autolaps(self) -> list[dict]:
-        self._returninit()
+        # self._returninit()
         return self.alaps
 
     def return_sport(self) -> str:
@@ -92,12 +59,70 @@ class Trainses(TrainsesBaseClass):
         return self.abstract["sport"]
 
 
+class Trainses_json(Trainses):
+    def __init__(self, path: str, file: str):
+        self.path = path
+        self.file = file
+        self.laps = []
+        self.alaps = []
+        self.abstract = {}
+        data = self._read_json()
+
+        self.add_data(data)
+        self.data = True
+
+    def _read_json(self) -> None:
+        with open(os.path.join(self.path, self.file)) as g:
+            temp = g.read()
+        data = json.loads(temp)
+        data.update({"fname": self.file})
+
+        return data
+        # self.add_data(data)
+
+    # def add_data_db(self, datadb: dict) -> None:
+    #     self.laps = datadb.pop("laps")
+    #     self.alaps = datadb.pop("autolaps")
+    #     self.abstract = datadb
+    #     self.data = True
+
+    # def add_data(self, data: dict):
+    #     self.data = data
+    #     try:
+    #         self.samples = data["exercises"][0].pop("samples")
+    #     except Exception:
+    #         pass
+    #     try:
+    #         self.laps = data["exercises"][0].pop("laps")
+    #     except KeyError:
+    #         self.laps = None
+    #     try:
+    #         self.alaps = data["exercises"][0].pop("autoLaps")
+    #     except KeyError:
+    #         self.alaps = None
+    #     data.update({"fname": self.file})
+
+    #     param = ["speed", "heartrate", "ascent", "descent", "sport"]
+    #     for par in param:
+    #         if par in data["exercises"][0]:
+    #             data.update({par: data["exercises"][0][par]})
+
+    #     data.pop("exercises")
+    #     self.abstract = data
+    #     self.data = True
+
+    # def _returninit(self) -> None:
+    #     if not self.data:
+    #         self.read_json()
+
+
 class Trainses_mongo(Trainses):
     def __init__(self, mongorecord):
-        self.laps = mongorecord.pop("laps")
-        self.alaps = mongorecord.pop("autolaps")
-        self.abstract = mongorecord
-        self.data = True
+        self.add_data(mongorecord)
+        # self.laps = mongorecord.pop("laps")
+        # self.alaps = mongorecord.pop("autolaps")
+        # self.abstract = mongorecord
+        # self.data = True
 
 
 class RLapAnalyzerBasic:
@@ -332,12 +357,7 @@ class RManualLapAnalyzer(RLapAnalyzerBasic):
             lapdur = float(lapdur_str.lstrip("PT").rstrip("S"))
             if lapdur < max_time:  # and lapcadence_max > min_cadence:
                 sprints.append(lnr)
-
-        if len(sprints) > 3:
-            result = True
-        else:
-            result = False
-
+        result = len(sprints) > 3
         return result
 
 
@@ -474,7 +494,7 @@ if __name__ == "__main__":
         # training-session-2015-10-24-263861018-3690058d-71c0-47c3-8539-e7b67e8099fe.json
 
         # training-session-2015-10-17-263860916-1b563b91-c4f4-4991-878c-5c1225f84b2c.json
-        session = Trainses(path, file)
+        session = Trainses_json(path, file)
         laps = session.return_laps()
         lapses = RManualLapAnalyzer(laps)
 
@@ -487,7 +507,7 @@ if __name__ == "__main__":
 
     if True:
         file = "training-session-2015-01-14-263888618-3d72bde3-4957-4db4-8fa6-662a180a2d23.json"
-        session = Trainses(path, file)
+        session = Trainses_json(path, file)
         # alaps = session.return_alaps()
         lapses = RAutoLapAnalyzer(session.alaps)
         result = lapses.identify_roadrace()
@@ -495,7 +515,7 @@ if __name__ == "__main__":
     if True:
         file = "training-session-2015-04-18-263883440-3be46e75-6a93-4746-a320-96c9660f809c.json"
 
-        session = Trainses(path, file)
+        session = Trainses_json(path, file)
         laps = session.return_laps()
         lapses = RManualLapAnalyzer(session.laps)
         # xx
@@ -524,7 +544,7 @@ if __name__ == "__main__":
         # "training-session-2014-12-07-263916482-2cbe9312-6b71-4693-8519-a9a860a23cbc.json"
         filename = fi.split("\\")[-1]
         print(filename)
-        session = Trainses(path, filename)
+        session = Trainses_json(path, filename)
 
         if False:
             if session.laps != None:

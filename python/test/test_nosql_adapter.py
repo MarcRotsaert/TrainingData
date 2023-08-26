@@ -67,9 +67,11 @@ class TestMongoPolar(unittest.TestCase):
         path = r"C:\Users\marcr\Polar\Polar\data\polar-user-data-export"
         filename = "training-session-2014-03-14-263911238-d1eefba4-26b5-4a68-9ed6-8571939ade8a.json"
 
+        docs_voor = self.adapter.returnDocs()
         self.adapter.put_jsonresume(path, filename)
-        docs = self.adapter.returnDocs()
-        self.assertEqual(len(docs), 1)
+
+        docs_na = self.adapter.returnDocs()
+        self.assertEqual(len(docs_na) - len(docs_voor), 1)
 
     @classmethod
     def tearDown(cls):

@@ -1,7 +1,7 @@
 # Determine training type en set info in Mongo DB.
 from typing import Generator
 import pymongo
-import polar_json as pj
+import polar_analyzer as pol_an
 import nosql_adapter as mongodb
 from polar_base import Base_training_classifier
 
@@ -15,8 +15,8 @@ class MongoRunningClassifier:
     def print_trainingtypes(self) -> None:
         print(self.TRAININGTYPES)
 
-    def _return_session(self, mongorecord) -> pj.Trainses_mongo:
-        return pj.Trainses_mongo(mongorecord)
+    def _return_session(self, mongorecord) -> pol_an.Trainses_mongo:
+        return pol_an.Trainses_mongo(mongorecord)
 
     def _generator_training(self) -> Generator:
         # yield all trainingen, from self.SPORT
@@ -37,7 +37,7 @@ class MongoRunningClassifier:
         intervaltr = {}
         for training in traingen:
             if training.laps is not None:
-                lapses = pj.RManualLapAnalyzer(training.laps)
+                lapses = pol_an.RManualLapAnalyzer(training.laps)
                 if (len(lapses.laps) != 0) & (lapses.laps["speed"] is not None):
                     print(training.abstract["fname"])
                     print(lapses.laps["speed"])
@@ -75,7 +75,7 @@ class MongoRunningClassifier:
         race_laps = []
         for training in traingen:
             if training.laps is not None:
-                lapses = pj.RManualLapAnalyzer(training.laps)
+                lapses = pol_an.RManualLapAnalyzer(training.laps)
                 if (len(lapses.laps) != 0) & (lapses.laps["speed"] is not None):
                     try:
                         # TODO solution for empty laps (laps without information)
@@ -89,7 +89,7 @@ class MongoRunningClassifier:
                         print(training.abstract["fname"])
                         race_laps.append(training.abstract["fname"])
 
-            alapses = pj.RAutoLapAnalyzer(training.alaps)
+            alapses = pol_an.RAutoLapAnalyzer(training.alaps)
             if len(alapses.laps) != 0:
                 try:
                     # TODO solution for empty laps (laps without information)
@@ -110,7 +110,7 @@ class MongoRunningClassifier:
         easyrun = []
 
         for training in traingen:
-            lapses = pj.RAutoLapAnalyzer(training.alaps)
+            lapses = pol_an.RAutoLapAnalyzer(training.alaps)
             if len(lapses.laps) != 0:
                 try:
                     if lapses.identify_easyrun():
@@ -132,7 +132,7 @@ class MongoRunningClassifier:
         sprint = []
         for training in traingen:
             if training.laps is not None:
-                lapses = pj.RManualLapAnalyzer(training.laps)
+                lapses = pol_an.RManualLapAnalyzer(training.laps)
                 if (len(lapses.laps) != 0) & (lapses.laps["speed"] is not None):
                     if lapses.identify_sprints():
                         sprint.append(training.abstract["fname"])

@@ -7,7 +7,7 @@ from pymongo import MongoClient
 import pymongo
 
 
-import polar_json as pj
+import polar_analyzer as pol_an
 from polar_base import Base_nosql
 
 
@@ -116,9 +116,9 @@ class MongoPolar(MongoQuery):
 
     def put_jsonresume(self, path: str, fname: str) -> None:
         # Add JSON-file to a collection
-        sess = pj.Trainses(path, fname)
+        sess = pol_an.Trainses_json(path, fname)
         resume = sess.abstract
-        SamAnal = pj.SampleAnalyzerBasic(sess.samples)
+        SamAnal = pol_an.SampleAnalyzerBasic(sess.samples)
         loc = SamAnal.determine_s_location()
         resume.update({"location": loc, "laps": sess.laps, "autolaps": sess.alaps})
         # resume = sess.return_resume()
@@ -164,7 +164,7 @@ if __name__ == "__main__":
     ids = docs[0]["_id"]
     print(ids)
 
-    # session = pj.Trainses(
+    # session = pol_an.Trainses(
     #     r"C:\Users\marcr\Polar\Polar\data\polar-user-data-export",
     #     "training-session-2013-12-29-263917040-9e3eaf26-016e-4401-b268-402cb95f389c.json",
     # )
