@@ -53,3 +53,24 @@ class TestMongoQuery(unittest.TestCase):
         )
         training = [res for res in cursor]
         self.assertEqual(len(training), 154)
+
+
+class TestMongoPolar(unittest.TestCase):
+    @classmethod
+    def setUp(cls) -> None:
+        cls.dbase = "polartest4"
+        cls.collections = range(2012, 2021)
+        cls.testyear = "polartest"
+        cls.adapter = mongodb.MongoPolar(cls.dbase, cls.testyear)
+
+    def test_addjson2db(self):
+        path = r"C:\Users\marcr\Polar\Polar\data\polar-user-data-export"
+        filename = "training-session-2014-03-14-263911238-d1eefba4-26b5-4a68-9ed6-8571939ade8a.json"
+
+        self.adapter.put_jsonresume(path, filename)
+        docs = self.adapter.returnDocs()
+        self.assertEqual(len(docs), 1)
+
+    @classmethod
+    def tearDown(cls):
+        cls.adapter.deleteCollection()

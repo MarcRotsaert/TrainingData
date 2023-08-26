@@ -13,5 +13,3 @@ class TestRunningClassifier(unittest.TestCase):
         for year in self.collections:
             session = mrc(self.dbase, year)
             self.assertEqual(session.sport, "RUNNING")
-            assertEqual(session, True)
-    def 

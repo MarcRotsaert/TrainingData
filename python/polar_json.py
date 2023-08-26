@@ -32,11 +32,11 @@ class Trainses(TrainsesBaseClass):
     def __init__(self, path: str, file: str):
         self.path = path
         self.file = file
-        self._read_json()
-        self.data = True
         self.laps = []
         self.alaps = []
-        self.abstract = None
+        self.abstract = {}
+        self._read_json()
+        self.data = True
 
     def _read_json(self) -> None:
         with open(os.path.join(self.path, self.file)) as g:
