@@ -44,7 +44,7 @@ class RLapAnalyzerBasic:
         print(len(self.laps["speed"]))
 
     def compare_hr_sp(self) -> Tuple[float, float] | str:
-        if self.laps["heartRate"] == None or self.laps["speed"] == None:
+        if self.laps["heartRate"] is None or self.laps["speed"] is None:
             print("no heartrate or speed")
             # return
         else:
@@ -83,7 +83,7 @@ class RLapAnalyzerBasic:
     ) -> (float, float, float):
         hrt = np.array(self.return_paraslist("heartRate"))
         hrt = np.delete(hrt, ignorelaps)
-        stdv = np.std(hrt)
+        stdhrt = np.std(hrt)
         maxhrt = np.max(hrt)
         minhrt = np.max(hrt)
         return stdhrt, maxhrt, minhrt
@@ -91,7 +91,7 @@ class RLapAnalyzerBasic:
     def identify_roadrace(
         self, ignorelaps: list = [], min_speed: float or None = None
     ) -> bool:
-        if min_speed == None:
+        if min_speed is None:
             min_speed = self.paces["minroadrace"]
         speedarr = np.array(self.return_paraslist("speed", "avg"))
         speedarr = np.delete(speedarr, ignorelaps)
@@ -104,14 +104,10 @@ class RLapAnalyzerBasic:
                 result = True
             else:
                 result = False
-        # else:
-        # params = self.return_speedvariability()
-        # if all(np.array(self.return_paraslist('speed'))>min_speed)
-        #     if std
         return result
 
     def identify_easyrun(self, max_speed: float or None = None) -> bool:
-        if max_speed == None:
+        if max_speed is None:
             max_speed = self.paces["maxeasy"]
 
         # laps = self.return_lapswithoutsu()
@@ -122,7 +118,6 @@ class RLapAnalyzerBasic:
             result = True
 
         return result
-        # for la in laps:
 
 
 class RAutoLapAnalyzer(RLapAnalyzerBasic):
@@ -141,7 +136,7 @@ class RManualLapAnalyzer(RLapAnalyzerBasic):
         return self.laps["duration"]
 
     def determine_startuprunoutlaps(self, su_speed=None) -> list[list, list]:
-        if su_speed == None:
+        if su_speed is None:
             su_speed = self.paces["maxruninout"]
         idx_su = []
         i1 = 0

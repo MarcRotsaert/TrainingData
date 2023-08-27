@@ -38,7 +38,7 @@ class SampleAnalyzerBasic:
         rlat = []
         rlon = []
         route = self.return_s_route()
-        if pnr == None:
+        if pnr is None:
             pnr = range(len(route))
 
         for nr in pnr:
@@ -72,17 +72,17 @@ class SampleAnalyzerBasic:
             location = None
             pnts = self.return_s_pointsel([5, -5])
 
-            for loc in deflocs:
-                pointloc = shp.Point(deflocs[loc][0][0], deflocs[loc][0][1])
+            for loc, coord in deflocs.items():
+                pointloc = shp.Point(coord[0][0], coord[0][1])
                 diststart = pointloc.distance(pnts[0])
                 distend = pointloc.distance(pnts[-1])
-                maxdist = deflocs[loc][1]
+                maxdist = coord[1]
                 if diststart < maxdist or distend < maxdist:
                     location = loc
         return location
 
     def plot(self, param: str) -> None:
-        fig = pp.figure()
+        pp.figure()
         values = [item["value"] for item in self.samples[param]]
         pp.plot(values)
         pp.grid()

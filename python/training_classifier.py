@@ -1,6 +1,6 @@
 # Determine training type en set info in Mongo DB.
 from typing import Generator
-import pymongo
+
 import polar_analyzer as pol_an
 import nosql_adapter as mongodb
 from polar_base import Base_training_classifier
@@ -47,7 +47,6 @@ class MongoRunningClassifier:
                         su_laps = lapses.determine_startuprunoutlaps()
                     except KeyError:
                         continue
-                    # ignorelaps = su_laps[0] + su_laps[1]
                     x = lapses.identify_interval()
                     # s if x:
                     # print(lapses["fname"])
@@ -61,12 +60,14 @@ class MongoRunningClassifier:
 
     def set_interval(self) -> None:
         trainingen = self._return_interval()
-        for fname in trainingen:
-            result = self.mongo.simplequery("fname", fname)
-            for res in result:
+        for fname, descr in trainingen.items():
+            cursor = self.mongo.simplequery("fname", fname)
+            for res in cursor:
                 objid = res["_id"]
                 self.mongo.updateOne(
-                    objid, {"trainingtype.interval": trainingen[fname]}
+                    # objid, {"trainingtype.interval": trainingen[fname]}
+                    objid,
+                    {"trainingtype.interval": descr},
                 )
 
     def _return_roadrace(self) -> list[str]:
