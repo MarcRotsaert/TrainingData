@@ -7,7 +7,7 @@ class Trainses:
     SPORT = ["RUNNING", "CYCLING", "OTHER"]
 
 
-class Base_polar_json(Trainses):
+class Base_polar(Trainses):
     run_classattr = {
         "lap_paces": {
             "maxeasy": 14,
