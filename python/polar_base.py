@@ -1,13 +1,13 @@
 # Basic class attributes
 
 
-class Trainses:
+class Basic_Collections:
     TRAININGTYPES = ["easy", "interval", "roadrace", "sprint"]
-    DATATYPES = ["laps", "autolaps", "samples"]
+    DATATYPES = ["laps", "autoLaps", "samples"]
     SPORT = ["RUNNING", "CYCLING", "OTHER"]
 
 
-class Base_polar(Trainses):
+class Base_polar(Basic_Collections):
     run_classattr = {
         "lap_paces": {
             "maxeasy": 14,
@@ -40,7 +40,7 @@ class Base_polar(Trainses):
     actions = ["read", "add", "identify", "determine", "read", "compare", "plot"]
 
 
-class Base_training_classifier(Trainses):
+class Base_training_classifier(Basic_Collections):
     actions = ["set"]
 
 

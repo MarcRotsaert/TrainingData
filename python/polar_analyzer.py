@@ -5,34 +5,41 @@ import json
 
 from lap_analyzer import RManualLapAnalyzer, RAutoLapAnalyzer
 from sample_analyzer import SampleAnalyzerBasic, SamAnalExtra
+from polar_base import Basic_Collections
 
 
 class Trainses:
     def add_data(self, data: dict):
-        self.data = data
+        def _set_data_nonexercise(data):
+            self.samples = data.pop("samples")
+            self.laps = data.pop("laps")
+            self.alaps = data.pop("autolaps")
+            return data
 
-        if "exercises" in data:
-            try:
-                self.samples = data["exercises"][0].pop("samples")
-            except Exception:
-                pass
-            try:
-                self.laps = data["exercises"][0].pop("laps")
-            except KeyError:
-                self.laps = None
-            try:
-                self.alaps = data["exercises"][0].pop("autoLaps")
-            except KeyError:
-                self.alaps = None
+        def _set_data_exercise(data):
+            for dtype in Basic_Collections.DATATYPES:
+                if dtype == "autolaps":
+                    dtype_attr = "alaps"
+                else:
+                    dtype_attr = dtype
+
+                if dtype in data["exercises"][0]:
+                    setattr(self, dtype_attr, data["exercises"][0].pop(dtype))
+                else:
+                    setattr(self, dtype_attr, None)
+
             param = ["speed", "heartrate", "ascent", "descent", "sport"]
             for par in param:
                 if par in data["exercises"][0]:
                     data.update({par: data["exercises"][0][par]})
             data.pop("exercises")
-        else:
-            self.laps = data.pop("laps")
-            self.alaps = data.pop("autolaps")
+            return data
 
+        # self.data = data
+        if "exercises" in data:
+            data = _set_data_exercise(data)
+        else:
+            data = _set_data_nonexercise(data)
         self.abstract = data
         self.data = True
 
@@ -63,17 +70,12 @@ class Trainses_json(Trainses):
             temp = g.read()
         data = json.loads(temp)
         data.update({"fname": self.file})
-
         return data
 
 
 class Trainses_mongo(Trainses):
     def __init__(self, mongorecord):
         self.add_data(mongorecord)
-        # self.laps = mongorecord.pop("laps")
-        # self.alaps = mongorecord.pop("autolaps")
-        # self.abstract = mongorecord
-        # self.data = True
 
 
 if __name__ == "__main__":
