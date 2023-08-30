@@ -25,6 +25,18 @@ class RLapAnalyzerBasic:
             result.update(temp)
         return result
 
+    def _check_allempty_data(self, param: str):
+        self.laps[param]
+
+        empty = []
+        for i, data in enumerate(self.laps[param]):
+            if len(data) == 0:
+                empty.append(i)
+        if len(empty) == len(self.laps[param]):
+            return True
+        else:
+            return False
+
     def return_paraslist(self, par: str, *arg: str) -> list[float]:
         temp = self.laps[par]
         values = []
@@ -96,16 +108,19 @@ class RLapAnalyzerBasic:
         return result
 
     def identify_easyrun(self, max_speed: float or None = None) -> bool:
+        if self._check_allempty_data("speed"):
+            return False
+
         if max_speed is None:
             max_speed = self.paces["maxeasy"]
 
-        speed = np.array([sp["avg"] for sp in self.laps["speed"]])
+        speed = []
+        for sp in self.laps["speed"]:
+            if len(sp) != 0:
+                speed.append(sp["avg"])
+        speed = np.array(speed)
 
         result = all(speed <= max_speed)
-        # if any(speed > max_speed):
-        #     result = False
-        # else:
-        #     result = True
 
         return result
 
@@ -121,18 +136,6 @@ class RManualLapAnalyzer(RLapAnalyzerBasic):
         # super(RManualLapAnalyzer, self).__init__(laps)
         super().__init__(laps)
 
-    def _check_empty_data(self, param: str):
-        self.laps[param]
-
-        empty = []
-        for i, data in enumerate(self.laps[param]):
-            if len(data) == 0:
-                empty.append(i)
-        if len(empty) == len(self.laps[param]):
-            return True
-        else:
-            return False
-
     def return_distance(self) -> list[float]:
         return self.laps["distance"]
 
@@ -140,7 +143,7 @@ class RManualLapAnalyzer(RLapAnalyzerBasic):
         return self.laps["duration"]
 
     def determine_startuprunoutlaps(self, su_speed=None) -> list[list, list]:
-        nodata = self._check_empty_data("speed")
+        nodata = self._check_allempty_data("speed")
         if nodata:
             return [], []
         if su_speed is None:
@@ -148,9 +151,9 @@ class RManualLapAnalyzer(RLapAnalyzerBasic):
         idx_su = []
         i1 = 0
 
-        if not self.laps["speed"]:
-            # empty self.laps
-            return None
+        # if not self.laps["speed"]:
+        #     # empty self.laps
+        #     return [], []
         # code hieronder kan niet omgaan met een lege dictionaryin laps["speed"]
         for speed in self.laps["speed"]:
             if len(speed) == 0:
@@ -172,7 +175,7 @@ class RManualLapAnalyzer(RLapAnalyzerBasic):
 
     def determine_lapswithoutsu(self) -> Union[dict, None]:
         su = self.determine_startuprunoutlaps()
-        if not su:
+        if su == ([], []):
             return None
 
         su = su[0] + su[1]
@@ -187,7 +190,7 @@ class RManualLapAnalyzer(RLapAnalyzerBasic):
         return laps
 
     def identify_interval(self) -> str:
-        if self._check_empty_data("speed"):
+        if self._check_allempty_data("speed"):
             return "undetermined"
 
         dspeed_int = self.paces["dspeedinterval"]

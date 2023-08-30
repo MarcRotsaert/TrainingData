@@ -6,7 +6,6 @@ import sys
 from pymongo import MongoClient
 import pymongo
 
-
 import polar_analyzer as pol_an
 from polar_base import Base_nosql
 

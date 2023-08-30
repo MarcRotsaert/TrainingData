@@ -11,7 +11,7 @@ from polar_base import Basic_Collections
 class Trainses:
     def add_data(self, data: dict):
         def _set_data_nonexercise(data):
-            self.samples = data.pop("samples")
+            # self.samples = data.pop("samples")
             self.laps = data.pop("laps")
             self.alaps = data.pop("autolaps")
             return data
