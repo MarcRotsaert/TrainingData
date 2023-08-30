@@ -101,7 +101,7 @@ class RLapAnalyzerBasic:
 
         speed = np.array([sp["avg"] for sp in self.laps["speed"]])
 
-        result = any(speed <= max_speed)
+        result = all(speed <= max_speed)
         # if any(speed > max_speed):
         #     result = False
         # else:
@@ -111,15 +111,27 @@ class RLapAnalyzerBasic:
 
 
 class RAutoLapAnalyzer(RLapAnalyzerBasic):
-    def __init__(self, alaps):
+    def __init__(self, alaps: dict):
         # super(RAutoLapAnalyzer, self).__init__(alaps)
         super().__init__(alaps)
 
 
 class RManualLapAnalyzer(RLapAnalyzerBasic):
-    def __init__(self, laps):
+    def __init__(self, laps: dict):
         # super(RManualLapAnalyzer, self).__init__(laps)
         super().__init__(laps)
+
+    def _check_empty_data(self, param: str):
+        self.laps[param]
+
+        empty = []
+        for i, data in enumerate(self.laps[param]):
+            if len(data) == 0:
+                empty.append(i)
+        if len(empty) == len(self.laps[param]):
+            return True
+        else:
+            return False
 
     def return_distance(self) -> list[float]:
         return self.laps["distance"]
@@ -128,6 +140,9 @@ class RManualLapAnalyzer(RLapAnalyzerBasic):
         return self.laps["duration"]
 
     def determine_startuprunoutlaps(self, su_speed=None) -> list[list, list]:
+        nodata = self._check_empty_data("speed")
+        if nodata:
+            return [], []
         if su_speed is None:
             su_speed = self.paces["maxruninout"]
         idx_su = []
@@ -172,6 +187,9 @@ class RManualLapAnalyzer(RLapAnalyzerBasic):
         return laps
 
     def identify_interval(self) -> str:
+        if self._check_empty_data("speed"):
+            return "undetermined"
+
         dspeed_int = self.paces["dspeedinterval"]
         laps = self.determine_lapswithoutsu()
         if not laps:
