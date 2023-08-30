@@ -29,32 +29,27 @@ class RLapAnalyzerBasic:
         temp = self.laps[par]
         values = []
         if len(arg) == 0:
-            values = [la for la in temp]
+            # values = [la for la in temp]
+            values = temp
         else:
             for la in temp:
                 try:
                     values.append(la[arg[0]])
                 except KeyError:
                     values.append(-999)
-            # values = [la[arg[0]] for la in temp]
 
         return values
 
     def print_nrlaps(self) -> None:
         print(len(self.laps["speed"]))
 
-    def compare_hr_sp(self) -> Tuple[float, float] | str:
+    def compare_hr_sp(self) -> np.array([float, float]) | None:
         if self.laps["heartRate"] is None or self.laps["speed"] is None:
             print("no heartrate or speed")
-            # return
+            return None
         else:
             avgheartr = self.return_paraslist("heartRate", "avg")
             avgspeed = self.return_paraslist("speed", "avg")
-            # heartr = self.laps["heartRate"]
-            # speed = self.laps["speed"]
-            # avgspeed = [sp["avg"] for sp in speed]
-            # avgheartr = [hr["avg"] for hr in heartr]
-            # xx
             return np.corrcoef(avgspeed, avgheartr)[0, 1]
 
     def determine_speedvariability(
@@ -73,9 +68,6 @@ class RLapAnalyzerBasic:
         speed = np.array(self.return_paraslist("speed", "avg"))
         speed = np.delete(speed, ignorelaps)
         dspeed = speed[1:] - speed[0:-1]
-        # dspeed[(dspeed > -mindspeed) & (dspeed < mindspeed)] = 0
-        # dspeed[dspeed > mindspeed] = 1
-        # dspeed[dspeed < -mindspeed] = -1
         return dspeed
 
     def determine_heartratevariability(
@@ -93,41 +85,41 @@ class RLapAnalyzerBasic:
     ) -> bool:
         if min_speed is None:
             min_speed = self.paces["minroadrace"]
+
         speedarr = np.array(self.return_paraslist("speed", "avg"))
         speedarr = np.delete(speedarr, ignorelaps)
         if len(speedarr) == 0:
             result = False
         else:
-            print(speedarr)
-            if all(speedarr > min_speed):
-                all(speedarr)
-                result = True
-            else:
-                result = False
+            # print(speedarr)
+            result = all(speedarr > min_speed)
         return result
 
     def identify_easyrun(self, max_speed: float or None = None) -> bool:
         if max_speed is None:
             max_speed = self.paces["maxeasy"]
 
-        # laps = self.return_lapswithoutsu()
         speed = np.array([sp["avg"] for sp in self.laps["speed"]])
-        if any(speed > max_speed):
-            result = False
-        else:
-            result = True
+
+        result = any(speed <= max_speed)
+        # if any(speed > max_speed):
+        #     result = False
+        # else:
+        #     result = True
 
         return result
 
 
 class RAutoLapAnalyzer(RLapAnalyzerBasic):
     def __init__(self, alaps):
-        super(RAutoLapAnalyzer, self).__init__(alaps)
+        # super(RAutoLapAnalyzer, self).__init__(alaps)
+        super().__init__(alaps)
 
 
 class RManualLapAnalyzer(RLapAnalyzerBasic):
     def __init__(self, laps):
-        super(RManualLapAnalyzer, self).__init__(laps)
+        # super(RManualLapAnalyzer, self).__init__(laps)
+        super().__init__(laps)
 
     def return_distance(self) -> list[float]:
         return self.laps["distance"]
@@ -146,13 +138,9 @@ class RManualLapAnalyzer(RLapAnalyzerBasic):
             return None
         # code hieronder kan niet omgaan met een lege dictionaryin laps["speed"]
         for speed in self.laps["speed"]:
-            # [i1]["avg"] < su_speed
-            # and i1 < len(self.laps["speed"]) - 1
-            # ):
             if len(speed) == 0:
                 idx_su.append(i1)
                 i1 += 1
-                continue
             else:
                 if speed["avg"] > su_speed:
                     break
@@ -171,62 +159,56 @@ class RManualLapAnalyzer(RLapAnalyzerBasic):
         su = self.determine_startuprunoutlaps()
         if not su:
             return None
+
         su = su[0] + su[1]
         su.sort()
         su.reverse()
         laps = self.laps.copy()
         for k in laps:
             for i_la in su:
-                try:
-                    laps[k].pop(i_la)
-                except AttributeError:  # None values
+                if laps[k] is None:
                     break
+                laps[k].pop(i_la)
         return laps
 
-    def identify_interval(self) -> Union[str, None]:
+    def identify_interval(self) -> str:
         dspeed_int = self.paces["dspeedinterval"]
         laps = self.determine_lapswithoutsu()
         if not laps:
-            return None
+            return "undetermined"
 
         speed = np.array([sp["avg"] for sp in laps["speed"]])
         sprint = self.identify_sprints()
         easyrun = self.identify_easyrun()
 
         if speed.shape[0] < 5:
-            result = "no interval, crit. 1"
+            return "no interval, crit. 1"
         elif sprint or easyrun:
-            result = "no interval, crit. 2"
-        else:
-            dspeed = speed[1:] - speed[0:-1]
-            dspeed[(dspeed < dspeed_int) & (dspeed > -dspeed_int)] = 0
-            dspeed[dspeed > dspeed_int] = 1
-            dspeed[dspeed < -dspeed_int] = -1
-            if np.count_nonzero(dspeed == 0) / len(dspeed) > 0.25:
-                result = "no interval, crit. 3, under investigation."
-            else:
-                deriv = dspeed[1:] + dspeed[0:-1]
-                if sum(deriv) == 0:
-                    # print(deriv)
-                    result = "interval"
-                else:
-                    if (
-                        len(speed) > 8
-                        and len(dspeed[dspeed == -1]) / len(dspeed) > 1 / 3
-                    ):
-                        result = "interval, check1"
+            return "no interval, crit. 2"
 
-                    elif len(speed) == 5 and len(dspeed[dspeed == -1]) == 2:
-                        result = "interval, check2"
-                    else:
-                        result = "no interval, crit. 4, under investigation"
-        return result
+        dspeed = speed[1:] - speed[0:-1]
+        dspeed[(dspeed < dspeed_int) & (dspeed > -dspeed_int)] = 0
+        dspeed[dspeed > dspeed_int] = 1
+        dspeed[dspeed < -dspeed_int] = -1
+        if np.count_nonzero(dspeed == 0) / len(dspeed) > 0.25:
+            return "no interval, crit. 3, under investigation."
+
+        deriv = dspeed[1:] + dspeed[0:-1]
+        if sum(deriv) == 0:
+            return "interval"
+
+        if len(speed) > 8 and len(dspeed[dspeed == -1]) / len(dspeed) > 1 / 3:
+            return "interval, check1"
+
+        if len(speed) == 5 and len(dspeed[dspeed == -1]) == 2:
+            return "interval, check2"
+        else:
+            return "no interval, crit. 4, under investigation"
 
     def identify_sprints(self, max_time: float = 20.0, min_cadence: int = 98) -> bool:
         sprints = []
         for lnr in range(len(self.laps["duration"])):
             lapdur_str = self.laps["duration"][lnr]
-            # lapcadence_max = self.laps["cadence"][lnr]["max"]
             lapdur = float(lapdur_str.lstrip("PT").rstrip("S"))
             if lapdur < max_time:  # and lapcadence_max > min_cadence:
                 sprints.append(lnr)

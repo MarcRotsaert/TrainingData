@@ -35,6 +35,8 @@ class Base_polar(Basic_Collections):
             "sola": [[395744, -72146], 15000],
             "meijendel": [[82905, 460500], 300],
         },
+        "sample_param": ["altitude", "heartRate", "speed", "distance", "recordedRoute"],
+        "sample_paces": {"low_movement": 7},
     }
 
     actions = ["read", "add", "identify", "determine", "read", "compare", "plot"]

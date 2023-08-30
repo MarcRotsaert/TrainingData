@@ -126,22 +126,44 @@ class MongoPolar(MongoQuery):
 
 
 if __name__ == "__main__":
-    # mongad = MongoAdapter("guess_who", "mongo-1")
+    # GET DATA FROM database
     mongad = MongoPolar("polartest4", "polar2018")
+    mongad.showConnections()
+    coll = mongad.getCollection()
+
     mongad.print_resumeattributes()
     if True:
         mongad.showConnections()
         coll = mongad.getCollection()
         docs = mongad.returnDocs()
         ids = docs[0]["_id"]
-        # xx
         print(ids)
-        # mongad.showDocs()
 
     if True:
         docs = mongad.return_docsrunning()
         for it in docs:
             print(it["fname"])
+
+    if True:
+        #
+        curs = mongad.simplequery("exportVersion", "1.6")
+        curs = mongad.morecomplexquery({"latitude": {"$gt": 0}})
+        curs = mongad.morecomplexquery({"physicalInformationSnapshot.sex": "MALE"})
+        curs = mongad.morecomplexquery({"exercises[0].distance": 8960.0})
+        curs = mongad.morecomplexquery({"exercises.speed.avg": {"$gt": 14}})
+        curs = mongad.morecomplexquery(
+            {
+                "exercises.speed.avg": {"$gt": 14},
+                "exercises.heartRate.avg": {"$gt": 140},
+            }
+        )
+        curs = mongad.morecomplexquery(
+            {"trainingtype.interval": "interval, check", "trainingtype.easyrun": True}
+        )
+        curs = mongad.simplequery("trainingtype.interval", "interval, check")
+        # print(dir(curs))
+        for c in curs:
+            print(c["fname"])
 
     if True:
         # remove fields
@@ -154,48 +176,13 @@ if __name__ == "__main__":
         for it in items2:
             i += 1
         print(i)
-        # xx
-        # mongad.updateOne(ids, {"exercises.distance": 10000})
 
-    if False:
-        mongad.updateOne(ids, {"exportVersion": "69.0"})
-        mongad.updateOne(ids, {"trainingtype": "blasting"})
+    # CHANGE DATABASE
     docs = mongad.returnDocs()
     ids = docs[0]["_id"]
     print(ids)
-
-    # session = pol_an.Trainses(
-    #     r"C:\Users\marcr\Polar\Polar\data\polar-user-data-export",
-    #     "training-session-2013-12-29-263917040-9e3eaf26-016e-4401-b268-402cb95f389c.json",
-    # )
-
-    # res = mongad.find_docssport()
-    # print(res)
-    # mongad.insertOne(res)
-    # xx
-    # mongad = MongoAdapter("polartest", "mongo-1")
-    # coll = mongad.getCollection("polartest", "mongo-1")
-    mongad.showConnections()
-    if False:
-        resume = session.return_resume()
-        mongad.insertOne(resume)
-
-    # mongad.insertOne({"ja": [1]})
+    if True:
+        mongad.updateOne(ids, {"exportVersion": "69.0"})
+        mongad.updateOne(ids, {"trainingtype": "blasting"})
 
     print("____________________________________")
-    if True:
-        # curs = mongad.simplequery("exportVersion", "1.6")
-        # curs = mongad.morecomplexquery({"latitude": {"$gt": 0}})
-        # curs = mongad.morecomplexquery({"physicalInformationSnapshot.sex": "MALE"})
-        # curs = mongad.morecomplexquery({"exercises[0].distance": 8960.0})
-        # curs = mongad.morecomplexquery({"exercises.speed.avg": {"$gt": 14}})
-        # curs = mongad.morecomplexquery(
-        #     {"exercises.speed.avg": {"$gt": 14}, "exercises.heartRate.avg": {"$gt": 140}}
-        # )
-        curs = mongad.morecomplexquery(
-            {"trainingtype.interval": "interval, check", "trainingtype.easyrun": True}
-        )
-        curs = mongad.simplequery("trainingtype.interval", "interval, check")
-        # print(dir(curs))
-        for c in curs:
-            print(c["fname"])

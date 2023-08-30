@@ -32,44 +32,6 @@ class MongoRunningClassifier:
                 objid = res["_id"]
                 self.mongo.updateOne(objid, {"trainingtype.roadrace": True})
 
-    def _return_interval(self) -> list[str]:
-        traingen = self._generator_training()
-        intervaltr = {}
-        for training in traingen:
-            if training.laps is not None:
-                lapses = pol_an.RManualLapAnalyzer(training.laps)
-                if (len(lapses.laps) != 0) & (lapses.laps["speed"] is not None):
-                    print(training.abstract["fname"])
-                    print(lapses.laps["speed"])
-                    print(len(lapses.laps))
-                    try:
-                        # TODO solution for empty laps (laps without information)
-                        su_laps = lapses.determine_startuprunoutlaps()
-                    except KeyError:
-                        continue
-                    x = lapses.identify_interval()
-                    # s if x:
-                    # print(lapses["fname"])
-                    # print(training.abstract["fname"])
-                    intervaltr.update({training.abstract["fname"]: x})
-                    # except TypeError:
-                    # print("Probabily no speed data ")
-                    # time.sleep(1)
-                    # pass
-        return intervaltr
-
-    def set_interval(self) -> None:
-        trainingen = self._return_interval()
-        for fname, descr in trainingen.items():
-            cursor = self.mongo.simplequery("fname", fname)
-            for res in cursor:
-                objid = res["_id"]
-                self.mongo.updateOne(
-                    # objid, {"trainingtype.interval": trainingen[fname]}
-                    objid,
-                    {"trainingtype.interval": descr},
-                )
-
     def _return_roadrace(self) -> list[str]:
         traingen = self._generator_training()
         race_alaps = []
@@ -106,6 +68,52 @@ class MongoRunningClassifier:
         set2 = set(race_alaps)
         return set1.union(set2)
 
+    def set_interval(self) -> None:
+        trainingen = self._return_interval()
+        for fname, descr in trainingen.items():
+            cursor = self.mongo.simplequery("fname", fname)
+            for res in cursor:
+                objid = res["_id"]
+                self.mongo.updateOne(
+                    # objid, {"trainingtype.interval": trainingen[fname]}
+                    objid,
+                    {"trainingtype.interval": descr},
+                )
+
+    def _return_interval(self) -> list[str]:
+        traingen = self._generator_training()
+        intervaltr = {}
+        for training in traingen:
+            if training.laps is not None:
+                lapses = pol_an.RManualLapAnalyzer(training.laps)
+                if (len(lapses.laps) != 0) & (lapses.laps["speed"] is not None):
+                    print(training.abstract["fname"])
+                    print(lapses.laps["speed"])
+                    print(len(lapses.laps))
+                    try:
+                        # TODO solution for empty laps (laps without information)
+                        su_laps = lapses.determine_startuprunoutlaps()
+                    except KeyError:
+                        continue
+                    x = lapses.identify_interval()
+                    # s if x:
+                    # print(lapses["fname"])
+                    # print(training.abstract["fname"])
+                    intervaltr.update({training.abstract["fname"]: x})
+                    # except TypeError:
+                    # print("Probabily no speed data ")
+                    # time.sleep(1)
+                    # pass
+        return intervaltr
+
+    def set_easyrun(self) -> None:
+        fnamerr = self._return_easyrun()
+        for fname in fnamerr:
+            result = self.mongo.simplequery("fname", fname)
+            for res in result:
+                objid = res["_id"]
+                self.mongo.updateOne(objid, {"trainingtype.easyrun": True})
+
     def _return_easyrun(self) -> list[str]:
         traingen = self._generator_training()
         easyrun = []
@@ -120,13 +128,13 @@ class MongoRunningClassifier:
                     continue
         return easyrun
 
-    def set_easyrun(self) -> None:
-        fnamerr = self._return_easyrun()
+    def set_sprint(self) -> list[str]:
+        fnamerr = self._return_sprint()
         for fname in fnamerr:
             result = self.mongo.simplequery("fname", fname)
             for res in result:
                 objid = res["_id"]
-                self.mongo.updateOne(objid, {"trainingtype.easyrun": True})
+                self.mongo.updateOne(objid, {"trainingtype.sprint": True})
 
     def _return_sprint(self) -> list[str]:
         traingen = self._generator_training()
@@ -138,14 +146,6 @@ class MongoRunningClassifier:
                     if lapses.identify_sprints():
                         sprint.append(training.abstract["fname"])
         return sprint
-
-    def set_sprint(self) -> list[str]:
-        fnamerr = self._return_sprint()
-        for fname in fnamerr:
-            result = self.mongo.simplequery("fname", fname)
-            for res in result:
-                objid = res["_id"]
-                self.mongo.updateOne(objid, {"trainingtype.sprint": True})
 
 
 if __name__ == "__main__":

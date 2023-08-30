@@ -11,6 +11,8 @@ class SampleAnalyzerBasic:
     def __init__(self, samples: dict):
         self.samples = samples
         self.locations = Base_polar.run_classattr["sample_loc"]
+        self.param = Base_polar.run_classattr["sample_param"]
+        self.paces = Base_polar.run_classattr["sample_paces"]
 
     def return_samples(self) -> dict[dict]:
         return self.samples
@@ -55,24 +57,13 @@ class SampleAnalyzerBasic:
         return rpolyrd.centroid
 
     def determine_s_location(self) -> Union[str, None]:
-        deflocs = {
-            "de velden": [[85575, 440076], 100],
-            "baanbras": [[85085, 449400], 100],
-            "kopjesloop": [[85055, 448570], 50],
-            "schiehaven": [[90775, 435330], 600],
-            "wippolder": [[86255, 446810], 150],
-            "bergenopzoom": [[81385, 389191], 400],
-            "menmoerhoeve": [[104258, 394390], 200],
-            "sola": [[395744, -72146], 15000],
-            "meijendel": [[82905, 460500], 300],
-        }
         if self.return_s_route() is None:
             location = None
         else:
             location = None
             pnts = self.return_s_pointsel([5, -5])
 
-            for loc, coord in deflocs.items():
+            for loc, coord in self.locations.items():
                 pointloc = shp.Point(coord[0][0], coord[0][1])
                 diststart = pointloc.distance(pnts[0])
                 distend = pointloc.distance(pnts[-1])
@@ -82,6 +73,8 @@ class SampleAnalyzerBasic:
         return location
 
     def plot(self, param: str) -> None:
+        if param not in self.param:
+            raise AttributeError
         pp.figure()
         values = [item["value"] for item in self.samples[param]]
         pp.plot(values)
@@ -94,12 +87,12 @@ class SamAnalExtra(SampleAnalyzerBasic):
         super(SamAnalExtra, self).__init__(samples)
 
     def return_idxlowmovement(self) -> Tuple[Union[int, None], Union[int, None]]:
-        # return index of  low activity at beginning and end of a
+        # return index of  low activity at beginning and end of a session
         speed = self.return_s_speed()
         speedlist = [sp["value"] for sp in speed]
         speed_arr = np.array(speedlist)
-        i_b = np.argwhere(speed_arr > 7)[0][0]
-        i_e = np.where(speed_arr > 7)[0][-1]
+        i_b = np.argwhere(speed_arr > self.paces["low_movement"])[0][0]
+        i_e = np.where(speed_arr > self.paces["low_movement"])[0][-1]
         if i_e == speed_arr.shape[0] - 1:
             i_e = None
         if i_b == 0:

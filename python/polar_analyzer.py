@@ -138,13 +138,11 @@ if __name__ == "__main__":
         # xx
 
     # xx
-    if False:
+    if True:
         session = SampleAnalyzerBasic(session.samples)
         session = SamAnalExtra(session.samples)
-        X = session.filter_lowmovement()
+        X = session.return_idxlowmovement()
 
-        # if True:
-        x
     files = glob.glob(os.path.join(path, "training-session-2022-*.json"))
     pointcoll = []
     for fi in files:
@@ -153,7 +151,7 @@ if __name__ == "__main__":
         print(filename)
         session = Trainses_json(path, filename)
 
-        if False:
+        if True:
             if session.laps != None:
                 # session = RLapAnalyzerBasic(session.laps)
                 # session.print_nrlaps()
@@ -182,18 +180,11 @@ if __name__ == "__main__":
                     pass
 
             print("_______________________________")
-        if False:
+        if True:
             session = SamAnalExtra(session.samples)
             session.plot("speed")
-        if False:
-            # resume = session.return_resume()
-            # print(resume)
-            # xx
-            # samples = session.return_samples()
-            # laps = session.return_laps()
-            # print(laps)
-            alaps = session.return_autolaps()
-            print(alaps)
+        if True:
+            samples = session.return_samples()
 
-            print(session.return_s_location())
+            print(session.determine_s_location())
             print(session.samples)
