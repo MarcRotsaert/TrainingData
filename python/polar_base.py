@@ -1,15 +1,14 @@
 # Basic class attributes
 
 
-class Trainses:
-    trainingtypes = ["easy", "interval", "roadrace", "sprint"]
-    datatypes = ["laps", "autolaps", "samples"]
-    sports = ["RUNNING", "CYCLING", "OTHER"]
+class Basic_Collections:
+    TRAININGTYPES = ["easy", "interval", "roadrace", "sprint"]
+    DATATYPES = ["laps", "autoLaps", "samples"]
+    SPORT = ["RUNNING", "CYCLING", "OTHER"]
 
 
-class Base_polar_json(Trainses):
-
-    classattr = {
+class Base_polar(Basic_Collections):
+    run_classattr = {
         "lap_paces": {
             "maxeasy": 14,
             "minroadrace": 15.3,
@@ -36,17 +35,19 @@ class Base_polar_json(Trainses):
             "sola": [[395744, -72146], 15000],
             "meijendel": [[82905, 460500], 300],
         },
+        "sample_param": ["altitude", "heartRate", "speed", "distance", "recordedRoute"],
+        "sample_paces": {"low_movement": 7},
     }
 
     actions = ["read", "add", "identify", "determine", "read", "compare", "plot"]
 
 
-class Base_training_classifier(Trainses):
+class Base_training_classifier(Basic_Collections):
     actions = ["set"]
 
 
 class Base_nosql:
-    datatypes = {
+    DATATYPES = {
         "database": "person",
         "collection": "year",
         "session": "training",
@@ -54,7 +55,7 @@ class Base_nosql:
         "docs": "",
     }
 
-    resume = {
+    RESUME = {
         "abstract": "session.abstract",
         "laps": "session.laps",
         "autolaps": "session:autolaps",

@@ -11,7 +11,10 @@ path = r"C:\Users\marcr\Polar\Polar\data\polar-user-data-export"
 files = glob.glob(os.path.join(path, "training-session-2015-*.json"))
 
 
-mongad = MongoPolar("polartest3", "polardb")
+mongad = MongoPolar("polartest4", "polardb")
+print(mongad.collection)
+
+
 pointcoll = []
 # items = mongad.returnDocs()
 # training-session-2015-06-03-263879174-463f62f9-4e7f-455a-9d42-fda0b0f237cc.json
@@ -36,7 +39,7 @@ for res in result:
     print(res)
 
 # xx
-if True:
+if False:
     fname = "training-session-2015-10-07-263860802-fb56334c-0b18-499a-91e7-2d3bd3b04d89.json"
     curs = mongad.simplequery("fname", fname)
     it = curs.next()

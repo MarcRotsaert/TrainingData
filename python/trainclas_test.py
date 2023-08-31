@@ -3,12 +3,12 @@ import nosql_adapter as mongodb
 import time
 
 path = r"C:\temp\polartest\polar-user-data-export"
-mongad = mongodb.MongoPolar("polartest3", "polardb")
+mongad = mongodb.MongoPolar("polartest4", "polardb")
 # result = mongad.morecomplexquery({"location": "baanbras"})
 
 
 # for res in result:
-#     session = pj.Trainses_mongo(res)
+#     session = pj.Trainses_mongo(path, rest)
 #     # print(res)
 #     if "trainingtype" in session.abstract:
 #         print(session.abstract["trainingtype"])
@@ -65,8 +65,7 @@ for res in result:
     if laps != None:
         lapses = pj.RManualLapAnalyzer(laps)
         su = lapses.determine_startuprunoutlaps()
-        result = lapses.determine_accelartion(ignorelaps=su[0] + su[1])
-        # result = lapses.return_accelartion()
+        result = lapses._determine_accelaration(ignorelaps=su[0] + su[1])
         print(result)
         print(sum(result))
         fname = session.abstract["fname"]
@@ -103,7 +102,6 @@ for res in result:
         print(session.abstract["fname"])
         print(session.abstract["location"])
         try:
-
             int_identity = lapses.identify_interval()
             print(int_identity)
             if int_identity == "interval" or int_identity == "interval, check":
