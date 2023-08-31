@@ -100,24 +100,32 @@ class MongoRunningClassifier:
         return intervaltr
 
     def set_easyrun(self) -> None:
-        fnamerr = self.return_easyrun()
-        for fname in fnamerr:
-            result = self.mongo.simplequery("fname", fname)
-            for res in result:
-                objid = res["_id"]
+        easyruns, no_easyruns = self.return_easyrun()
+        for fname in easyruns:
+            res = self.mongo.simplequery("fname", fname)
+            for training in res:
+                objid = training["_id"]
                 self.mongo.updateOne(objid, {"trainingtype.easyrun": True})
+
+        for fname in no_easyruns:
+            res = self.mongo.simplequery("fname", fname)
+            for training in res:
+                objid = training["_id"]
+                self.mongo.updateOne(objid, {"trainingtype.easyrun": False})
 
     def return_easyrun(self) -> list[str]:
         traingen = self._generator_training()
         easyrun = []
-
+        no_easyrun = []
         for training in traingen:
             lapses = pol_an.RAutoLapAnalyzer(training.alaps)
             if len(lapses.laps) == 0:
                 continue
             if lapses.identify_easyrun():
                 easyrun.append(training.abstract["fname"])
-        return easyrun
+            else:
+                no_easyrun.append(training.abstract["fname"])
+        return easyrun, no_easyrun
 
     def set_sprint(self) -> list[str]:
         fnamerr = self.return_sprint()
@@ -142,16 +150,17 @@ class MongoRunningClassifier:
 if __name__ == "__main__":
     classif = MongoRunningClassifier("polartest4", "polar2014")
 
+    classif.set_easyrun()
+    road_races = classif.mongo.simplequery("trainingtype.easyrun", True)
+    for rr in road_races:
+        print(rr["fname"])
+    print("___________________________________________________")
+    xx
     classif.set_sprint()
     road_races = classif.mongo.simplequery("trainingtype.sprint", True)
     for rr in road_races:
         print(rr["fname"])
 
-    print("___________________________________________________")
-    classif.set_easyrun()
-    road_races = classif.mongo.simplequery("trainingtype.easyrun", True)
-    for rr in road_races:
-        print(rr["fname"])
     print("___________________________________________________")
     classif.set_interval()
     interval = classif.mongo.simplequery("trainingtype.interval", "interval, check1")
