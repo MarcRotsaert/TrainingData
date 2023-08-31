@@ -123,12 +123,37 @@ class MongoPolar(MongoQuery):
         # resume = sess.return_resume()
         self.insertOne(resume)
 
+    def _has_duplicate(self, document: dict):
+        fname = document["fname"]
+        res = self.simplequery("fname", fname)
+        if len(list(res)) > 1:
+            return True
+        else:
+            return False
+
+    def find_duplicates(self):
+        duplicates = set()
+        docs = self.returnDocs()
+        for doc in docs:
+            if self._has_duplicate(doc):
+                duplicates.add(doc["fname"])
+        return duplicates
+
+    def delete_duplicates(self) -> None:
+        fnames_dupl = self.find_duplicates()
+        for fname in fnames_dupl:
+            cursor = self.simplequery("fname", fname)
+            docs = list(cursor)
+            for doc in docs[1:]:
+                self.deleteDocument(doc)
+
 
 if __name__ == "__main__":
     # GET DATA FROM database
-    mongad = MongoPolar("polartest4", "polar2018")
+    mongad = MongoPolar("polartest4", "polar2014")
     mongad.showConnections()
     coll = mongad.getCollection()
+    mongad.delete_duplicates()
 
     mongad.print_resumeattributes()
     if True:
