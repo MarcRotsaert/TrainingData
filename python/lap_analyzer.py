@@ -1,7 +1,7 @@
 from typing import Tuple, Union
 import numpy as np
-from polar_base import Base_polar
-
+# from polar_base import Base_polar
+import tomli
 
 class RLapAnalyzerBasic:
     """
@@ -9,8 +9,12 @@ class RLapAnalyzerBasic:
     """
 
     def __init__(self, laps: dict):
-        self.param = Base_polar.run_classattr["lap_param"]
-        self.paces = Base_polar.run_classattr["lap_paces"]
+        config = tomli.load(open('config.toml',"rb"))
+        self.param = config["running"]["lap_param"]
+        self.paces = config["running"]["lap_paces"]
+        
+        # self.param = Base_polar.run_classattr["lap_param"]
+        # self.paces = Base_polar.run_classattr["lap_paces"]
         self.laps = self._reshapelaps(laps)
 
     def _reshapelaps(self, laps) -> dict:

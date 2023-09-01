@@ -1,5 +1,6 @@
 import unittest
 from pymongo import MongoClient
+import tomli 
 import nosql_adapter as mongodb
 
 
@@ -64,7 +65,8 @@ class TestMongoPolar_adddata(unittest.TestCase):
         cls.adapter = mongodb.MongoPolar(cls.dbase, cls.testyear)
 
     def test_addjson2db(self):
-        path = r"C:\Users\marcr\Polar\Polar\data\polar-user-data-export"
+        config = tomli.load(open("config.toml","rb"))
+        path = config["polar_json"]["datapath"]
         filename = "training-session-2014-03-14-263911238-d1eefba4-26b5-4a68-9ed6-8571939ade8a.json"
 
         docs_voor = self.adapter.returnDocs()
@@ -86,7 +88,8 @@ class TestMongoPolar_deletedata(unittest.TestCase):
         cls.adapter = mongodb.MongoPolar(cls.dbase, cls.testyear)
 
     def test_delete_duplicates(self):
-        path = r"C:\Users\marcr\Polar\Polar\data\polar-user-data-export"
+        config = tomli.load(open("config.toml","rb"))
+        path = config["polar_json"]["datapath"]
         filename = "training-session-2014-01-07-263914646-19f7d47a-6fd0-4a4b-bdf5-56df34741458.json"
 
         self.adapter.put_jsonresume(path, filename)

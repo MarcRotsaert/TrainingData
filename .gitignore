@@ -133,3 +133,6 @@ data/
 # VSC
 settings.json
 launch.json
+
+#local polar config
+config.toml
