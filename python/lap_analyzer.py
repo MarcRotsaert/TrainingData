@@ -55,7 +55,7 @@ class RLapAnalyzerBasic:
     def print_nrlaps(self) -> None:
         print(len(self.laps["speed"]))
 
-    def compare_hr_sp(self) -> np.array([float, float]) | None:
+    def compare_hr_sp(self) -> Union[None, np.ndarray[float, float]]:
         if self.laps["heartRate"] is None or self.laps["speed"] is None:
             print("no heartrate or speed")
             return None

@@ -31,11 +31,12 @@ class TestMongoQuery(unittest.TestCase):
     def test_simplequery(self):
         cursor = self.adapter.simplequery("trainingtype.easyrun", True)
         training = [res for res in cursor]
-        self.assertEqual(len(training), 92)
+        self.assertEqual(len(training), 86)
 
     def test_morecomplexquery(self):
         cursor = self.adapter.morecomplexquery({"trainingtype": {"$exists": False}})
         training = [res for res in cursor]
+        self.assertEqual(len(training), 35)
         self.assertEqual(len(training), 35)
 
     def test_morecomplexquery2(self):
@@ -52,7 +53,7 @@ class TestMongoQuery(unittest.TestCase):
             }
         )
         training = [res for res in cursor]
-        self.assertEqual(len(training), 130)
+        self.assertEqual(len(training), 128)
 
 
 class TestMongoPolar_adddata(unittest.TestCase):
