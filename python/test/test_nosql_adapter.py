@@ -16,7 +16,7 @@ class TestMongoAdapter(unittest.TestCase):
 
     def test_returndocs(self):
         docs = self.adapter.returnDocs()
-        self.assertEqual(len(docs), 596)
+        self.assertEqual(len(docs), 298)
 
 
 class TestMongoQuery(unittest.TestCase):
@@ -37,6 +37,7 @@ class TestMongoQuery(unittest.TestCase):
         cursor = self.adapter.morecomplexquery({"trainingtype": {"$exists": False}})
         training = [res for res in cursor]
         self.assertEqual(len(training), 35)
+        self.assertEqual(len(training), 35)
 
     def test_morecomplexquery2(self):
         cursor = self.adapter.morecomplexquery(
@@ -55,7 +56,7 @@ class TestMongoQuery(unittest.TestCase):
         self.assertEqual(len(training), 128)
 
 
-class TestMongoPolar(unittest.TestCase):
+class TestMongoPolar_adddata(unittest.TestCase):
     @classmethod
     def setUp(cls) -> None:
         cls.dbase = "polartest4"
@@ -71,6 +72,31 @@ class TestMongoPolar(unittest.TestCase):
 
         docs_na = self.adapter.returnDocs()
         self.assertEqual(len(docs_na) - len(docs_voor), 1)
+
+    @classmethod
+    def tearDown(cls):
+        cls.adapter.deleteCollection()
+
+
+class TestMongoPolar_deletedata(unittest.TestCase):
+    @classmethod
+    def setUp(cls) -> None:
+        cls.dbase = "polartest4"
+        cls.testyear = "polartest"
+        cls.adapter = mongodb.MongoPolar(cls.dbase, cls.testyear)
+
+    def test_delete_duplicates(self):
+        path = r"C:\Users\marcr\Polar\Polar\data\polar-user-data-export"
+        filename = "training-session-2014-01-07-263914646-19f7d47a-6fd0-4a4b-bdf5-56df34741458.json"
+
+        self.adapter.put_jsonresume(path, filename)
+        self.adapter.put_jsonresume(path, filename)
+        docs_voor = self.adapter.returnDocs()
+
+        self.adapter.delete_duplicates()
+        docs_na = self.adapter.returnDocs()
+
+        self.assertEqual(len(docs_na), 1)
 
     @classmethod
     def tearDown(cls):

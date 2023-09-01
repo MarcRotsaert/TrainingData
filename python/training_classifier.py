@@ -100,41 +100,32 @@ class MongoRunningClassifier:
         return intervaltr
 
     def set_easyrun(self) -> None:
-        easyrun, no_easyrun = self.return_easyrun()
-        for fname in easyrun:
-            result = self.mongo.simplequery("fname", fname)
-            for res in result:
-                objid = res["_id"]
-                self.mongo.updateOne(objid, {"trainingtype.easyrun": True})
-        for fname in no_easyrun:
-            result = self.mongo.simplequery("fname", fname)
-            for res in result:
-                objid = res["_id"]
+        easyruns, no_easyruns = self.return_easyrun()
+
+        for fname in easyruns:
+            res = self.mongo.simplequery("fname", fname)
+            for training in res:
+                objid = training["_id"]
+
+        for fname in no_easyruns:
+            res = self.mongo.simplequery("fname", fname)
+            for training in res:
+                objid = training["_id"]
                 self.mongo.updateOne(objid, {"trainingtype.easyrun": False})
 
     def return_easyrun(self) -> list[str]:
-        traingen = self._generator_training()
+        trainingen = self._generator_training()
         easyrun = []
         no_easyrun = []
 
-        for training in traingen:
-            if (
-                training.abstract["fname"]
-                == "training-session-2014-04-11-263909204-dcdf0fcf-b3d8-4f81-8920-75352b184a6c.json"
-            ):
-                print("x")
-                # xx
-                        
+        for training in trainingen:
             if training.laps is not None and len(training.laps) > 2:
                 lapses = pol_an.RManualLapAnalyzer(training.laps)
-                if len(lapses.laps) == 0:
-                    continue
-
                 if lapses.identify_easyrun():
                     easyrun.append(training.abstract["fname"])
                 else:
                     no_easyrun.append(training.abstract["fname"])
-            
+  
             else:
                 lapses = pol_an.RAutoLapAnalyzer(training.alaps)
                 if len(lapses.laps) == 0:
@@ -143,7 +134,8 @@ class MongoRunningClassifier:
                     easyrun.append(training.abstract["fname"])
                 else:
                     no_easyrun.append(training.abstract["fname"])
-        return easyrun, no_easyrun
+ 
+        return easyrun, no_easyrun, no_easyrun
 
     def set_sprint(self) -> list[str]:
         fnamerr = self.return_sprint()
