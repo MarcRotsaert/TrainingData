@@ -124,13 +124,25 @@ class MongoRunningClassifier:
             ):
                 print("x")
                 # xx
-            lapses = pol_an.RManualLapAnalyzer(training.laps)
-            if len(lapses.laps) == 0:
-                continue
-            if lapses.identify_easyrun():
-                easyrun.append(training.abstract["fname"])
+                        
+            if training.laps is not None and len(training.laps) > 2:
+                lapses = pol_an.RManualLapAnalyzer(training.laps)
+                if len(lapses.laps) == 0:
+                    continue
+
+                if lapses.identify_easyrun():
+                    easyrun.append(training.abstract["fname"])
+                else:
+                    no_easyrun.append(training.abstract["fname"])
+            
             else:
-                no_easyrun.append(training.abstract["fname"])
+                lapses = pol_an.RAutoLapAnalyzer(training.alaps)
+                if len(lapses.laps) == 0:
+                    continue
+                if lapses.identify_easyrun():
+                    easyrun.append(training.abstract["fname"])
+                else:
+                    no_easyrun.append(training.abstract["fname"])
         return easyrun, no_easyrun
 
     def set_sprint(self) -> list[str]:
@@ -162,7 +174,7 @@ if __name__ == "__main__":
     for rr in road_races:
         print(rr["fname"])
     print("___________________________________________________")
-    xx
+    # xx
     classif.set_sprint()
     road_races = classif.mongo.simplequery("trainingtype.sprint", True)
     for rr in road_races:
