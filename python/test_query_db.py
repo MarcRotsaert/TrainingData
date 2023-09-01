@@ -3,7 +3,7 @@ import os
 import glob
 
 from nosql_adapter import MongoPolar
-import polar_json as pj
+import polar_analyzer as pj
 import time
 from matplotlib import pyplot as pp
 
@@ -11,7 +11,7 @@ path = r"C:\Users\marcr\Polar\Polar\data\polar-user-data-export"
 files = glob.glob(os.path.join(path, "training-session-2015-*.json"))
 
 
-mongad = MongoPolar("polartest4", "polardb")
+mongad = MongoPolar("polartest4", "polar2014")
 print(mongad.collection)
 
 
@@ -55,7 +55,7 @@ if True:
         fname = it["fname"]
         print("_________________")
         print(fname)
-        Ses = pj.Trainses(path, fname)
+        Ses = pj.Trainses_json(path, fname)
         Samp = pj.SamAnalExtra(Ses.samples)
 
         Samp.plot("speed")
@@ -66,7 +66,7 @@ if True:
     items2 = mongad.getbyField("interval")
     for it in items2:
         print(it)
-    # xx
+    xx
 
 if True:
     items2 = mongad.morecomplexquery({"trainingtype.interval": "interval"})
@@ -74,7 +74,7 @@ if True:
     for it in items2:
         fname = it["fname"]
         print("_________________")
-        Ses = pj.Trainses(path, fname)
+        Ses = pj.Trainses_json(path, fname)
         Samp = pj.SamAnalExtra(Ses.samples)
 
         Samp.plot("speed")
