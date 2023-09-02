@@ -1,7 +1,8 @@
-from typing import Tuple, Union
+from typing import Union
 import numpy as np
 
 import tomli
+
 
 class RLapAnalyzerBasic:
     """
@@ -9,10 +10,10 @@ class RLapAnalyzerBasic:
     """
 
     def __init__(self, laps: dict):
-        config = tomli.load(open('config.toml',"rb"))
+        config = tomli.load(open("config.toml", "rb"))
         self.param = config["running"]["lap_param"]
         self.paces = config["running"]["lap_paces"]
-        
+
         self.laps = self._reshapelaps(laps)
 
     def _reshapelaps(self, laps) -> dict:

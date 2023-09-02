@@ -2,7 +2,6 @@
 Skin over mongodb nosql database voor Polar.
 """
 
-import sys
 import tomli
 from pymongo import MongoClient
 import pymongo
@@ -13,12 +12,12 @@ import polar_analyzer as pol_an
 class MongoAdapter:
     # Baseclass Mongo
     def __init__(self, mongoDB: str, collection: str):
-        config = tomli.load(open('config.toml', "rb"))
+        config = tomli.load(open("config.toml", "rb"))
         self.client = MongoClient(
-            host=config['mongodb']['host'],
-            serverSelectionTimeoutMS=config['mongodb']['timeout'],
-            username=config['mongodb']['loginname'],
-            password=config['mongodb']['password'],
+            host=config["mongodb"]["host"],
+            serverSelectionTimeoutMS=config["mongodb"]["timeout"],
+            username=config["mongodb"]["loginname"],
+            password=config["mongodb"]["password"],
         )
         self.dbname: str = mongoDB
         self.collection: str = collection
@@ -142,8 +141,8 @@ class MongoPolar(MongoQuery):
 
 if __name__ == "__main__":
     # GET DATA FROM database
-    config = tomli.load(open('config.toml', "rb"))
-    mongad = MongoPolar(config['mongodb']['database'], "polar2014")
+    config = tomli.load(open("config.toml", "rb"))
+    mongad = MongoPolar(config["mongodb"]["database"], "polar2014")
     mongad.showConnections()
     coll = mongad.getCollection()
     mongad.delete_duplicates()

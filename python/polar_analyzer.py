@@ -19,8 +19,8 @@ class Trainses:
             return data
 
         def _set_data_exercise(data):
-            config = tomli.load(open("config.toml","rb"))
-            for dtype in config["polar_json"]['datatypes']:
+            config = tomli.load(open("config.toml", "rb"))
+            for dtype in config["polar_json"]["datatypes"]:
                 if dtype == "autolaps":
                     dtype_attr = "alaps"
                 else:
@@ -31,7 +31,7 @@ class Trainses:
                 else:
                     setattr(self, dtype_attr, None)
 
-            param = config['running']['overall_param']
+            param = config["running"]["overall_param"]
             for par in param:
                 if par in data["exercises"][0]:
                     data.update({par: data["exercises"][0][par]})
@@ -82,12 +82,10 @@ class Trainses_mongo(Trainses):
 
 
 if __name__ == "__main__":
+    config = tomli.load(open("config.toml", "rb"))
+    path = config["polar_json"]["datapath"]
 
-    config = tomli.load(open('config.toml',"rb"))
-    path = config['polar_json']['datapath']
-  
-
-    if True:
+    if False:
         file = "training-session-2015-06-26-263879702-2d485ab0-ef26-4100-b2ae-1ca9c5f144d6.json"
         # file = "training-session-2019-10-30-4009640085-5105bf47-b37c-47c3-a96c-d74653ae0d5a.json"
         # training-session-2015-07-03-263876996-e9c14b6c-bc80-4c10-b335-91081c2552e7.json
@@ -131,11 +129,11 @@ if __name__ == "__main__":
         session = Trainses_json(path, filename)
 
         if True:
-            if session.laps != None:
+            if session.laps is not None:
                 lapses = RManualLapAnalyzer(session.laps)
                 lapses.compare_hr_sp()
         if True:
-            if session.laps != None:
+            if session.laps is not None:
                 lapses = RManualLapAnalyzer(session.laps)
                 result = lapses.identify_interval()
                 print(result)
@@ -143,13 +141,13 @@ if __name__ == "__main__":
                 result = lapses.identify_sprints()
                 print("sprints? " + str(result))
 
-            if session.alaps != None:
-                try:
-                    lapses = RManualLapAnalyzer(session.alaps)
-                    result = lapses.identify_easyrun()
-                    print("easyrun?" + str(result))
-                except:
-                    pass
+            if session.alaps is not None:
+                # try:
+                lapses = RManualLapAnalyzer(session.alaps)
+                result = lapses.identify_easyrun()
+                print("easyrun?" + str(result))
+                # except:
+                #    pass
 
             print("_______________________________")
         if True:

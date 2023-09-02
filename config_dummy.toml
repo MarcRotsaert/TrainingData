@@ -1,11 +1,12 @@
 [polar_json]
 datapath = "{{datapath}}"
-datatypes = ["laps", "autolaps", "samples"]
+datatypes = ["laps", "autoLaps", "samples"]
 sport = ["RUNNING", "CYCLING", "OTHER"]
 
 [mongodb]
+database = "{{databasename}}"
 password = "{{password}}"
-loginname = "{{inlogname}}
+loginname = "{{inlogname}}"
 host = "localhost:27017"
 timeout=3000
 level.database = "person"
@@ -20,7 +21,7 @@ lap_paces.dspeedinterval = 3
 
 lap_param = ["distance", "duration", "cadence","heartRate","speed","ascent","descent"]
 
-running.sample_param = ["altitude", "heartRate", "speed", "distance", "recordedRoute"]
+sample_param = ["altitude", "heartRate", "speed", "distance", "recordedRoute"]
 [running.sample_paces]
         low_movement = 7
 [running.sample_loc]

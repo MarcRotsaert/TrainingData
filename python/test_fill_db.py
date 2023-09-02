@@ -1,14 +1,13 @@
-#!/usr/bin/python
 import os
 import glob
 
 from nosql_adapter import MongoPolar
-import polar_json as pj
+
 import tomli
 
 config = tomli.load(open("config.toml", "rb"))
-database = config['mongodb']['database']
-path = config['polar_json']['datapath']
+database = config["mongodb"]["database"]
+path = config["polar_json"]["datapath"]
 for year in range(2013, 2022):
     mongad = MongoPolar(database, "polar" + str(year))
     files = glob.glob(os.path.join(path, "training-session-" + str(year) + "-*.json"))
