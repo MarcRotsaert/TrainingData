@@ -1,16 +1,16 @@
 # Determine training type en set info in Mongo DB.
 from typing import Generator
-
+import tomli
 import polar_analyzer as pol_an
 import nosql_adapter as mongodb
-from polar_base import Base_training_classifier
 
 
 class MongoRunningClassifier:
     def __init__(self, dbase: str, collection: str):
         self.mongo = mongodb.MongoPolar(dbase, collection)
         self.SPORT = "RUNNING"
-        self.TRAININGTYPES = Base_training_classifier.TRAININGTYPES
+        config = tomli.load(open('config.toml',"rb"))
+        self.TRAININGTYPES = config['polar_json']['sport']
 
     def print_trainingtypes(self) -> None:
         print(self.TRAININGTYPES)
@@ -135,7 +135,7 @@ class MongoRunningClassifier:
                 else:
                     no_easyrun.append(training.abstract["fname"])
  
-        return easyrun, no_easyrun, no_easyrun
+        return easyrun, no_easyrun
 
     def set_sprint(self) -> list[str]:
         fnamerr = self.return_sprint()
@@ -158,7 +158,8 @@ class MongoRunningClassifier:
 
 
 if __name__ == "__main__":
-    classif = MongoRunningClassifier("polartest4", "polar2014")
+    config = tomli.load(open('config.toml', "rb"))
+    classif = MongoRunningClassifier(config['mongodb']['database'], "polar2014")
 
     easyrun, no_easyrun = classif.return_easyrun()
     classif.set_easyrun()

@@ -4,10 +4,13 @@ datatypes = ["laps", "autolaps", "samples"]
 sport = ["RUNNING", "CYCLING", "OTHER"]
 
 [mongodb]
-database="person"
-collection="year"
-doc="training"
-
+password = "{{password}}"
+loginname = "{{inlogname}}
+host = "localhost:27017"
+timeout=3000
+level.database = "person"
+level.collection = "year"
+level.doc = "training"
 
 [running]
 lap_paces.maxeasy = 14
@@ -15,19 +18,18 @@ lap_paces.minroadrace = 15.3
 lap_paces.maxruninout = 13.2
 lap_paces.dspeedinterval = 3
 
-lap_param=["distance", "duration", "cadence","heartRate","speed","ascent","descent"]
+lap_param = ["distance", "duration", "cadence","heartRate","speed","ascent","descent"]
 
-running.sample_param=["altitude", "heartRate", "speed", "distance", "recordedRoute"]
+running.sample_param = ["altitude", "heartRate", "speed", "distance", "recordedRoute"]
 [running.sample_paces]
-        low_movement=7
+        low_movement = 7
 [running.sample_loc]
-        develden=[[85575,440076], 100]
-        baanbras=[[85085, 449400],100]
-        kopjesloop=[[85055, 448570],50]
-        schiehaven=[[90775, 435330],600]
-        wippolder=[[86255, 446810],150]
-        bergenopzoom=[[81385, 389191],400]
-        menmoerhoeve=[[104258, 394390],200]
-        sola=[[395744, -72146],15000]
-        meijendel=[[82905, 460500],300]
-
+        develden = [[85575,440076], 100]
+        baanbras = [[85085, 449400],100]
+        kopjesloop = [[85055, 448570],50]
+        schiehaven = [[90775, 435330],600]
+        wippolder = [[86255, 446810],150]
+        bergenopzoom = [[81385, 389191],400]
+        menmoerhoeve = [[104258, 394390],200]
+        sola = [[395744, -72146],15000]
+        meijendel = [[82905, 460500],300]

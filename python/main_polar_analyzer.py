@@ -1,5 +1,7 @@
 import polar_analyzer as pol_an
 import tomli
+
+
 config = tomli.load(open("config.toml",'rb'))
 path = config['polar_json']['datapath']
 fnames = (

@@ -1,6 +1,6 @@
 from typing import Tuple, Union
 import numpy as np
-# from polar_base import Base_polar
+
 import tomli
 
 class RLapAnalyzerBasic:
@@ -13,8 +13,6 @@ class RLapAnalyzerBasic:
         self.param = config["running"]["lap_param"]
         self.paces = config["running"]["lap_paces"]
         
-        # self.param = Base_polar.run_classattr["lap_param"]
-        # self.paces = Base_polar.run_classattr["lap_paces"]
         self.laps = self._reshapelaps(laps)
 
     def _reshapelaps(self, laps) -> dict:
@@ -30,8 +28,6 @@ class RLapAnalyzerBasic:
         return result
 
     def _check_allempty_data(self, param: str):
-        self.laps[param]
-
         empty = []
         for i, data in enumerate(self.laps[param]):
             if len(data) == 0:
@@ -45,7 +41,6 @@ class RLapAnalyzerBasic:
         temp = self.laps[par]
         values = []
         if len(arg) == 0:
-            # values = [la for la in temp]
             values = temp
         else:
             for la in temp:

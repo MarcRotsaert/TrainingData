@@ -3,16 +3,17 @@ import numpy as np
 from matplotlib import pyplot as pp
 import shapely as shp
 import geopandas as gpd
-
-from polar_base import Base_polar
+import tomli
 
 
 class SampleAnalyzerBasic:
     def __init__(self, samples: dict):
+
+        config = tomli.load(open("config.toml", "rb"))
         self.samples = samples
-        self.locations = Base_polar.run_classattr["sample_loc"]
-        self.param = Base_polar.run_classattr["sample_param"]
-        self.paces = Base_polar.run_classattr["sample_paces"]
+        self.locations = config["running"]["sample_loc"]
+        self.param = config["running"]["sample_param"]
+        self.paces = config["running"]["sample_paces"]
 
     def return_samples(self) -> dict[dict]:
         return self.samples
