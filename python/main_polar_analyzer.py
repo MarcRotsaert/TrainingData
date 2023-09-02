@@ -1,7 +1,9 @@
 import polar_analyzer as pol_an
+import tomli
 
 
-path = r"C:\Users\marcr\Polar\Polar\data\polar-user-data-export"
+config = tomli.load(open("config.toml", "rb"))
+path = config["polar_json"]["datapath"]
 fnames = (
     "training-session-2014-01-27-263915162-07e7d91b-d3aa-4f89-b2f5-036d8a023f3e.json",
     "training-session-2014-01-28-263915222-2eae615f-9203-4444-a264-5bb5cfdef6e4.json",

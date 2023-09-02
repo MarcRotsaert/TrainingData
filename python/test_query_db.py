@@ -1,17 +1,20 @@
 #!/usr/bin/python
 import os
 import glob
+import tomli
 
 from nosql_adapter import MongoPolar
 import polar_analyzer as pj
 import time
 from matplotlib import pyplot as pp
 
-path = r"C:\Users\marcr\Polar\Polar\data\polar-user-data-export"
+config = tomli.load(open("config.toml", "rb"))
+path = config['polar_json']['datapath']
+# path = r"C:\Users\marcr\Polar\Polar\data\polar-user-data-export"
 files = glob.glob(os.path.join(path, "training-session-2015-*.json"))
 
-
-mongad = MongoPolar("polartest4", "polar2014")
+database = config['mongodb']['database']
+mongad = MongoPolar(database, "polar2014")
 print(mongad.collection)
 
 

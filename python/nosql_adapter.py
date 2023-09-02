@@ -2,22 +2,22 @@
 Skin over mongodb nosql database voor Polar.
 """
 
-import sys
+import tomli
 from pymongo import MongoClient
 import pymongo
 
 import polar_analyzer as pol_an
-from polar_base import Base_nosql
 
 
 class MongoAdapter:
     # Baseclass Mongo
     def __init__(self, mongoDB: str, collection: str):
+        config = tomli.load(open("config.toml", "rb"))
         self.client = MongoClient(
-            host="localhost:27017",
-            serverSelectionTimeoutMS=3000,
-            username="student",
-            password="miw3",
+            host=config["mongodb"]["host"],
+            serverSelectionTimeoutMS=config["mongodb"]["timeout"],
+            username=config["mongodb"]["loginname"],
+            password=config["mongodb"]["password"],
         )
         self.dbname: str = mongoDB
         self.collection: str = collection
@@ -79,9 +79,6 @@ class MongoAdapter:
 
 
 class MongoQuery(MongoAdapter):
-    # def __init__(self, mongoDB, collection):
-    #    super().__init__(mongoDB, collection)
-
     def simplequery(self, keyn: any, valn: any) -> pymongo.cursor.Cursor:
         collection = self.getCollection()
         cursor = collection.find({keyn: valn})
@@ -101,13 +98,7 @@ class MongoPolar(MongoQuery):
 
     def __init__(self, mongoDB: str, collection: str):
         # initiate collection
-        # MongoAdapter.__init__(self, mongoDB, collection)
-        # MongoQuery.__init__(self, mongoDB, collection)
         super().__init__(mongoDB, collection)
-
-    def print_resumeattributes(self) -> None:
-        # print content resume.
-        print(Base_nosql.RESUME)
 
     def return_docsrunning(self) -> pymongo.cursor.Cursor:
         curs = self.simplequery("sport", "RUNNING")
@@ -150,12 +141,12 @@ class MongoPolar(MongoQuery):
 
 if __name__ == "__main__":
     # GET DATA FROM database
-    mongad = MongoPolar("polartest4", "polar2014")
+    config = tomli.load(open("config.toml", "rb"))
+    mongad = MongoPolar(config["mongodb"]["database"], "polar2014")
     mongad.showConnections()
     coll = mongad.getCollection()
     mongad.delete_duplicates()
 
-    mongad.print_resumeattributes()
     if True:
         mongad.showConnections()
         coll = mongad.getCollection()
@@ -207,6 +198,4 @@ if __name__ == "__main__":
     print(ids)
     if True:
         mongad.updateOne(ids, {"exportVersion": "69.0"})
-        mongad.updateOne(ids, {"trainingtype": "blasting"})
-
     print("____________________________________")

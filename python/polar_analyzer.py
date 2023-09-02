@@ -1,11 +1,13 @@
 # Processing data export polar data json files
 
 import os
+import glob
 import json
+
+import tomli
 
 from lap_analyzer import RManualLapAnalyzer, RAutoLapAnalyzer
 from sample_analyzer import SampleAnalyzerBasic, SamAnalExtra
-from polar_base import Basic_Collections
 
 
 class Trainses:
@@ -17,7 +19,8 @@ class Trainses:
             return data
 
         def _set_data_exercise(data):
-            for dtype in Basic_Collections.DATATYPES:
+            config = tomli.load(open("config.toml", "rb"))
+            for dtype in config["polar_json"]["datatypes"]:
                 if dtype == "autolaps":
                     dtype_attr = "alaps"
                 else:
@@ -28,7 +31,7 @@ class Trainses:
                 else:
                     setattr(self, dtype_attr, None)
 
-            param = ["speed", "heartrate", "ascent", "descent", "sport"]
+            param = config["running"]["overall_param"]
             for par in param:
                 if par in data["exercises"][0]:
                     data.update({par: data["exercises"][0][par]})
@@ -79,27 +82,16 @@ class Trainses_mongo(Trainses):
 
 
 if __name__ == "__main__":
-    path = r"C:\Users\marcr\Polar\Polar\data\polar-user-data-export"
-    import glob
+    config = tomli.load(open("config.toml", "rb"))
+    path = config["polar_json"]["datapath"]
 
     if False:
-        file = "training-session-2015-04-18-263883440-3be46e75-6a93-4746-a320-96c9660f809c.json"
-        session = Trainses(path, file)
-        # alaps = session.return_alaps()
-        lapses = RAutoLapAnalyzer(session.alaps)
-        result = lapses.return_accelartion()
-        print(result)
-        print(sum(result))
-        xx
-    if True:
-        # file = "training-session-2019-10-30-4009640085-5105bf47-b37c-47c3-a96c-d74653ae0d5a.json"
         file = "training-session-2015-06-26-263879702-2d485ab0-ef26-4100-b2ae-1ca9c5f144d6.json"
+        # file = "training-session-2019-10-30-4009640085-5105bf47-b37c-47c3-a96c-d74653ae0d5a.json"
         # training-session-2015-07-03-263876996-e9c14b6c-bc80-4c10-b335-91081c2552e7.json
         # training-session-2015-09-20-263873564-7f116bac-8756-4f54-a5a0-9272ec0f44ee.json
-        # training-session-2015-09-22
         # training-session-2015-09-29-263860670-b456e24e-4325-411f-b2c6-3e3a3bc29de6.json
         # training-session-2015-10-24-263861018-3690058d-71c0-47c3-8539-e7b67e8099fe.json
-
         # training-session-2015-10-17-263860916-1b563b91-c4f4-4991-878c-5c1225f84b2c.json
         session = Trainses_json(path, file)
         laps = session.return_laps()
@@ -115,76 +107,54 @@ if __name__ == "__main__":
     if True:
         file = "training-session-2015-01-14-263888618-3d72bde3-4957-4db4-8fa6-662a180a2d23.json"
         session = Trainses_json(path, file)
-        # alaps = session.return_alaps()
         lapses = RAutoLapAnalyzer(session.alaps)
         result = lapses.identify_roadrace()
         # xx
     if True:
         file = "training-session-2015-04-18-263883440-3be46e75-6a93-4746-a320-96c9660f809c.json"
-
         session = Trainses_json(path, file)
         laps = session.return_laps()
         lapses = RManualLapAnalyzer(session.laps)
-        # xx
-        # print(session.return_startuprunoutlaps())
-        # laps = session.return_lapswithoutsu()
-        # result = session.identify_easyrun()
-        # result = session.identify_interval()
 
-        # su_laps = lapses.return_startuprunoutlaps()
-        # ignorelaps = su_laps[0] + su_laps[1]
-        # result = lapses.identify_roadrace(ignorelaps)
-        # print(result)
-        # xx
-
-    # xx
     if True:
-        session = SampleAnalyzerBasic(session.samples)
-        session = SamAnalExtra(session.samples)
-        X = session.return_idxlowmovement()
+        samses = SampleAnalyzerBasic(session.samples)
+        samses = SamAnalExtra(session.samples)
+        X = samses.return_idxlowmovement()
 
     files = glob.glob(os.path.join(path, "training-session-2022-*.json"))
     pointcoll = []
-    for fi in files:
-        # "training-session-2014-12-07-263916482-2cbe9312-6b71-4693-8519-a9a860a23cbc.json"
+    for fi in files[0:5]:
         filename = fi.split("\\")[-1]
         print(filename)
         session = Trainses_json(path, filename)
 
         if True:
-            if session.laps != None:
-                # session = RLapAnalyzerBasic(session.laps)
-                # session.print_nrlaps()
-                session = RManualLapAnalyzer(session.laps)
-                # print(session.return_startuprunoutlaps())
-                # print(session.return_startuprunoutlaps())
-                # laps = session.return_lapswithoutsu()
-                print(result)
-                session.compare_hr_sp()
+            if session.laps is not None:
+                lapses = RManualLapAnalyzer(session.laps)
+                lapses.compare_hr_sp()
         if True:
-            if session.laps != None:
-                sessionl = RManualLapAnalyzer(session.laps)
-                result = sessionl.identify_interval()
+            if session.laps is not None:
+                lapses = RManualLapAnalyzer(session.laps)
+                result = lapses.identify_interval()
                 print(result)
 
-                result = sessionl.identify_sprints()
+                result = lapses.identify_sprints()
                 print("sprints? " + str(result))
 
-            if session.alaps != None:
-                try:
-                    sessiona = RManualLapAnalyzer(session.alaps)
-                    sessiona = RManualLapAnalyzer(session.alaps)
-                    result = sessiona.identify_easyrun()
-                    print("easyrun?" + str(result))
-                except:
-                    pass
+            if session.alaps is not None:
+                # try:
+                lapses = RManualLapAnalyzer(session.alaps)
+                result = lapses.identify_easyrun()
+                print("easyrun?" + str(result))
+                # except:
+                #    pass
 
             print("_______________________________")
         if True:
-            session = SamAnalExtra(session.samples)
-            session.plot("speed")
+            samses = SamAnalExtra(session.samples)
+            samses.plot("speed")
         if True:
-            samples = session.return_samples()
+            samples = samses.return_samples()
 
-            print(session.determine_s_location())
-            print(session.samples)
+            print(samses.determine_s_location())
+            print(samses.samples)
