@@ -21,7 +21,7 @@ class Trainses:
         def _set_data_exercise(data):
             config = tomli.load(open("config.toml", "rb"))
             for dtype in config["polar_json"]["datatypes"]:
-                if dtype == "autolaps":
+                if dtype == "autoLaps":
                     dtype_attr = "alaps"
                 else:
                     dtype_attr = dtype
