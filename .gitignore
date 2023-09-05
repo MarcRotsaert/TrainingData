@@ -133,6 +133,8 @@ data/
 # VSC
 settings.json
 launch.json
+tasks.json
+jsconfig.json
 
 #local polar config
 config.toml
