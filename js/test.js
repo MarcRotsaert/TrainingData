@@ -54,7 +54,18 @@ if (false) {
 dosomething1 = function (y) { return (y + 1) }
 dosomething2 = function addone(y) { return (y + 1) }
 
-
-
 console.log(dosomething1(10))
 console.log(dosomething2(10))
+
+harry = [1,'2', null, undefined]
+// console.log(harry.length)
+// console.log(harry[0])
+y = harry.forEach(dosomething1)
+console.log(y)
+
+x= harry.map(dosomething1)
+console.log(x)
+
+console.log(harry.pop())
+
+
