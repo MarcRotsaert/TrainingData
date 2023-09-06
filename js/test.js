@@ -50,22 +50,26 @@ if (false) {
     console.log(robj.getValue(5))
     console.log(robj.getRandomValue)
 }
+if (false) {
+    let x = 10;
+    x ||= 5; console.log(x)
+    dosomething1 = function (y) { return (y + 1) }
+    dosomething2 = function addone(y) { return (y + 1) }
 
-dosomething1 = function (y) { return (y + 1) }
-dosomething2 = function addone(y) { return (y + 1) }
+    console.log(dosomething1(10))
+    console.log(dosomething2(10))
 
-console.log(dosomething1(10))
-console.log(dosomething2(10))
+    harry = [1, '2', null, undefined]
+    // console.log(harry.length)
+    // console.log(harry[0])
+    y = harry.forEach(dosomething1)
+    console.log(y)
 
-harry = [1,'2', null, undefined]
-// console.log(harry.length)
-// console.log(harry[0])
-y = harry.forEach(dosomething1)
-console.log(y)
+    x = harry.map(dosomething1)
+    console.log(x)
 
-x= harry.map(dosomething1)
-console.log(x)
-
-console.log(harry.pop())
-
-
+    console.log(harry.pop())
+}
+var x = Array("ja", "nee")
+console.log(x.filter())
+console.log(x[0])
