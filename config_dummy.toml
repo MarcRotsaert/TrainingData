@@ -3,6 +3,10 @@ datapath = "{{datapath}}"
 datatypes = ["laps", "autoLaps", "samples"]
 sport = ["RUNNING", "CYCLING", "OTHER"]
 
+[forerunner_xml]
+datapath= '{{datapath}}'
+datatypes = ["laps", "samples"]
+
 [mongodb]
 database = "{{databasename}}"
 password = "{{password}}"
