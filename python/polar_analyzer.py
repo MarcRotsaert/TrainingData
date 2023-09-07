@@ -11,9 +11,8 @@ from sample_analyzer import SampleAnalyzerBasic, SamAnalExtra
 
 
 class Trainses:
-    def add_data(self, data: dict):
+    def add_data(self, data: dict) -> None:
         def _set_data_nonexercise(data):
-            # self.samples = data.pop("samples")
             self.laps = data.pop("laps")
             self.alaps = data.pop("autolaps")
             return data
@@ -68,7 +67,7 @@ class Trainses_json(Trainses):
         self.add_data(data)
         self.data = True
 
-    def _read_json(self) -> None:
+    def _read_json(self) -> dict:
         with open(os.path.join(self.path, self.file)) as g:
             temp = g.read()
         data = json.loads(temp)
@@ -85,7 +84,7 @@ if __name__ == "__main__":
     config = tomli.load(open("config.toml", "rb"))
     path = config["polar_json"]["datapath"]
 
-    if False:
+    if True:
         file = "training-session-2015-06-26-263879702-2d485ab0-ef26-4100-b2ae-1ca9c5f144d6.json"
         # file = "training-session-2019-10-30-4009640085-5105bf47-b37c-47c3-a96c-d74653ae0d5a.json"
         # training-session-2015-07-03-263876996-e9c14b6c-bc80-4c10-b335-91081c2552e7.json

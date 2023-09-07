@@ -87,10 +87,10 @@ class MongoQuery(MongoAdapter):
 
     def morecomplexquery(self, query: dict[any]) -> pymongo.cursor.Cursor:
         collection = self.getCollection()
-        cursor = collection.find(query)  # {"distance":{"$gt":"7000"}}
+        cursor = collection.find(query)
         return cursor
 
-    def _has_duplicate(self, document: dict):
+    def _has_duplicate(self, document: dict) -> bool:
         fname = document["fname"]
         res = self.simplequery("fname", fname)
         if len(list(res)) > 1:
@@ -136,13 +136,12 @@ class MongoPolar(MongoQuery):
         SamAnal = pol_an.SampleAnalyzerBasic(sess.samples)
         loc = SamAnal.determine_s_location()
         resume.update({"location": loc, "laps": sess.laps, "autolaps": sess.alaps})
-        # resume = sess.return_resume()
         self.insertOne(resume)
 
 
 class MongoForerunner(MongoQuery):
     """
-    Mongo-extension for Polar.
+    Mongo-extension for Forerunner data.
     Data for
     """
 
@@ -157,7 +156,6 @@ class MongoForerunner(MongoQuery):
         SamAnal = for_an.SampleAnalyzerBasic(sess.samples)
         loc = SamAnal.determine_s_location()
         resume.update({"location": loc, "laps": sess.laps})
-        # resume = sess.return_resume()
         self.insertOne(resume)
 
 

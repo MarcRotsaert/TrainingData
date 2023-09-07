@@ -15,7 +15,7 @@ class SampleAnalyzerBasic:
         self.param = config["running"]["sample_param"]
         self.paces = config["running"]["sample_paces"]
 
-    def return_samples(self) -> dict[dict]:
+    def return_samples(self) -> dict[list]:
         return self.samples
 
     def return_s_heartrate(self) -> list[dict]:
@@ -84,7 +84,7 @@ class SampleAnalyzerBasic:
 
 
 class SamAnalExtra(SampleAnalyzerBasic):
-    def __init__(self, samples: dict[dict]):
+    def __init__(self, samples: dict[list]):
         super(SamAnalExtra, self).__init__(samples)
 
     def return_idxlowmovement(self) -> Tuple[Union[int, None], Union[int, None]]:

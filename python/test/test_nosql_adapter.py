@@ -53,7 +53,6 @@ class TestMongoQuery(unittest.TestCase):
             }
         )
         training = [res for res in cursor]
-        # self.assertEqual(len(training), 128)
         self.assertTrue(125 < len(training) < 130)
 
 
@@ -94,7 +93,6 @@ class TestMongoPolar_deletedata(unittest.TestCase):
 
         self.adapter.put_jsonresume(path, filename)
         self.adapter.put_jsonresume(path, filename)
-        # docs_voor = self.adapter.returnDocs()
 
         self.adapter.delete_duplicates()
         docs_na = self.adapter.returnDocs()
@@ -143,7 +141,6 @@ class TestMongoForerunner_deletedata(unittest.TestCase):
 
         self.adapter.put_jsonresume(path, filename)
         self.adapter.put_jsonresume(path, filename)
-        # docs_voor = self.adapter.returnDocs()
 
         self.adapter.delete_duplicates()
         docs_na = self.adapter.returnDocs()

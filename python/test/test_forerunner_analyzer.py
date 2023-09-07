@@ -4,9 +4,6 @@ import tomli
 
 import forerunner_analyzer as for_an
 
-# import nosql_adapter as mongodb
-
-
 class ForerunnerAnalyzer(unittest.TestCase):
     @classmethod
     def setUp(cls) -> None:
@@ -14,7 +11,7 @@ class ForerunnerAnalyzer(unittest.TestCase):
         config = tomli.load(open("config.toml", "rb"))
         cls.path = config["forerunner_xml"]["datapath"]
 
-    def test_read_data1(self):
+    def test_read_data_multilap(self):
         file = "20050725-190632.xml"
         session = for_an.Trainses_xml(self.path, file)
         with self.subTest():
@@ -22,7 +19,7 @@ class ForerunnerAnalyzer(unittest.TestCase):
         with self.subTest():
             self.assertIn("fname", session.abstract)
 
-    def test_read_data2(self):
+    def test_read_data_onelap(self):
         file = "20041008-170457.xml"
         session = for_an.Trainses_xml(self.path, file)
         with self.subTest():

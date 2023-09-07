@@ -76,7 +76,7 @@ class RLapAnalyzerBasic:
 
     def _determine_accelaration(
         self, ignorelaps: list[int] = []
-    ) -> np.array:  # , mindspeed=0.400):
+    ) -> np.array:
         speed = np.array(self.return_paraslist("speed", "avg"))
         speed = np.delete(speed, ignorelaps)
         dspeed = speed[1:] - speed[0:-1]
@@ -103,7 +103,6 @@ class RLapAnalyzerBasic:
         if len(speedarr) == 0:
             result = False
         else:
-            # print(speedarr)
             result = all(speedarr > min_speed)
         return result
 
@@ -127,13 +126,11 @@ class RLapAnalyzerBasic:
 
 class RAutoLapAnalyzer(RLapAnalyzerBasic):
     def __init__(self, alaps: dict):
-        # super(RAutoLapAnalyzer, self).__init__(alaps)
         super().__init__(alaps)
 
 
 class RManualLapAnalyzer(RLapAnalyzerBasic):
     def __init__(self, laps: dict):
-        # super(RManualLapAnalyzer, self).__init__(laps)
         super().__init__(laps)
 
     def return_distance(self) -> list[float]:
@@ -151,9 +148,6 @@ class RManualLapAnalyzer(RLapAnalyzerBasic):
         idx_su = []
         i1 = 0
 
-        # if not self.laps["speed"]:
-        #     # empty self.laps
-        #     return [], []
         # code hieronder kan niet omgaan met een lege dictionaryin laps["speed"]
         for speed in self.laps["speed"]:
             if len(speed) == 0:
@@ -231,7 +225,7 @@ class RManualLapAnalyzer(RLapAnalyzerBasic):
         for lnr in range(len(self.laps["duration"])):
             lapdur_str = self.laps["duration"][lnr]
             lapdur = float(lapdur_str.lstrip("PT").rstrip("S"))
-            if lapdur < max_time:  # and lapcadence_max > min_cadence:
+            if lapdur < max_time:
                 sprints.append(lnr)
         result = len(sprints) > 3
         return result
