@@ -94,7 +94,7 @@ class TestMongoPolar_deletedata(unittest.TestCase):
 
         self.adapter.put_jsonresume(path, filename)
         self.adapter.put_jsonresume(path, filename)
-        docs_voor = self.adapter.returnDocs()
+        # docs_voor = self.adapter.returnDocs()
 
         self.adapter.delete_duplicates()
         docs_na = self.adapter.returnDocs()
@@ -104,3 +104,48 @@ class TestMongoPolar_deletedata(unittest.TestCase):
     @classmethod
     def tearDown(cls):
         cls.adapter.deleteCollection()
+
+
+class TestMongoForerunner_adddata(unittest.TestCase):
+    @classmethod
+    def setUp(cls) -> None:
+        cls.dbase = "polartest4"
+        cls.testyear = "polartest"
+        cls.adapter = mongodb.MongoForerunner(cls.dbase, cls.testyear)
+
+    def test_addjson2db(self):
+        config = tomli.load(open("config.toml", "rb"))
+        path = config["forerunner_xml"]["datapath"]
+        filename = "20040922-132041.xml"
+
+        docs_voor = self.adapter.returnDocs()
+        self.adapter.put_jsonresume(path, filename)
+
+        docs_na = self.adapter.returnDocs()
+        self.assertEqual(len(docs_na) - len(docs_voor), 1)
+
+    @classmethod
+    def tearDown(cls):
+        cls.adapter.deleteCollection()
+
+
+class TestMongoForerunner_deletedata(unittest.TestCase):
+    @classmethod
+    def setUp(cls) -> None:
+        cls.dbase = "polartest4"
+        cls.testyear = "polartest"
+        cls.adapter = mongodb.MongoForerunner(cls.dbase, cls.testyear)
+
+    def test_delete_duplicates(self):
+        config = tomli.load(open("config.toml", "rb"))
+        path = config["forerunner_xml"]["datapath"]
+        filename = "20040922-132041.xml"
+
+        self.adapter.put_jsonresume(path, filename)
+        self.adapter.put_jsonresume(path, filename)
+        # docs_voor = self.adapter.returnDocs()
+
+        self.adapter.delete_duplicates()
+        docs_na = self.adapter.returnDocs()
+
+        self.assertEqual(len(docs_na), 1)
