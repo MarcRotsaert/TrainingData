@@ -1,5 +1,5 @@
 import os
-import tomli 
+import tomli
 import pprint
 import xml.etree.ElementTree as ET
 
@@ -9,7 +9,7 @@ from sample_analyzer import SampleAnalyzerBasic, SamAnalExtra
 
 
 class Trainses:
-     def add_data(self, data: dict):
+    def add_data(self, data: dict):
         def _set_data_nonexercise(data):
             # self.samples = data.pop("samples")
             self.laps = data.pop("laps")
@@ -35,13 +35,13 @@ class Trainses:
             data.pop("exercises")
             return data
 
-         # self.data = data
+        # self.data = data
         if "exercises" in data:
             data = _set_data_exercise(data)
         else:
             data = _set_data_nonexercise(data)
         self.abstract = data
-        self.data = True       
+        self.data = True
 
 
 class Trainses_xml(Trainses):
@@ -58,7 +58,7 @@ class Trainses_xml(Trainses):
 
     def _read_xml(self) -> None:
         data = fparser.Parser(self.file).xml2json()
-        
+
         # with open(os.path.join(self.path, self.file)) as g:
         #     temp = g.read()
         # data = json.loads(temp)
@@ -71,13 +71,13 @@ if __name__ == "__main__":
     path = config["forerunner_xml"]["datapath"]
 
     if True:
-        file = '20050725-190632.xml'
+        file = "20050725-190632.xml"
         session = Trainses_xml(path, file)
         lapses = RManualLapAnalyzer(session.laps)
-        SamAnalExtra(session.samples).determine_s_location()
+        print(SamAnalExtra(session.samples).determine_s_location())
 
-        file = '20041008-170457.xml'
+        file = "20041008-170457.xml"
         session = Trainses_xml(path, file)
+        print(session)
         # lapses = RManualLapAnalyzer(session.laps)
         # result = lapses.identify_roadrace()
-
