@@ -74,6 +74,7 @@ if __name__ == "__main__":
         file = '20050725-190632.xml'
         session = Trainses_xml(path, file)
         lapses = RManualLapAnalyzer(session.laps)
+        SamAnalExtra(session.samples).determine_s_location()
 
         file = '20041008-170457.xml'
         session = Trainses_xml(path, file)

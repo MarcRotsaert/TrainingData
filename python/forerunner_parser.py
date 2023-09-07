@@ -123,9 +123,11 @@ class Parser(Forerunner_parser):
 
         recordedroute = Sampleparser(self.filename).xml2samples()
         if len(laps)>1:
-            json = {"exercises":[{"laps":laps, "recordedroute":recordedroute}]}
+            json = {"exercises":[{"laps":laps, 
+                                  "samples":{"recordedRoute":recordedroute}}]}
         else:
-            json = {laps, {"exercises":[{"recordedroute":recordedroute }]}}
+            json = {laps, 
+                      {"exercises":[{"samples":{"recordedRoute":recordedroute }}]}}
         return json
 
 

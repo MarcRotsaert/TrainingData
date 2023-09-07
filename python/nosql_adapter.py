@@ -7,6 +7,7 @@ from pymongo import MongoClient
 import pymongo
 
 import polar_analyzer as pol_an
+import forerunner_analyzer as for_an
 
 
 class MongoAdapter:
@@ -138,6 +139,26 @@ class MongoPolar(MongoQuery):
             for doc in docs[1:]:
                 self.deleteDocument(doc)
 
+
+class MongoForerunner(MongoQuery):
+    """
+    Mongo-extension for Polar.
+    Data for
+    """
+
+    def __init__(self, mongoDB: str, collection: str):
+        # initiate collection
+        super().__init__(mongoDB, collection)
+
+    def put_jsonresume(self, path: str, fname: str) -> None:
+        # Add JSON-file to a collection
+        sess = for_an.Trainses_xml(path, fname)
+        resume = sess.abstract
+        SamAnal = for_an.SampleAnalyzerBasic(sess.samples)
+        loc = SamAnal.determine_s_location()
+        resume.update({"location": loc, "laps": sess.laps})
+        # resume = sess.return_resume()
+        self.insertOne(resume)
 
 if __name__ == "__main__":
     # GET DATA FROM database
