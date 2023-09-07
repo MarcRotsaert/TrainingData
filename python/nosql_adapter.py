@@ -90,31 +90,6 @@ class MongoQuery(MongoAdapter):
         cursor = collection.find(query)  # {"distance":{"$gt":"7000"}}
         return cursor
 
-
-class MongoPolar(MongoQuery):
-    """
-    Mongo-extension for Polar.
-    Data for
-    """
-
-    def __init__(self, mongoDB: str, collection: str):
-        # initiate collection
-        super().__init__(mongoDB, collection)
-
-    def return_docsrunning(self) -> pymongo.cursor.Cursor:
-        curs = self.simplequery("sport", "RUNNING")
-        return curs
-
-    def put_jsonresume(self, path: str, fname: str) -> None:
-        # Add JSON-file to a collection
-        sess = pol_an.Trainses_json(path, fname)
-        resume = sess.abstract
-        SamAnal = pol_an.SampleAnalyzerBasic(sess.samples)
-        loc = SamAnal.determine_s_location()
-        resume.update({"location": loc, "laps": sess.laps, "autolaps": sess.alaps})
-        # resume = sess.return_resume()
-        self.insertOne(resume)
-
     def _has_duplicate(self, document: dict):
         fname = document["fname"]
         res = self.simplequery("fname", fname)
@@ -140,6 +115,31 @@ class MongoPolar(MongoQuery):
                 self.deleteDocument(doc)
 
 
+class MongoPolar(MongoQuery):
+    """
+    Mongo-extension for Polar.
+    Data for
+    """
+
+    def __init__(self, mongoDB: str, collection: str):
+        # initiate collection
+        super().__init__(mongoDB, collection)
+
+    def return_docsrunning(self) -> pymongo.cursor.Cursor:
+        curs = self.simplequery("sport", "RUNNING")
+        return curs
+
+    def put_jsonresume(self, path: str, fname: str) -> None:
+        # Add JSON-file to a collection
+        sess = pol_an.Trainses_json(path, fname)
+        resume = sess.abstract
+        SamAnal = pol_an.SampleAnalyzerBasic(sess.samples)
+        loc = SamAnal.determine_s_location()
+        resume.update({"location": loc, "laps": sess.laps, "autolaps": sess.alaps})
+        # resume = sess.return_resume()
+        self.insertOne(resume)
+
+
 class MongoForerunner(MongoQuery):
     """
     Mongo-extension for Polar.
@@ -160,9 +160,16 @@ class MongoForerunner(MongoQuery):
         # resume = sess.return_resume()
         self.insertOne(resume)
 
+
 if __name__ == "__main__":
     # GET DATA FROM database
     config = tomli.load(open("config.toml", "rb"))
+    mongfr = MongoForerunner(config["mongodb"]["database"], "polar2004")
+
+    path = config["forerunner_xml"]["datapath"]
+    mongfr.put_jsonresume(path, "20050725-190632.xml")
+    print(mongfr.returnDocs())
+
     mongad = MongoPolar(config["mongodb"]["database"], "polar2014")
     mongad.showConnections()
     coll = mongad.getCollection()
