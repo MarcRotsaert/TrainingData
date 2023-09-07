@@ -1,3 +1,5 @@
+import Math
+
 const conti = 1
 let leti
 var vari
@@ -70,6 +72,14 @@ if (false) {
 
     console.log(harry.pop())
 }
-var x = Array("ja", "nee")
-console.log(x.filter())
-console.log(x[0])
+
+// STRING
+var x = "stringie"
+y = x.slice(1, 3)
+// var x = Array("ja", "nee")
+// console.log(x.filter())
+// console.log(x[0])
+
+let text = "Please locate where 'locate' occurs!";
+text.search("locate");
+text.search(/locate/)
