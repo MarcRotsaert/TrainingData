@@ -10,13 +10,12 @@ class Forerunner_parser:
         self.Namespace = '{http://www.garmin.com/xmlschemas/ForerunnerLogbook}'
         self.filename = filename
 
-
     def _xml_parser(self):
         xml = ET.parse(os.path.join(self.path, self.filename))
         session = xml.find(f'{self.Namespace}Run')
         laps = session.findall(f'{self.Namespace}Lap')
-        samples =session.findall(f'{self.Namespace}Track')
-        return session, laps, samples
+        track =session.findall(f'{self.Namespace}Track')
+        return session, laps, track
 
 
 class Lapparser(Forerunner_parser):
@@ -38,7 +37,6 @@ class Lapparser(Forerunner_parser):
         speed =  3600*(distance/s_duration)/1000
         return round(speed,1)
 
-
     def xml2json_laps(self):
         laps = []    
         for i, lap in enumerate(self.laps):
@@ -56,10 +54,42 @@ class Lapparser(Forerunner_parser):
 
 class Sampleparser(Forerunner_parser):
     def __init__(self, filename ):
-        super(Forerunner_parser)
-        _, _, self.samples = self._xml_parser() 
-    def xml2json_samples(self):
+        super().__init__(filename)
+        _, _, track = self._xml_parser()
+        print(track[0])
+        self.samples = track[0].findall(f'{self.Namespace}Trackpoint')
+        print(self.samples)
 
-# if __name_ == '__main__':
-x = Lapparser('20050725-190632.xml').xml2json_laps()
-pprint.pprint(x)
+    def xml2json_samples(self):
+        recordedRoute = []
+        for sample in self.samples:
+            # dateTime
+            alt = self._return_altitude(sample)
+            lat, lon = self._return_latlon(sample)
+            time = self._return_time(sample)
+            recordedRoute.append({'latitude':lat,
+                                  'longitude':lon,
+                                  'altitude':alt,
+                                  'dateTime':time
+                                  })
+        return recordedRoute
+
+    def _return_altitude(self, sample):
+        sample2 = sample.find(f'{self.Namespace}Position')
+        return sample2.find(f'{self.Namespace}Altitude').text
+
+    def _return_latlon(self, sample):
+        sample2 = sample.find(f'{self.Namespace}Position')
+        lat = sample2.find(f'{self.Namespace}Latitude').text
+        lon = sample2.find(f'{self.Namespace}Longitude').text
+        return lat, lon
+
+    def _return_time(self, sample):
+        return sample.find(f'{self.Namespace}Time').text
+
+
+if __name__ == '__main__':
+    y = Sampleparser('20050725-190632.xml').xml2json_samples()
+    pprint.pprint(y)
+    # x = Lapparser('20050725-190632.xml').xml2json_laps()
+    # pprint.pprint(x)
