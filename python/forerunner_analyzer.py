@@ -3,124 +3,80 @@ import tomli
 import pprint
 import xml.etree.ElementTree as ET
 
-class Forerunner_parser:
-    def __init__(self, filename: str):
-        config = tomli.load(open('config.toml',"rb"))
-        self.path = config['forerunner_xml']['datapath']
-        self.Namespace = '{http://www.garmin.com/xmlschemas/ForerunnerLogbook}'
-        self.filename = filename
-
-    def _xml_parser(self) -> tuple[ET.Element, ET.Element, ET.Element]:
-        xml = ET.parse(os.path.join(self.path, self.filename))
-        session = xml.find(f'{self.Namespace}Run')
-        laps = session.findall(f'{self.Namespace}Lap')
-        track =session.findall(f'{self.Namespace}Track')
-        return session, laps, track
+import forerunner_parser as fparser
+from lap_analyzer import RManualLapAnalyzer, RAutoLapAnalyzer
+from sample_analyzer import SampleAnalyzerBasic, SamAnalExtra
 
 
-class Lapparser(Forerunner_parser):
-    def __init__(self, filename: str):
-        super().__init__(filename)
-        _, self.laps, _= self._xml_parser() 
+class Trainses:
+     def add_data(self, data: dict):
+        def _set_data_nonexercise(data):
+            # self.samples = data.pop("samples")
+            self.laps = data.pop("laps")
+            return data
 
-    def _return_starttime(self, lap: ET.Element) -> str:
-        return lap.find(f'{self.Namespace}StartTime').text
+        def _set_data_exercise(data):
+            config = tomli.load(open("config.toml", "rb"))
+            for dtype in config["forerunner_xml"]["datatypes"]:
+                if dtype == "autoLaps":
+                    dtype_attr = "alaps"
+                else:
+                    dtype_attr = dtype
 
-    def _return_latitude(self, lap: ET.Element) -> float:
-        temp = lap.find(f'{self.Namespace}BeginPosition')
-        return float(temp.find(f'{self.Namespace}Latitude').text)
+                if dtype in data["exercises"][0]:
+                    setattr(self, dtype_attr, data["exercises"][0].pop(dtype))
+                else:
+                    setattr(self, dtype_attr, None)
 
-    def _return_longitude(self, lap: ET.Element) -> float:
-        temp = lap.find(f'{self.Namespace}BeginPosition')
-        return float(temp.find(f'{self.Namespace}Longitude').text)
+            param = config["running"]["overall_param"]
+            for par in param:
+                if par in data["exercises"][0]:
+                    data.update({par: data["exercises"][0][par]})
+            data.pop("exercises")
+            return data
 
-    def _return_distance(self, lap: ET.Element) -> float:
-        length = lap.find(f'{self.Namespace}Length').text       
-        return float(length) 
-
-    def _return_duration(self, lap: ET.Element) -> str:
-        return lap.find(f'{self.Namespace}Duration').text
-
-    def _return_speed(self, lap: ET.Element) -> float: 
-        duration = self._return_duration(lap)
-        s_duration = float(duration[2:-1])
-        distance = self._return_distance(lap)
-        speed =  3600*(distance/s_duration)/1000
-        return round(speed,1)
-
-    def xml2json_laps(self) -> list[dict]:
-        if len(self.laps)>1:
-            json = self._xml2json_multiplelap()    
+         # self.data = data
+        if "exercises" in data:
+            data = _set_data_exercise(data)
         else:
-            json = self._xml2json_onelap()    
-        return json
-
-    def _xml2json_onelap(self) -> list[dict]:
-        exercises =[
-            {'startTime': self._return_starttime(self.laps[0]),
-             'duration': self._return_duration(self.laps[0]),
-             'distance': self._return_distance(self.laps[0]),
-             'latitude': self._return_latitude(self.laps[0]),
-             'longitude': self._return_longitude(self.laps[0]),
-             'speed': {'avg': self._return_speed(self.laps[0])}
-            }
-        ]
-        return exercises
-
-    def _xml2json_multiplelap(self) ->list[dict]:
-        laps = []    
-        for i, lap in enumerate(self.laps):
-            duration = self._return_duration(lap)
-            distance = self._return_distance(lap)
-            speed = self._return_speed(lap)
-            laps.append( {'lapNumber':i,
-                      'duration':duration,
-                      'speed':{'avg':speed},
-                      'distance':distance
-                      })
-            print(len(laps))
-        return laps
+            data = _set_data_nonexercise(data)
+        self.abstract = data
+        self.data = True       
 
 
-class Sampleparser(Forerunner_parser):
-    def __init__(self, filename: str):
-        super().__init__(filename)
-        _, _, track = self._xml_parser()
-        self.samples = track[0].findall(f'{self.Namespace}Trackpoint')
+class Trainses_xml(Trainses):
+    def __init__(self, path: str, file: str):
+        self.path = path
+        self.file = file
+        self.laps = []
+        self.alaps = []
+        self.abstract = {}
+        data = self._read_xml()
 
-    def xml2json_samples(self) -> list[dict]:
-        recordedRoute = []
-        for sample in self.samples:
-            # dateTime
-            alt = self._return_altitude(sample)
-            lat, lon = self._return_latlon(sample)
-            time = self._return_time(sample)
-            recordedRoute.append({'latitude':lat,
-                                  'longitude':lon,
-                                  'altitude':alt,
-                                  'dateTime':time
-                                  })
-        return recordedRoute
+        self.add_data(data)
+        self.data = True
 
-    def _return_altitude(self, sample: ET.Element):
-        sample2 = sample.find(f'{self.Namespace}Position')
-        return sample2.find(f'{self.Namespace}Altitude').text
-
-    def _return_latlon(self, sample: ET.Element):
-        sample2 = sample.find(f'{self.Namespace}Position')
-        lat = sample2.find(f'{self.Namespace}Latitude').text
-        lon = sample2.find(f'{self.Namespace}Longitude').text
-        return lat, lon
-
-    def _return_time(self, sample: ET.Element):
-        return sample.find(f'{self.Namespace}Time').text
+    def _read_xml(self) -> None:
+        data = fparser.Parser(self.file).xml2json()
+        
+        # with open(os.path.join(self.path, self.file)) as g:
+        #     temp = g.read()
+        # data = json.loads(temp)
+        data.update({"fname": self.file})
+        return data
 
 
-if __name__ == '__main__':
-    x = Lapparser('20041008-170457.xml').xml2json_laps()
-    pprint.pprint(x)
-    x = Lapparser('20050725-190632.xml').xml2json_laps()
-    pprint.pprint(x)
-    
-    y = Sampleparser('20050725-190632.xml').xml2json_samples()
-    pprint.pprint(y)
+if __name__ == "__main__":
+    config = tomli.load(open("config.toml", "rb"))
+    path = config["forerunner_xml"]["datapath"]
+
+    if True:
+        file = '20050725-190632.xml'
+        session = Trainses_xml(path, file)
+        lapses = RManualLapAnalyzer(session.laps)
+
+        file = '20041008-170457.xml'
+        session = Trainses_xml(path, file)
+        # lapses = RManualLapAnalyzer(session.laps)
+        # result = lapses.identify_roadrace()
+
