@@ -18,6 +18,10 @@ mongad = MongoPolar(database, "polar2014")
 print(mongad.collection)
 
 
+mongad = MongoPolar(database, "forerunner2006")
+cursor = mongad.simplequery("location", None)
+res = list(cursor)
+
 pointcoll = []
 # items = mongad.returnDocs()
 # training-session-2015-06-03-263879174-463f62f9-4e7f-455a-9d42-fda0b0f237cc.json
