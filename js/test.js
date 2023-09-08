@@ -1,4 +1,3 @@
-import Math
 
 const conti = 1
 let leti
@@ -79,7 +78,40 @@ y = x.slice(1, 3)
 // var x = Array("ja", "nee")
 // console.log(x.filter())
 // console.log(x[0])
-
+if (false) {
 let text = "Please locate where 'locate' occurs!";
 text.search("locate");
-text.search(/locate/)
+console.log(text.search(/locate/))
+}
+
+//LOOPS
+let language = "JavaScript";
+
+let text2 = "";
+for (let x of language) {
+text2 += x;
+console.log(text2)
+}
+
+let text3 = "";
+for (let x in language) {
+text3 += x;
+console.log(text3)
+}
+
+// Create a Set
+const letters = new Set(["a","b","c"]);
+
+// List all Elements
+let text4 = "";
+letters.forEach (function(value) {
+  text4 += value;
+})
+
+console.log(typeof text4)
+
+
+f = "tt".constructor
+g = [1].constructor
+console.log(typeof f('888'))
+console.log(typeof g('888'))
