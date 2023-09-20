@@ -49,7 +49,6 @@ class Garminfit_parser:
                         print(frame.name)
         return session
 
-
     def _extract_alaps(self):
         alaps = []
         with fitdecode.FitReader(os.path.join(self.path, self.filename)) as fitreader:
@@ -73,7 +72,7 @@ class Garminfit_parser:
                     if frame.name == "lap":
                         field_lap_trigger = self._find_onefield(frame,'lap_trigger')
                         try: 
-                             if field_lap_trigger.name in ["manual", "session_end"]:
+                             if field_lap_trigger.value in ["manual", "session_end", "time"]:
                                 laps.append(frame)
                         except:
                             pass
@@ -107,7 +106,6 @@ class Lapparser(Garminfit_parser):
     def __init__(self, filename: str):
         super().__init__(filename)
         _, self.alaps, self.laps, _ = self._fit_parser()
-
 
     def _return_starttime(self, lap: FitDataMessage) -> str:
         par_name = 'start_time'
@@ -144,17 +142,6 @@ class Lapparser(Garminfit_parser):
         # fieldnames = self._get_fitframedata_fieldnames(lap)
         return self._values_from_frame(lap, par_names)
 
-    # def _frame2laps_onelap(self,lapnr) -> dict:
-    #     result = {
-    #         "startTime": self._return_starttime(self.laps[lapnr]),
-    #         "duration": self._return_duration(self.laps[lapnr]),
-    #         "distance": self._return_distance(self.laps[lapnr]),
-    #         "latitude": self._return_latitude(self.laps[lapnr]),
-    #         "longitude": self._return_longitude(self.laps[lapnr]),
-    #         "speed": {"avg": self._return_speed(self.laps[lapnr])},
-    #     }
-    #     return result
-
     def fit2laps(self, laps_alaps) -> dict or list:
         json = self._fit2laps_multiplelap(laps_alaps)
         return json
@@ -185,7 +172,6 @@ class Lapparser(Garminfit_parser):
         return laps_out
 
 
-
 # class Sampleparser():
 #     name = "record"
 #     timestamp
@@ -207,6 +193,6 @@ if __name__=='__main__':
     
     for lap in laps:
         y = Lapparser('marcrotsaert_712321869.fit')._return_heartrate(lap)
-        print(y)        
+        print(y)
         y = Lapparser('marcrotsaert_712321869.fit')._return_cadence(lap)
         print(y)
