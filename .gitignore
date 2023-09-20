@@ -136,3 +136,4 @@ launch.json
 
 #local polar config
 config.toml
+docker/makeaiwork3_files
