@@ -253,6 +253,28 @@ class Sampleparser(Garminfit_parser):
         return speed_kmu
 
 
+class Parser(Garminfit_parser):
+    def __init__(self, filename: str):
+       super().__init__(filename)
+       self.session, self.alaps, self.laps, self.samples = self._fit_parser()
+
+    def fit2json(self):
+        laps = Lapparser(self.filename).fit2laps('laps')
+        alaps = Lapparser(self.filename).fit2laps('alaps')
+        recordedroute = Sampleparser(self.filename).fit2samples()
+        # if isinstance(laps, list):
+        json = {
+            "exercises": [
+                {"alaps": alaps, "laps": laps, "samples": {"recordedRoute": recordedroute}}
+            ]
+        }
+        # else:
+        #    json = laps
+        #    json.update({"exercises": [{"samples": {"recordedRoute": recordedroute}}]})
+
+        return json
+
+
 if __name__ == '__main__':
     g = Sampleparser('marcrotsaert_220466005.fit')
     print(g._return_latlon(g.samples[100]))
