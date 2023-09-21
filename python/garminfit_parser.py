@@ -1,6 +1,5 @@
 import os
 import tomli
-import pprint
 import numpy as np
 import fitdecode
 from fitdecode.records import FitDataMessage
@@ -11,6 +10,7 @@ from typing import Union
 # * fitdecode.FitDataMessage (FIT_FRAME_DATA)
 # * fitdecode.FitCRC (FIT_FRAME_CRC)
 
+
 class Garminfit_parser:
     def __init__(self, filename: str):
         config = tomli.load(open("config.toml", "rb"))
@@ -20,7 +20,7 @@ class Garminfit_parser:
     def _fit_parser(self) -> [FitDataMessage, ]:
         alaps_raw = self._extract_alaps()
         laps_raw = self._extract_laps()
-        samples_raw = self._extract_samples()        
+        samples_raw = self._extract_samples()
         session_raw = self._extract_session()
         return session_raw, alaps_raw, laps_raw, samples_raw
 
@@ -46,7 +46,7 @@ class Garminfit_parser:
                     # Here, frame is a FitDataMessage object.
                     # A FitDataMessage object contains decoded values that
                     # are directly usable in your script logic.
-                    if frame.name=="record":
+                    if frame.name == "record":
                         samples.append(frame)
         return samples
 
@@ -69,41 +69,39 @@ class Garminfit_parser:
             for frame in fitreader:
                 if frame.frame_type == fitdecode.FIT_FRAME_DATA:
                     if frame.name == "lap":
-                        field_lap_trigger = self._find_onefield(frame,'lap_trigger')
+                        field_lap_trigger = self._find_onefield(frame, 'lap_trigger')
                         print(field_lap_trigger.value)
-                        try: 
-                            if field_lap_trigger.value == "distance":
-                                alaps.append(frame)
-                        except:
-                            pass
+                        if field_lap_trigger.value == "distance":
+                            alaps.append(frame)
         return alaps
 
     def _extract_laps(self):
-        laps = [] 
+        laps = []
         with fitdecode.FitReader(os.path.join(self.path, self.filename)) as fitreader:
             for frame in fitreader:
                 if frame.frame_type == fitdecode.FIT_FRAME_DATA:
                     if frame.name == "lap":
-                        field_lap_trigger = self._find_onefield(frame,'lap_trigger')
-                        try: 
-                             if field_lap_trigger.value in ["manual", "session_end", "time"]:
-                                laps.append(frame)
-                        except:
-                            pass
+                        field_lap_trigger = self._find_onefield(frame, 'lap_trigger')
+                        if field_lap_trigger.value in ["manual", "session_end", "time"]:
+                            laps.append(frame)
         return laps
 
-    def _find_onefield(self,frame, fieldname):
-        for i,field in enumerate(frame.fields):
+    def _find_onefield(self, frame, fieldname):
+        for i, field in enumerate(frame.fields):
             if field.name == fieldname:
                 return field
 
     def _values_from_frame(self, frame: FitDataMessage, fieldnames: Union[list, str]) -> list:
         if isinstance(fieldnames, str):
             fieldnames = [fieldnames]
+
         values = []
         for fi in fieldnames:
             field = self._find_onefield(frame, fi)
-            values.append(field.value)
+            if hasattr(field, 'value'):
+                values.append(field.value)
+            else:
+                values.append(None)
         return values
 
     def _get_fitframedata_fieldnames(self):
@@ -112,14 +110,13 @@ class Garminfit_parser:
             for frame in fitreader:
                 if frame.frame_type == fitdecode.FIT_FRAME_DATA:
                     fieldnames.add(frame.name)
-                    #print(frame.fields)
-        return(fieldnames)
-
+        return fieldnames
 
     def _semicircles2deg(self, value_in):
-        degree = value_in * ( 180 / 2**31 )
+        degree = value_in * (180 / 2**31)
         return degree
-    
+
+
 class Lapparser(Garminfit_parser):
     def __init__(self, filename: str):
         super().__init__(filename)
@@ -132,7 +129,10 @@ class Lapparser(Garminfit_parser):
     def _return_latitude(self, lap: FitDataMessage) -> float:
         par_name = 'start_position_lat'
         value_semicirc = self._values_from_frame(lap, par_name)[0]
-        degree = self._semicircles2deg(value_semicirc)
+        if value_semicirc is not None:
+            degree = self._semicircles2deg(value_semicirc)
+        else:
+            degree = None
         return degree
 
     def _return_longitude(self, lap: FitDataMessage) -> float:
@@ -150,9 +150,10 @@ class Lapparser(Garminfit_parser):
         return self._values_from_frame(lap, par_name)[0]
 
     def _return_speed(self, lap: FitDataMessage) -> list[float]:
-        par_names = ['enhanced_avg_speed', 'avg_speed', 'enhanced_max_speed', 'max_speed']
-        speed_list =  self._values_from_frame(lap, par_names)
-        speed_kmu = np.array(speed_list)*3600/1000 # 
+        par_names = ['enhanced_avg_speed', 'avg_speed',
+                     'enhanced_max_speed', 'max_speed']
+        speed_list = self._values_from_frame(lap, par_names)
+        speed_kmu = np.array(speed_list)*3600/1000  # m/s -> km/u
         return speed_kmu
 
     def _return_heartrate(self, lap: FitDataMessage) -> list[float]:
@@ -161,7 +162,6 @@ class Lapparser(Garminfit_parser):
 
     def _return_cadence(self, lap: FitDataMessage) -> list[float]:
         par_names = ['avg_running_cadence', 'max_running_cadence']
-        # fieldnames = self._get_fitframedata_fieldnames(lap)
         return self._values_from_frame(lap, par_names)
 
     def fit2laps(self, laps_alaps) -> dict or list:
@@ -169,7 +169,7 @@ class Lapparser(Garminfit_parser):
         return json
 
     def _fit2laps_multiplelap(self, laps_alaps: str) -> list:
-        if laps_alaps =='alaps':
+        if laps_alaps == 'alaps':
             laps_in = self.alaps
         elif laps_alaps == 'laps':
             laps_in = self.laps
@@ -185,7 +185,7 @@ class Lapparser(Garminfit_parser):
                 {
                     "lapNumber": i,
                     "duration": duration,
-                    "speed": {"avg": speed[0], "max":speed[2]},
+                    "speed": {"avg": speed[0], "max": speed[2]},
                     "heartRate": {"avg": heartrate[0], "max": heartrate[1]},
                     "cadence": {"avg": cadence[0], "max": cadence[1]},
                     "distance": distance,
@@ -193,71 +193,80 @@ class Lapparser(Garminfit_parser):
             )
         return laps_out
 
-# class Sessionparser:
-#     name = "session"
-#     def _return_sport(self):
-#         session.sport.value
 
 class Sampleparser(Garminfit_parser):
     def __init__(self, filename: str):
         super().__init__(filename)
-        _, _ , _, self.samples = self._fit_parser()
+        _, _, _, self.samples = self._fit_parser()
 
-    def fit2samples(self) ->list[dict]:
+    def fit2samples(self) -> list[dict]:
         recordedRoute = []
         for sample in self.samples:
             # dateTime
+            hr = self._return_heartrate(sample)
             alt = self._return_altitude(sample)
             lat, lon = self._return_latlon(sample)
             time = self._return_time(sample)
             speed = self._return_speed(sample)
 
             recordedRoute.append(
-                {"latitude": lat, "longitude": lon, "altitude": alt, "dateTime": time, "speed": speed[0]}
+                {"latitude": lat, "longitude": lon,
+                 "altitude": alt[0],
+                 "dateTime": time,
+                 "speed": speed[0], 'heartRate': hr[0]}
             )
         return recordedRoute
 
+    def _return_heartrate(self, lap: FitDataMessage) -> list[float]:
+        par_names = 'heart_rate'
+        return self._values_from_frame(lap, par_names)
+
     def _return_altitude(self, sample: FitDataMessage) -> list:
-        par_names = ['enhanced_altitude', 'altitude' ]
-        altitude_list =  self._values_from_frame(sample, par_names)
-        altitude = altitude_list[0]
+        par_names = ['enhanced_altitude', 'altitude']
+        altitude_list = self._values_from_frame(sample, par_names)
         return altitude_list
 
     def _return_latlon(self, sample: FitDataMessage) -> [float, float]:
         par_names = ['position_lat', 'position_long']
-        latlon_list =  self._values_from_frame(sample, par_names)
-        lat_deg = self._semicircles2deg(latlon_list[0])
-        lon_deg = self._semicircles2deg(latlon_list[1])
-        return lat_deg,lon_deg
+        latlon_list = self._values_from_frame(sample, par_names)
+        if latlon_list[0] is not None:
+            lat_deg = self._semicircles2deg(latlon_list[0])
+            lon_deg = self._semicircles2deg(latlon_list[1])
+        else:
+            lat_deg = lon_deg = None
+        return lat_deg, lon_deg
 
-    def _return_time(self, sample: FitDataMessage):
+    def _return_time(self, sample: FitDataMessage) -> str:
         par_names = 'timestamp'
-        timestamp =  self._values_from_frame(sample, par_names)[0]
+        timestamp = self._values_from_frame(sample, par_names)[0]
         isotime = timestamp.isoformat()
         return isotime
 
     def _return_speed(self, sample: FitDataMessage):
         par_names = ['enhanced_speed', 'speed']
-        speed_list =  self._values_from_frame(sample, par_names)
-        speed_kmu = np.array(speed_list)*3600/1000 # m/s -> km/u
+        speed_list = self._values_from_frame(sample, par_names)
+        if speed_list[0] is not None and speed_list[1]:
+            speed_kmu = np.array(speed_list)*3600/1000  # m/s -> km/u
+        else:
+            speed_kmu = np.array([None, None])
+
         return speed_kmu
 
 
-if __name__=='__main__':
-    # f = Garminfit_parser('marcrotsaert_711735968.fit')
-    # frames = f._extract_fitdefinitionmessage()
+if __name__ == '__main__':
     g = Sampleparser('marcrotsaert_220466005.fit')
-    g.fit2samples()
     print(g._return_latlon(g.samples[100]))
-    g._return_altitude(g.samples[100])
-    g._return_speed(g.samples[100])
+    print(g._return_altitude(g.samples[100]))
+    print(g._return_speed(g.samples[100]))
+    print(g._return_heartrate(g.samples[100]))
+    print(g.fit2samples())
+    g = Sampleparser('marcrotsaert_711735968.fit')
+    print(g.fit2samples())
 
-    alaps_raw = f._extract_alaps()
     x = Lapparser('marcrotsaert_711735968.fit')
     alaps = x.fit2laps('alaps')
     laps = x.fit2laps('laps')
-    _, alaps ,laps  ,_ = Garminfit_parser('marcrotsaert_711735968.fit')._fit_parser()
-    
+
     for lap in laps:
         y = Lapparser('marcrotsaert_712321869.fit')._return_heartrate(lap)
         print(y)
