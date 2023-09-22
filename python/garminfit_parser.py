@@ -60,7 +60,7 @@ class Garminfit_parser:
                     # are directly usable in your script logic.
                     if frame.name == "session" or frame.name == "activity":
                         session.append(frame)
-                        print(frame.name)
+                        # print(frame.name)
         return session
 
     def _extract_alaps(self):
@@ -70,8 +70,8 @@ class Garminfit_parser:
                 if frame.frame_type == fitdecode.FIT_FRAME_DATA:
                     if frame.name == "lap":
                         field_lap_trigger = self._find_onefield(frame, 'lap_trigger')
-                        print(field_lap_trigger.value)
-                        if field_lap_trigger.value == "distance":
+                        # print(field_lap_trigger.value)
+                        if field_lap_trigger.value in ["distance", "time", "session_end"]:
                             alaps.append(frame)
         return alaps
 
@@ -82,7 +82,7 @@ class Garminfit_parser:
                 if frame.frame_type == fitdecode.FIT_FRAME_DATA:
                     if frame.name == "lap":
                         field_lap_trigger = self._find_onefield(frame, 'lap_trigger')
-                        if field_lap_trigger.value in ["manual", "session_end", "time"]:
+                        if field_lap_trigger.value in ["manual"]:
                             laps.append(frame)
         return laps
 
