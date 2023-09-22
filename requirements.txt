@@ -5,3 +5,4 @@ pymongo
 matplotlib
 shapely
 tomli
+fitdecode

@@ -7,6 +7,14 @@ sport = ["RUNNING", "CYCLING", "OTHER"]
 datapath= '{{datapath}}'
 datatypes = ["laps", "samples"]
 
+[garmin_fit]
+datapath= '{{datapath}}
+datatypes = ["laps", "alaps", "samples"]
+sport = ["running", "cycling"]
+paramnameconversion= {"heartRate": "heart_rate", "startTime":"start_time", "duration":"total_elapsed_time" }
+enhanced_record = ['altitude', 'speed']
+enhanced_lap = ['max_speed', 'avg_speed']
+
 [mongodb]
 database = "{{databasename}}"
 password = "{{password}}"
@@ -18,14 +26,17 @@ level.collection = "year"
 level.doc = "training"
 
 [running]
+overall_param = ["distance", "speed", "heartRate", "ascent", "descent", "duration", "cadence","startTime", "stopTime"]
+lap_param = ["distance", "duration", "cadence", "heartRate", "speed", "ascent", "descent"]
+
 lap_paces.maxeasy = 14
 lap_paces.minroadrace = 15.3
 lap_paces.maxruninout = 13.2
 lap_paces.dspeedinterval = 3
 
-lap_param = ["distance", "duration", "cadence","heartRate","speed","ascent","descent"]
 
 sample_param = ["altitude", "heartRate", "speed", "distance", "recordedRoute"]
+
 [running.sample_paces]
         low_movement = 7
 [running.sample_loc]
