@@ -9,7 +9,7 @@ datatypes = ["laps", "samples"]
 
 [garmin_fit]
 datapath= '{{datapath}}
-datatypes = ["laps", "autoLaps", "samples"]
+datatypes = ["laps", "alaps", "samples"]
 sport = ["running", "cycling"]
 paramnameconversion= {"heartRate": "heart_rate", "startTime":"start_time", "duration":"total_elapsed_time" }
 enhanced_record = ['altitude', 'speed']
