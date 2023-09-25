@@ -3,7 +3,7 @@
 import os
 import glob
 import json
-
+import pprint
 import tomli
 
 from lap_analyzer import RManualLapAnalyzer, RAutoLapAnalyzer
@@ -98,24 +98,24 @@ if __name__ == "__main__":
 
         x = lapses.return_paraslist("speed")
         result = lapses.determine_startuprunoutlaps()
-        print(lapses.identify_interval())
+        pprint.pprint(lapses.identify_interval())
         samses = SamAnalExtra(session.samples)
         samses.plot("speed")
         # xx
 
-    if True:
+    if False:
         file = "training-session-2015-01-14-263888618-3d72bde3-4957-4db4-8fa6-662a180a2d23.json"
         session = Trainses_json(path, file)
         lapses = RAutoLapAnalyzer(session.alaps)
         result = lapses.identify_roadrace()
         # xx
-    if True:
+    if False:
         file = "training-session-2015-04-18-263883440-3be46e75-6a93-4746-a320-96c9660f809c.json"
         session = Trainses_json(path, file)
         laps = session.return_laps()
         lapses = RManualLapAnalyzer(session.laps)
 
-    if True:
+    if False:
         samses = SampleAnalyzerBasic(session.samples)
         samses = SamAnalExtra(session.samples)
         X = samses.return_idxlowmovement()
@@ -124,36 +124,36 @@ if __name__ == "__main__":
     pointcoll = []
     for fi in files[0:5]:
         filename = fi.split("\\")[-1]
-        print(filename)
+        pprint.pprint(filename)
         session = Trainses_json(path, filename)
 
         if True:
             if session.laps is not None:
                 lapses = RManualLapAnalyzer(session.laps)
                 lapses.compare_hr_sp()
-        if True:
+        if False:
             if session.laps is not None:
                 lapses = RManualLapAnalyzer(session.laps)
                 result = lapses.identify_interval()
-                print(result)
+                pprint.pprint(result)
 
                 result = lapses.identify_sprints()
-                print("sprints? " + str(result))
+                pprint.pprint("sprints? " + str(result))
 
             if session.alaps is not None:
                 # try:
                 lapses = RManualLapAnalyzer(session.alaps)
                 result = lapses.identify_easyrun()
-                print("easyrun?" + str(result))
+                pprint.pprint("easyrun?" + str(result))
                 # except:
                 #    pass
 
             print("_______________________________")
-        if True:
+        if False:
             samses = SamAnalExtra(session.samples)
             samses.plot("speed")
         if True:
             samples = samses.return_samples()
 
-            print(samses.determine_s_location())
-            print(samses.samples)
+            pprint.pprint(samses.determine_s_location())
+            # pprint.pprint(samses.samples)
