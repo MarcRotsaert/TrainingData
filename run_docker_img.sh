@@ -1,5 +1,12 @@
 #!/usr/bin/env bash
 
+# start mongodb container
+
+
+source docker/compose/up.sh docker/compose/python-mongo-polar.yaml
+
+
+# startup polar-analyzer container
 repo="polar"
 name="polar"
 version="0.1"

@@ -18,4 +18,4 @@ ENV DJANGO_SETTINGS_MODULE="myfirstdjango.settings"
 # Filepath location in Docker container
 WORKDIR /mnt/Polar
 
-CMD ["python","python/polar_analyzer.py"]
+CMD ["python","python/main_polar_analyzer.py"]
