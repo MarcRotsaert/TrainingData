@@ -163,6 +163,7 @@ if __name__ == "__main__":
     # GET DATA FROM database
     config = tomli.load(open("config.toml", "rb"))
     mongfr = MongoForerunner(config["mongodb"]["database"], "polar2004")
+    mongfr.showDocs()
 
     path = config["forerunner_xml"]["datapath"]
     mongfr.put_jsonresume(path, "20050725-190632.xml")
