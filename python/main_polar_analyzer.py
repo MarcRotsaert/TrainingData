@@ -1,8 +1,18 @@
+import pprint
 import polar_analyzer as pol_an
 import tomli
-
+import nosql_adapter as nos_adap
 
 config = tomli.load(open("config.toml", "rb"))
+
+
+database = config["mongodb"]["database"]
+conn = nos_adap.MongoQuery(database, "polar2014")
+curs = conn.simplequery("trainingtype.easyrun", False)
+trainings = list(curs)
+pprint.pprint(trainings[1])
+
+
 path = config["polar_json"]["datapath"]
 fnames = (
     "training-session-2014-01-27-263915162-07e7d91b-d3aa-4f89-b2f5-036d8a023f3e.json",
@@ -20,4 +30,7 @@ for fname in fnames:
     training = pol_an.Trainses_json(path, fname)
 
     lap_an = pol_an.RManualLapAnalyzer(training.laps)
+    # try:
     print(lap_an.identify_easyrun())
+    # except:
+    # print(fname)
