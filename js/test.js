@@ -115,3 +115,20 @@ f = "tt".constructor
 g = [1].constructor
 console.log(typeof f('888'))
 console.log(typeof g('888'))
+
+name = null
+text = "missing"
+let result2 = name ?? text; 
+console.log(result2)
+
+
+
+for (t of text) 
+    {console.log(t)}
+
+for (t in text) 
+    {console.log(t)}
+
+array = [0,1,3];
+for (t of array) 
+    {console.log(t)}
