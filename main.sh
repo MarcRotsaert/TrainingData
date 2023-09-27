@@ -1,20 +1,22 @@
-
+#!/bin/bash 
 composefile=python-mongo-polar.yaml
-# composefile="python"
-# docker-compose ls > 'test.txt'
-result_compose=`docker-compose ls`
-echo $result_compose
-linenr_compose=`awk '/'"$composefile"'/ {print NR}' <<< "$result_compose"`
-echo $linenr_compose
+su_container_file=docker/compose/up.sh
+
+result_compose=$(docker-compose ls)
+echo "$result_compose"
+linenr_compose=$(awk -v pattern="$composefile" '$0 ~ pattern {print NR}' <<< "$result_compose")
+echo "$linenr_compose"
 if [[ $linenr_compose ]]
 then
-    if [[ "$result_status"=='running(1)' ]]
+    result_status=$(awk 'NR=="'"$linenr_compose"'" {print $2}' <<< "$result_compose") 
+    if [[ "$result_status" == 'running(1)' ]]
     then
         echo 'mongo database already started'
     else
-        source docker/compose/up.sh docker/compose/python-mongo-polar.yaml
+        echo 'startup mongo database'
+        source "$su_container_file" docker/compose/python-mongo-polar.yaml
     fi 
 else
     echo 'startup mongo database'
-    source docker/compose/up.sh docker/compose/python-mongo-polar.yaml
+    source "$su_container_file" docker/compose/python-mongo-polar.yaml
 fi 
