@@ -20,3 +20,6 @@ else
     echo 'startup mongo database'
     source "$su_container_file" docker/compose/python-mongo-polar.yaml
 fi 
+
+# startup app
+source run_docker_img.sh
