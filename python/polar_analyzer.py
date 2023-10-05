@@ -5,6 +5,7 @@ import glob
 import json
 import pprint
 import tomli
+from matplotlib import pyplot as pp
 
 from lap_analyzer import RManualLapAnalyzer, RAutoLapAnalyzer
 from sample_analyzer import SampleAnalyzerBasic, SamAnalExtra
@@ -86,21 +87,35 @@ if __name__ == "__main__":
 
     if True:
         file = "training-session-2015-06-26-263879702-2d485ab0-ef26-4100-b2ae-1ca9c5f144d6.json"
-        # file = "training-session-2019-10-30-4009640085-5105bf47-b37c-47c3-a96c-d74653ae0d5a.json"
+        file = "training-session-2019-10-30-4009640085-5105bf47-b37c-47c3-a96c-d74653ae0d5a.json"
         # training-session-2015-07-03-263876996-e9c14b6c-bc80-4c10-b335-91081c2552e7.json
         # training-session-2015-09-20-263873564-7f116bac-8756-4f54-a5a0-9272ec0f44ee.json
         # training-session-2015-09-29-263860670-b456e24e-4325-411f-b2c6-3e3a3bc29de6.json
         # training-session-2015-10-24-263861018-3690058d-71c0-47c3-8539-e7b67e8099fe.json
         # training-session-2015-10-17-263860916-1b563b91-c4f4-4991-878c-5c1225f84b2c.json
         session = Trainses_json(path, file)
+        samses = SamAnalExtra(session.samples)
+        normroute = samses.return_normalizedroute()
+        normheading = samses.return_normalizedheading()
+        head2wind = samses.return_normalizedrelwind(360)
+        pp.figure()
+        ax1 = pp.subplot(2, 1, 1)
+        pp.plot(normheading)
+        pp.subplot(2, 1, 2,sharex=ax1)
+        pp.plot(head2wind)
+        pp.show()
+        samses.export_geojson()
+        
+        samses.plot("speed")
+
+
         laps = session.return_laps()
         lapses = RManualLapAnalyzer(laps)
 
         x = lapses.return_paraslist("speed")
         result = lapses.determine_startuprunoutlaps()
         pprint.pprint(lapses.identify_interval())
-        samses = SamAnalExtra(session.samples)
-        samses.plot("speed")
+       
         # xx
 
     if False:
