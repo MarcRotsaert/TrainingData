@@ -26,7 +26,11 @@ level.collection = "year"
 level.doc = "training"
 
 [running]
-overall_param = ["distance", "speed", "heartRate", "ascent", "descent", "duration", "cadence","startTime", "stopTime"]
+overall_param = ["distance", "speed", "heartRate", 
+                 "ascent", "descent", "duration", 
+                 "cadence","startTime", "stopTime", 
+                 "sport" ]
+
 lap_param = ["distance", "duration", "cadence", "heartRate", "speed", "ascent", "descent"]
 
 lap_paces.maxeasy = 14

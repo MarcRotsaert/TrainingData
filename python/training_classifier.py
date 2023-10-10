@@ -106,6 +106,7 @@ class MongoRunningClassifier:
             res = self.mongo.simplequery("fname", fname)
             for training in res:
                 objid = training["_id"]
+                self.mongo.updateOne(objid, {"trainingtype.easyrun": True})
 
         for fname in no_easyruns:
             res = self.mongo.simplequery("fname", fname)
