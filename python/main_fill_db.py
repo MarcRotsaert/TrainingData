@@ -7,9 +7,10 @@ import tomli
 
 config = tomli.load(open("config.toml", "rb"))
 database = config["mongodb"]["database"]
-if False:
+if True:
     path = config["polar_json"]["datapath"]
-    for year in range(2013, 2022):
+    # for year in range(2013, 2022):
+    for year in range(2014, 2015):
         mongad = MongoPolar(database, "polar" + str(year))
         files = glob.glob(os.path.join(path, "training-session-" + str(year) + "-*.json"))
         pointcoll = []
@@ -18,12 +19,12 @@ if False:
             filename = fi.split("\\")[-1]
             mongad.put_jsonresume(path, filename)
 
-
-path = config["forerunner_xml"]["datapath"]
-for year in range(2004, 2008):
-    files = glob.glob(os.path.join(path, str(year) + "*.xml"))
-    pointcoll = []
-    for fi in files:
-        mongad = MongoForerunner(database, "forerunner" + str(year))
-        filename = fi.split("\\")[-1]
-        mongad.put_jsonresume(path, filename)
+if True:
+    path = config["forerunner_xml"]["datapath"]
+    for year in range(2004, 2008):
+        files = glob.glob(os.path.join(path, str(year) + "*.xml"))
+        pointcoll = []
+        for fi in files:
+            mongad = MongoForerunner(database, "forerunner" + str(year))
+            filename = fi.split("\\")[-1]
+            mongad.put_jsonresume(path, filename)
