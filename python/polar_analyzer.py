@@ -6,9 +6,9 @@ import json
 import pprint
 import tomli
 
+import polar_parser as pparser
 from lap_analyzer import RManualLapAnalyzer, RAutoLapAnalyzer
 from sample_analyzer import SampleAnalyzerBasic, SamAnalExtra
-
 
 class Trainses:
     def add_data(self, data: dict) -> None:
@@ -68,12 +68,9 @@ class Trainses_json(Trainses):
         self.data = True
 
     def _read_json(self) -> dict:
-        with open(os.path.join(self.path, self.file)) as g:
-            temp = g.read()
-        data = json.loads(temp)
+        data = pparser.Parser(self.file).json2json()
         data.update({"fname": self.file})
         return data
-
 
 class Trainses_mongo(Trainses):
     def __init__(self, mongorecord):
