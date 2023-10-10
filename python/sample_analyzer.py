@@ -1,6 +1,8 @@
+import os
 from typing import Tuple, Iterable, Union
 import numpy as np
 import datetime
+
 import json
 from matplotlib import pyplot as pp
 import shapely as shp
@@ -37,24 +39,22 @@ class SampleAnalyzerBasic:
         lat = [rec["latitude"] for rec in recordedroute]
         return lon, lat
 
-    def return_s_timeroute(self, tzoffset=0) -> np.array:
+    def return_s_timeroute(self, tzoffset: int = 0) -> np.array:
         recordedroute = self.return_s_route()
         # tzoffset=self.jsonobj['exercises'][0]['timezoneOffset']
         dtRoute = [
             datetime.datetime.fromisoformat(rec["dateTime"])
-            - datetime.timedelta(0, seconds=tzoffset * 60)
+            - datetime.timedelta(0, seconds=tzoffset)
             for rec in recordedroute
         ]
         dtRoute = np.array(dtRoute)
         return dtRoute
 
     def return_s_timesamples(self, tzoffset: int = 0) -> np.array:
-        samples = {}
-        # tzoffset=self.jsonobj['exercises'][0]['timezoneOffset']
         dump = self.return_s_speed()
         dt = [
             datetime.datetime.fromisoformat(d["dateTime"])
-            - datetime.timedelta(0, seconds=tzoffset * 60)
+            - datetime.timedelta(0, seconds=tzoffset)
             for d in dump
         ]
         dt = np.array(dt)
@@ -62,9 +62,6 @@ class SampleAnalyzerBasic:
 
     def return_s_speed(self) -> list[dict]:
         return self.samples["speed"]
-
-    def return_s_heartrate(self) -> list[dict]:
-        return self.samples["heartRate"]
 
     def return_s_pointsel(
         self, pnr: Union[None, Iterable[int]] = None
@@ -228,9 +225,10 @@ class SamAnalExtra(SampleAnalyzerBasic):
         self,
     ) -> Tuple[list, list, list]:
         """
-        Oplijnen van array route ten opzichte van tijd van samples (hartslag, snelheid).
+        Oplijnen van array route ten opzichte van tijd van samples
+        (hartslag, snelheid).
         uitvoer:
-            uitvoer: array, tijdstippen genormaliseerde  lengtegraad en breedtegraad en bijbehorende tijd
+        array, tijdstippen genormaliseerde  lon en lat en bijbehorende T
         """
         dtRoute = self.return_s_timeroute()
         lon, lat = self.return_s_rcoord()
@@ -286,7 +284,7 @@ class SamAnalExtra(SampleAnalyzerBasic):
         ind1 = [0]
         while len(ind1) != 0:
             # try:
-            deltat = dt[0 : len(dtRoute)] - dtRoute
+            deltat = dt[0:len(dtRoute)] - dtRoute
             # except:
             #    print(len(dt))
             #    print(len(dtRoute))
