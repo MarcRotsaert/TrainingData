@@ -1,17 +1,17 @@
 [polar_json]
-datapath = "{{datapath}}"
+datapath = "{{datapath_polar}}"
 datatypes = ["laps", "autoLaps", "samples"]
 sport = ["RUNNING", "CYCLING", "OTHER"]
 
 [forerunner_xml]
-datapath= '{{datapath}}'
+datapath= "{{datapath_forerunner}}"
 datatypes = ["laps", "samples"]
 
 [garmin_fit]
-datapath= '{{datapath}}
+datapath= "{{datapath_garmin}}"
 datatypes = ["laps", "alaps", "samples"]
 sport = ["running", "cycling"]
-paramnameconversion= {"heartRate": "heart_rate", "startTime":"start_time", "duration":"total_elapsed_time" }
+paramnameconversion = {"heartRate"= "heart_rate", "startTime"="start_time", "duration"="total_elapsed_time" }
 enhanced_record = ['altitude', 'speed']
 enhanced_lap = ['max_speed', 'avg_speed']
 
