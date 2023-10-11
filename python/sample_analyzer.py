@@ -301,24 +301,23 @@ class SamAnalExtra(SampleAnalyzerBasic):
                 samples[sam] = np.concatenate(
                     (samples[sam][0:ind1[0]], samples[sam][ind2[0]-1:])
                 )
+            return dt, samples
 
     def export_geojson(self, filename="geojsontest", pad=r"C:\temp") -> None:
         features = []
         dtroute, lon, lat = self.return_normalizedroute()
         dt, samples = self.return_normalizedsamples()
-        heading = self.return_normalizedheading()
-
-        for i in range(len(dtroute) - 1):
+        for i in range(len(dt) - 1):
             # for i in range(50):
             level310 = {
-                "speed": samples["speed"][i],
-                "heartrate": samples["heartRate"][i],
-                "distance": samples["distance"][i],
-                "heading": heading[i],
+                "speed": samples["speed"][i]['value'],
+                "heartrate": samples["heartRate"][i]['value'],
+                "distance": samples["distance"][i]['value'],
                 "tijd": dt[i].isoformat(),
             }
             level300 = {"type": "Point",
-                        "coordinates": [lon[i], lat[i]]}
+                        "coordinates": [samples['recordedRoute'][i]['longitude'], 
+                                        samples['recordedRoute'][i]['latitude']]}
             level20 = {"type": "Feature",
                        "geometry": level300,
                        "properties": level310}
