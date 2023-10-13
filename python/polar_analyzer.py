@@ -1,5 +1,5 @@
 # Processing data export polar data json files
-
+import traceback
 import os
 import glob
 import json
@@ -82,7 +82,42 @@ if __name__ == "__main__":
     config = tomli.load(open("config.toml", "rb"))
     path = config["polar_json"]["datapath"]
 
-    if True:
+    files = glob.glob(os.path.join(path, "training-session-2018-*.json"))
+    for file in files:
+        session = Trainses_json(path, file)
+        samses = SamAnalExtra(session.samples)
+        try:
+            samses.export_geojson(file[-63:])
+        except IndexError:
+            print(file + ': export failed')
+        # except:
+        #     print(file + ': something happened on the way to heaven')
+
+        #print(samses._determine_timediff_samp2route())
+        
+    
+
+    files =  [ 
+
+        "training-session-2019-10-30-4009640085-5105bf47-b37c-47c3-a96c-d74653ae0d5a.json",
+        "training-session-2015-06-26-263879702-2d485ab0-ef26-4100-b2ae-1ca9c5f144d6.json",
+    ]
+    for file in files:
+        session = Trainses_json(path, file)
+        samses = SamAnalExtra(session.samples)
+        dtroute = samses.return_s_timeroute()
+        dt = samses.return_s_timesamples()
+        
+        idx1 = samses.return_idx_bytime( dtroute[0], 'samples')
+        idx2 = samses.return_idx_bytime( dtroute[-1], 'samples', 'last')
+
+        try:
+            samses.export_geojson()
+        except TypeError as exc:
+            print(traceback.format_exc())
+    files = glob.glob(os.path.join(path, "training-session-2022-*.json"))
+
+    if False:
         file = "training-session-2015-06-26-263879702-2d485ab0-ef26-4100-b2ae-1ca9c5f144d6.json"
         file = "training-session-2019-10-30-4009640085-5105bf47-b37c-47c3-a96c-d74653ae0d5a.json"
         # training-session-2015-07-03-263876996-e9c14b6c-bc80-4c10-b335-91081c2552e7.json
@@ -132,40 +167,41 @@ if __name__ == "__main__":
         samses = SamAnalExtra(session.samples)
         X = samses.return_idxlowmovement()
 
-    files = glob.glob(os.path.join(path, "training-session-2022-*.json"))
-    pointcoll = []
-    for fi in files[0:5]:
-        filename = fi.split("\\")[-1]
-        pprint.pprint(filename)
-        session = Trainses_json(path, filename)
+    if False:
+        files = glob.glob(os.path.join(path, "training-session-2022-*.json"))
+        pointcoll = []
+        for fi in files[0:5]:
+            filename = fi.split("\\")[-1]
+            pprint.pprint(filename)
+            session = Trainses_json(path, filename)
 
-        if True:
-            if session.laps is not None:
-                lapses = RManualLapAnalyzer(session.laps)
-                lapses.compare_hr_sp()
-        if False:
-            if session.laps is not None:
-                lapses = RManualLapAnalyzer(session.laps)
-                result = lapses.identify_interval()
-                pprint.pprint(result)
+            if True:
+                if session.laps is not None:
+                    lapses = RManualLapAnalyzer(session.laps)
+                    lapses.compare_hr_sp()
+            if False:
+                if session.laps is not None:
+                    lapses = RManualLapAnalyzer(session.laps)
+                    result = lapses.identify_interval()
+                    pprint.pprint(result)
 
-                result = lapses.identify_sprints()
-                pprint.pprint("sprints? " + str(result))
+                    result = lapses.identify_sprints()
+                    pprint.pprint("sprints? " + str(result))
 
-            if session.alaps is not None:
-                # try:
-                lapses = RManualLapAnalyzer(session.alaps)
-                result = lapses.identify_easyrun()
-                pprint.pprint("easyrun?" + str(result))
-                # except:
-                #    pass
+                if session.alaps is not None:
+                    # try:
+                    lapses = RManualLapAnalyzer(session.alaps)
+                    result = lapses.identify_easyrun()
+                    pprint.pprint("easyrun?" + str(result))
+                    # except:
+                    #    pass
 
-            print("_______________________________")
-        if False:
-            samses = SamAnalExtra(session.samples)
-            samses.plot("speed")
-        if True:
-            samples = samses.return_samples()
+                print("_______________________________")
+            if False:
+                samses = SamAnalExtra(session.samples)
+                samses.plot("speed")
+            if True:
+                samples = samses.return_samples()
 
-            pprint.pprint(samses.determine_s_location())
-            # pprint.pprint(samses.samples)
+                pprint.pprint(samses.determine_s_location())
+                # pprint.pprint(samses.samples)
