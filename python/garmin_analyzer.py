@@ -68,3 +68,10 @@ if __name__ == "__main__":
         lapses = RManualLapAnalyzer(session.laps)
         print(SamAnalExtra(session.samples).determine_s_location())
         alapses = RAutoLapAnalyzer(session.alaps)
+        samses = SamAnalExtra(session.samples)
+        samses.export_geojson()
+
+        file = 'marcrotsaert_220466005.fit'
+        session = Trainses_fit(path, file)
+        samses = SamAnalExtra(session.samples)
+        samses.export_geojson('marcrotsaert_220466005')

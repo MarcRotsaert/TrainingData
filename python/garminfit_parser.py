@@ -200,7 +200,10 @@ class Sampleparser(Garminfit_parser):
         _, _, _, self.samples = self._fit_parser()
 
     def fit2samples(self) -> list[dict]:
+        speed_arr= []
+        heartrate_arr = []
         recordedRoute = []
+        distance_arr = []
         for sample in self.samples:
             # dateTime
             hr = self._return_heartrate(sample)
@@ -208,14 +211,21 @@ class Sampleparser(Garminfit_parser):
             lat, lon = self._return_latlon(sample)
             time = self._return_time(sample)
             speed = self._return_speed(sample)
-
+            distance = self._return_distance(sample)
+            
+            speed_arr.append({'dateTime': time,'value': speed[0]}) 
+            heartrate_arr.append({'dateTime': time,'value': hr[0]}) 
+            distance_arr.append({'dateTime': time,'value': distance[0]}) 
+            
             recordedRoute.append(
                 {"latitude": lat, "longitude": lon,
                  "altitude": alt[0],
                  "dateTime": time,
-                 "speed": speed[0], 'heartRate': hr[0]}
+                 }
             )
-        return recordedRoute
+            # samples = {'speed': speed_arr, 'heartRate': heartrate_arr, 'recordedRoute':recordedRoute}
+        samples = {'distance':distance_arr, 'speed': speed_arr, 'heartRate': heartrate_arr, 'recordedRoute':recordedRoute}
+        return samples #, recordedRoute
 
     def _return_heartrate(self, lap: FitDataMessage) -> list[float]:
         par_names = 'heart_rate'
@@ -252,6 +262,11 @@ class Sampleparser(Garminfit_parser):
 
         return speed_kmu
 
+    def _return_distance(self, sample: FitDataMessage):
+        par_names = ['distance']
+        distance_list = self._values_from_frame(sample, par_names)
+        return distance_list
+
 
 class Parser(Garminfit_parser):
     def __init__(self, filename: str):
@@ -261,14 +276,17 @@ class Parser(Garminfit_parser):
     def fit2json(self):
         laps = Lapparser(self.filename).fit2laps('laps')
         alaps = Lapparser(self.filename).fit2laps('alaps')
-        recordedroute = Sampleparser(self.filename).fit2samples()
+        samples = Sampleparser(self.filename).fit2samples()
         # if isinstance(laps, list):
         json = {
             "exercises": [
-                {"alaps": alaps, "laps": laps, "samples": {"recordedRoute": recordedroute}}
-            ]
-        }
-        # else:
+                {"alaps": alaps, "laps": laps, 
+                 "samples": {"recordedRoute": samples['recordedRoute'],
+                             "speed": samples['speed'],
+                             "heartRate": samples['heartRate'],
+                             "distance": samples['distance'],
+                             },
+        }] }
         #    json = laps
         #    json.update({"exercises": [{"samples": {"recordedRoute": recordedroute}}]})
 
