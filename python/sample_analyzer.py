@@ -152,7 +152,13 @@ class SamAnalTiming(SampleAnalyzerBasic):
             dt = self.return_s_timesamples()
             dtRoute = self.return_s_timeroute()
             diff_dt = self.determine_timediff_samp2route()
+          
             if datetime.timedelta(0, -10, 0) < diff_dt[1] < datetime.timedelta(0, -1, 0):
+                dtRoute = dtRoute + diff_dt[1]
+
+            # Correction in time zone difference between samples and route
+            # 2014 and 2015 data.
+            if datetime.timedelta(0, -3000, 0) < diff_dt[1]:
                 dtRoute = dtRoute + diff_dt[1]
 
             i_start = np.where(dt <= dtRoute[0])[0][-1]

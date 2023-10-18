@@ -83,14 +83,14 @@ if __name__ == "__main__":
     config = tomli.load(open("config.toml", "rb"))
     path = config["polar_json"]["datapath"]
 
-    files = glob.glob(os.path.join(path, "training-session-2018-*.json"))
+    files = glob.glob(os.path.join(path, "training-session-2015-*.json"))
     for file in files:
         session = Trainses_json(path, file)
         samses = SamAnalExtra(session.samples)
         try:
             samses.export_geojson(file[-63:])
             print(samses.determine_timediff_samp2route())
-            print(file + ': export ended')
+            # print(file + ': export ended')
         except IndexError:
             dtRoute = samses.return_s_timeroute()
             dt = samses.return_s_timesamples()
