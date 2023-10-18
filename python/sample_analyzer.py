@@ -19,7 +19,7 @@ class SampleAnalyzerBasic:
         self.locations = config["running"]["sample_loc"]
         self.param = config["running"]["sample_param"]
         self.paces = config["running"]["sample_paces"]
-    
+
         self.len_samples = len(samples['speed'])
         self.len_route = len(samples['recordedRoute'])
 
@@ -114,17 +114,19 @@ class SampleAnalyzerBasic:
         pp.show()
 
     def return_v_sample(self, param: str, idx: int) -> Union[float, None]:
-        if 'value' in self.samples[param][idx]: 
+        if 'value' in self.samples[param][idx]:
             value = self.samples[param][idx]['value']
         else:
             value = None
         return value
+
+
 class SamAnalTiming(SampleAnalyzerBasic):
     def __init__(self, samples: dict[list]):
         super(SamAnalTiming, self).__init__(samples)
-    
-    def return_idx_bytime(self, dt: datetime.datetime, 
-                          param: str, 
+
+    def return_idx_bytime(self, dt: datetime.datetime,
+                          param: str,
                           firstorlast: str = 'first') -> int:
         if param.lower() == 'recordedroute':
             dtimearr = self.return_s_timeroute()
@@ -132,35 +134,59 @@ class SamAnalTiming(SampleAnalyzerBasic):
             dtimearr = self.return_s_timesamples()
 
         if firstorlast == 'first':
-            idx = np.where(dtimearr>=dt )[0][0]
+            idx = np.where(dtimearr >= dt)[0][0]
         elif firstorlast == 'last':
-            idx = np.where(dtimearr<=dt )[0][0]
+            idx = np.where(dtimearr <= dt)[0][0]
         return idx
 
     def determine_timediff_samp2route(self):
         dt = self.return_s_timesamples()
         dtroute = self.return_s_timeroute()
-        diff_dt = [dt[0] - dtroute[0], dt[-1] - dtroute[-1]] 
+        diff_dt = [dt[0] - dtroute[0], dt[-1] - dtroute[-1]]
         return diff_dt
+
+    def _lineup_tr2ts(self) -> int:
+        if self.len_samples-self.len_route == 1:
+            i_start = 1
+        else:
+            dt = self.return_s_timesamples()
+            dtRoute = self.return_s_timeroute()
+            diff_dt = self.determine_timediff_samp2route()
+            if datetime.timedelta(0, -10, 0) < diff_dt[1] < datetime.timedelta(0, -1, 0):
+                dtRoute = dtRoute + diff_dt[1]
+
+            i_start = np.where(dt <= dtRoute[0])[0][-1]
+        return i_start
+
+    def _lineup_tr2ts_source(self):
+        pass
+
+    def _lineup_tr2ts_timezone(self):
+        pass
+
+    def lineup_troute2tsamples(self) -> int:
+        """
+        timing recorded route is not in always line with samples.
+        Because
+        - timezone, samples are in GMT, recordedroute in UMt (2014, 2015)
+        - GPS failure, missing values for recorded route
+        - source, recorded route takes timestring from GPS, samples from watch.
+        """
+
+        if self.len_samples == self.len_route:
+            i_start = 0
+        else:
+            i_start = self._lineup_tr2ts()
+        return i_start
+
+    @staticmethod
+    def timeshift(dt: np.array, deltat: datetime.timedelta) -> np.array:
+        return dt+deltat
 
     def check_tzcoor_samples2route(self):
         """
         Check if timing route corresponds to timing.
         """
-        pass
-
-    def check_time_samples2route(self):
-        res1 = self._check_starttime_samples2route()
-        res2 = self._check_endtime_samples2route()
-        
-
-    def _check_starttime_samples2route(self):
-        dtroute = self.return_s_timeroute
-        dt = self.return_s_timesamples
-        diff = dt[0]-dtroute 
-        return diff
-
-    def _check_endtime_samples2route(self):
         pass
 
 
@@ -211,79 +237,6 @@ class SamAnalExtra(SamAnalTiming):
             else:
                 relwind.append(difwind)
         return np.array(relwind)
-    """
-    def _stripstartindexroute(
-        self,
-    ) -> Union[int, None]:
-        # indexnummer voor het strippen tijd Route aan begin.
-
-        dt = self.return_s_timesamples()
-        dtRoute = self.return_s_timeroute()
-        inds1 = np.where(dtRoute >= dt[0])[0]
-        if len(inds1) == 0:
-            inds1 = None
-        else:
-            inds1 = inds1[0]
-        return inds1
-
-    def _stripendindexroute(
-        self,
-    ) -> Union[int, None]:
-        #         indexnummer voor het strippen tijd Route aan einde.
-        dt = self.return_s_timesamples()
-        dtRoute = self.return_s_timeroute()
-        inds2 = np.where(dtRoute > dt[-1])[0]
-        if len(inds2) == 0:
-            inds2 = None
-        else:
-            inds2 = inds2[0] - 1
-        return inds2
-
-    def _stripstartindexsamples(
-        self,
-    ) -> Union[int, None]:
-        # indexnummer voor het strippen Samples aan begin.
-        dt = self.return_s_timesamples()
-        dtRoute = self.return_s_timeroute()
-        inds1 = np.where(dt >= dtRoute[0])[0]
-        if len(inds1) == 0:
-            inds1 = None
-        else:
-            inds1 = inds1[0]
-        return inds1
-
-    def _stripendindexsamples(
-        self,
-    ) -> Union[int, None]:
-        # integer, indexnummer voor het strippen Samples aan einde.
-
-        dt = self.return_s_timesamples()
-        dtRoute = self.return_s_timeroute()
-        inds2 = np.where(dt > dtRoute[-1])[0]
-        if len(inds2) == 0:
-            inds2 = None
-        else:
-            inds2 = inds2[0] - 1
-        return inds2
-    """
-
-    def return_normalizedroute(
-        self,
-    ) -> Tuple[list, list, list]:
-        """
-        Oplijnen van array route ten opzichte van tijd van samples
-        (hartslag, snelheid).
-        uitvoer:
-        array, tijdstippen genormaliseerde  lon en lat en bijbehorende T
-        """
-        dtRoute = self.return_s_timeroute()
-        lon, lat = self.return_s_rcoord()
-        # inds1 = self._stripstartindexroute()
-        # inds2 = self._stripendindexroute()
-        # dtRoute = dtRoute[inds1:inds2]
-        #lon = lon[inds1:inds2]
-        # lat = lat[inds1:inds2]
-        return dtRoute, lon, lat
 
     def return_normalizedheading(
         self,
@@ -292,9 +245,6 @@ class SamAnalExtra(SamAnalTiming):
         array, heading, die opgelijnd is met de samples.
         """
         heading = self.extract_heading()
-        # inds1 = self._stripstartindexroute()
-        # inds2 = self._stripendindexroute()
-        # heading = heading[inds1:inds2]
         return np.array(heading)
 
     def return_normalizedrelwind(self, windrich: float) -> list:
@@ -307,72 +257,32 @@ class SamAnalExtra(SamAnalTiming):
         # relwind = relwind[inds1:inds2]
         return relwind
 
-    """
-    def return_normalizedsamples(
-        self,
-    ) -> [list, dict]:
-        # array, genormaliseerde samples
-
-        # samples = self.extract_samples()
-        dt = self.return_s_timesamples()
-        dtRoute = self.return_s_timeroute()
-                
-        # inds1 = self._stripstartindexsamples()
-        # inds2 = self._stripendindexsamples()
-        
-        if len(dt) ==  len(dtRoute):
-            # dt = dt[inds1:inds2]
-            samples = self.samples
-            # for sam in self.samples:
-            #    samples[sam] = samples[sam][inds1:inds2]
-            # inds1 = self._stripstartindexroute()
-            # inds2 = self._stripendindexroute()
-            # dtRoute = dtRoute[inds1:inds2]
-        
-        ind1 = [0]
-        while len(ind1) != 0:
-            # try:
-            deltat = dt[0:len(dtRoute)] - dtRoute
-            # except:
-            #    print(len(dt))
-            #    print(len(dtRoute))
-            #    return dt,dtRoute
-            ind1 = np.where(deltat < datetime.timedelta(0, -1, 0))[0]
-
-            if len(ind1) == 0:
-                continue
-            ind2 = np.where(dtRoute[ind1[0]] < dt)[0]
-            print(ind1)
-            print(ind2)
-            dt = np.concatenate((dt[0:ind1[0]], dt[ind2[0]-1:]))
-            for sam in samples:
-                samples[sam] = np.concatenate(
-                    (samples[sam][0:ind1[0]], samples[sam][ind2[0]-1:])
-                )
-        return dt, samples
-        """
-
     def export_geojson(self, filename="geojsontest", pad=r"C:\temp") -> None:
-        if self.len_route !=  self.len_samples:
+        dtRoute = self.return_s_timeroute()
+        lon, lat = self.return_s_rcoord()
+        dt = self.return_s_timesamples()
+        i_start = self.lineup_troute2tsamples()
+        print('_______________________________________')
+
+        if abs(len(dt[i_start:])-len(dtRoute)) > 30:
             raise IndexError
 
-        dtRoute, lon, lat = self.return_normalizedroute()
-        
-        dt = self.return_s_timesamples()
-        samples = self.samples
-        # dt, samples = self.return_normalizedsamples()
- 
+        if len(dt[i_start:]) < len(dtRoute):
+            l_index = len(dt[i_start:])
+        else:
+            l_index = len(dtRoute)
+
         features = []
-        for i in range(len(dt) - 1):
+        for i in range(0, l_index):
             level310 = {
-                "speed": self.return_v_sample("speed", i),
-                "heartrate": self.return_v_sample("heartRate",i),
-                "distance": self.return_v_sample("distance",i),
-                "tijd": dt[i].isoformat(),
+                "speed": self.return_v_sample("speed", i + i_start),
+                "heartrate": self.return_v_sample("heartRate", i + i_start),
+                "distance": self.return_v_sample("distance", i + i_start),
+                "tijd": dt[i + i_start].isoformat(),
             }
             level300 = {"type": "Point",
-                        "coordinates": [samples['recordedRoute'][i]['longitude'], 
-                                        samples['recordedRoute'][i]['latitude']]}
+                        "coordinates": [lon[i],
+                                        lat[i]]}
             level20 = {"type": "Feature",
                        "geometry": level300,
                        "properties": level310}

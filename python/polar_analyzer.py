@@ -2,7 +2,6 @@
 import traceback
 import os
 import glob
-import json
 import pprint
 import tomli
 from matplotlib import pyplot as pp
@@ -10,6 +9,7 @@ from matplotlib import pyplot as pp
 import polar_parser as pparser
 from lap_analyzer import RManualLapAnalyzer, RAutoLapAnalyzer
 from sample_analyzer import SampleAnalyzerBasic, SamAnalExtra
+
 
 class Trainses:
     def add_data(self, data: dict) -> None:
@@ -73,6 +73,7 @@ class Trainses_json(Trainses):
         data.update({"fname": self.file})
         return data
 
+
 class Trainses_mongo(Trainses):
     def __init__(self, mongorecord):
         self.add_data(mongorecord)
@@ -88,34 +89,32 @@ if __name__ == "__main__":
         samses = SamAnalExtra(session.samples)
         try:
             samses.export_geojson(file[-63:])
+            print(samses.determine_timediff_samp2route())
+            print(file + ': export ended')
         except IndexError:
+            dtRoute = samses.return_s_timeroute()
+            dt = samses.return_s_timesamples()
             print(file + ': export failed')
-        # except:
-        #     print(file + ': something happened on the way to heaven')
 
-        #print(samses._determine_timediff_samp2route())
-        
-    
+    if False:
+        files = [
+            "training-session-2019-10-30-4009640085-5105bf47-b37c-47c3-a96c-d74653ae0d5a.json",
+            "training-session-2015-06-26-263879702-2d485ab0-ef26-4100-b2ae-1ca9c5f144d6.json",
+        ]
+        for file in files:
+            session = Trainses_json(path, file)
+            samses = SamAnalExtra(session.samples)
+            dtroute = samses.return_s_timeroute()
+            dt = samses.return_s_timesamples()
 
-    files =  [ 
+            idx1 = samses.return_idx_bytime(dtroute[0], 'samples')
+            idx2 = samses.return_idx_bytime(dtroute[-1], 'samples', 'last')
 
-        "training-session-2019-10-30-4009640085-5105bf47-b37c-47c3-a96c-d74653ae0d5a.json",
-        "training-session-2015-06-26-263879702-2d485ab0-ef26-4100-b2ae-1ca9c5f144d6.json",
-    ]
-    for file in files:
-        session = Trainses_json(path, file)
-        samses = SamAnalExtra(session.samples)
-        dtroute = samses.return_s_timeroute()
-        dt = samses.return_s_timesamples()
-        
-        idx1 = samses.return_idx_bytime( dtroute[0], 'samples')
-        idx2 = samses.return_idx_bytime( dtroute[-1], 'samples', 'last')
-
-        try:
-            samses.export_geojson()
-        except TypeError as exc:
-            print(traceback.format_exc())
-    files = glob.glob(os.path.join(path, "training-session-2022-*.json"))
+            try:
+                samses.export_geojson()
+            except TypeError:
+                print(traceback.format_exc())
+        files = glob.glob(os.path.join(path, "training-session-2022-*.json"))
 
     if False:
         file = "training-session-2015-06-26-263879702-2d485ab0-ef26-4100-b2ae-1ca9c5f144d6.json"
@@ -133,11 +132,11 @@ if __name__ == "__main__":
         pp.figure()
         ax1 = pp.subplot(2, 1, 1)
         pp.plot(normheading)
-        pp.subplot(2, 1, 2,sharex=ax1)
+        pp.subplot(2, 1, 2, sharex=ax1)
         pp.plot(head2wind)
         pp.show()
         samses.export_geojson()
-        
+
         samses.plot("speed")
 
 
@@ -147,8 +146,6 @@ if __name__ == "__main__":
         x = lapses.return_paraslist("speed")
         result = lapses.determine_startuprunoutlaps()
         pprint.pprint(lapses.identify_interval())
-       
-        # xx
 
     if False:
         file = "training-session-2015-01-14-263888618-3d72bde3-4957-4db4-8fa6-662a180a2d23.json"
