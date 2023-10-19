@@ -154,10 +154,10 @@ class MongoGarminfit(MongoQuery):
         resume = sess.abstract
         SamAnal = gar_an.SampleAnalyzerBasic(sess.samples)
         loc = SamAnal.determine_s_location()
-        print(resume)
-        print(loc)
-        # resume.update({"location": loc, "laps": sess.laps})
-        # self.insertOne(resume)
+        # print(resume)
+        # print(loc)
+        resume.update({"location": loc, "laps": sess.laps})
+        self.insertOne(resume)
 
 class MongoForerunner(MongoQuery):
 

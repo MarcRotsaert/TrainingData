@@ -313,11 +313,14 @@ class Parser(Garminfit_parser):
        self.session, self.alaps, self.laps, self.samples = self._fit_parser()
 
     def fit2json(self):
+        json = self.extract_abstract()
+
         laps = Lapparser(self.filename).fit2laps('laps')
         alaps = Lapparser(self.filename).fit2laps('alaps')
         samples = Sampleparser(self.filename).fit2samples()
         # if isinstance(laps, list):
-        json = {
+
+        json.update({
             "exercises": [
                 {"alaps": alaps, "laps": laps, 
                  "samples": {"recordedRoute": samples['recordedRoute'],
@@ -325,7 +328,7 @@ class Parser(Garminfit_parser):
                              "heartRate": samples['heartRate'],
                              "distance": samples['distance'],
                              },
-        }] }
+        }] })
         #    json = laps
         #    json.update({"exercises": [{"samples": {"recordedRoute": recordedroute}}]})
 
