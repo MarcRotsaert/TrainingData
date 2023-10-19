@@ -8,7 +8,7 @@ import pymongo
 
 import polar_analyzer as pol_an
 import forerunner_analyzer as for_an
-
+import garmin_analyzer as gar_an
 
 class MongoAdapter:
     # Baseclass Mongo
@@ -129,8 +129,8 @@ class MongoPolar(MongoQuery):
         curs = self.simplequery("sport", "RUNNING")
         return curs
 
-    def put_jsonresume(self, path: str, fname: str) -> None:
-        # Add JSON-file to a collection
+    def put_fitresume(self, path: str, fname: str) -> None:
+        # Add fit-file to a collection
         sess = pol_an.Trainses_json(path, fname)
         resume = sess.abstract
         SamAnal = pol_an.SampleAnalyzerBasic(sess.samples)
@@ -139,7 +139,28 @@ class MongoPolar(MongoQuery):
         self.insertOne(resume)
 
 
+class MongoGarminfit(MongoQuery):
+    """
+    Mongo-extension for Garmin Fit data.
+    """
+
+    def __init__(self, mongoDB: str, collection: str):
+        # initiate collection
+        super().__init__(mongoDB, collection)
+
+    def put_jsonresume(self, path: str, fname: str) -> None:
+        # Add JSON-file to a collection
+        sess = gar_an.Trainses_fit(path, fname)
+        resume = sess.abstract
+        SamAnal = gar_an.SampleAnalyzerBasic(sess.samples)
+        loc = SamAnal.determine_s_location()
+        print(resume)
+        print(loc)
+        # resume.update({"location": loc, "laps": sess.laps})
+        # self.insertOne(resume)
+
 class MongoForerunner(MongoQuery):
+
     """
     Mongo-extension for Forerunner data.
     Data for
@@ -158,10 +179,17 @@ class MongoForerunner(MongoQuery):
         resume.update({"location": loc, "laps": sess.laps})
         self.insertOne(resume)
 
-
 if __name__ == "__main__":
     # GET DATA FROM database
     config = tomli.load(open("config.toml", "rb"))
+
+    path = config["garmin_fit"]["datapath"]
+
+    monggf = MongoGarminfit(config["mongodb"]["database"], "garminfit")
+    monggf.put_jsonresume(path, "marcrotsaert_169919458.fit")
+
+
+
     mongfr = MongoForerunner(config["mongodb"]["database"], "polar2004")
     mongfr.showDocs()
 
