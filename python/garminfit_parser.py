@@ -100,6 +100,8 @@ class Garminfit_parser:
         for fi in fieldnames:
             field = self._find_onefield(frame, fi)
             if hasattr(field, 'value'):
+                if field.value==None:
+                    field.value = np.nan
                 values.append(field.value)
             else:
                 values.append(None)

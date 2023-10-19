@@ -156,7 +156,7 @@ class MongoGarminfit(MongoQuery):
         loc = SamAnal.determine_s_location()
         # print(resume)
         # print(loc)
-        resume.update({"location": loc, "laps": sess.laps})
+        resume.update({"location": loc, "laps": sess.laps, "alaps": sess.alaps})
         self.insertOne(resume)
 
 class MongoForerunner(MongoQuery):
@@ -187,8 +187,6 @@ if __name__ == "__main__":
 
     monggf = MongoGarminfit(config["mongodb"]["database"], "garminfit")
     monggf.put_jsonresume(path, "marcrotsaert_169919458.fit")
-
-
 
     mongfr = MongoForerunner(config["mongodb"]["database"], "polar2004")
     mongfr.showDocs()

@@ -2,12 +2,40 @@ import os
 import glob
 
 from nosql_adapter import MongoPolar, MongoForerunner
+from nosql_adapter import MongoGarminfit, MongoQuery
+
+import garminfit_parser as ga_pa
 
 import tomli
 
 config = tomli.load(open("config.toml", "rb"))
 database = config["mongodb"]["database"]
+
 if True:
+    path = config["garmin_fit"]["datapath"]
+    # for year in range(2013, 2022):
+    files = glob.glob(os.path.join(path, "*.fit"))
+    mongad = MongoGarminfit(database, "garminfit")
+    pointcoll = []
+    for fi in files:
+        # "training-session-2014-12-07-263916482-2cbe9312-6b71-4693-8519-a9a860a23cbc.json"
+        try:
+            abstract = ga_pa.Garminfit_parser(fi.split('\\')[-1]).extract_abstract()
+            if abstract is not None:
+                curs =  MongoQuery(database, "garminfit").simplequery('startTime', abstract['startTime'])
+                if len(list(curs)) == 0:
+                    filename = fi.split("\\")[-1]
+                    try:
+                        mongad.put_jsonresume(path, filename)
+                    except:
+                        print(f'error in: {fi}')
+                else:
+                    print(f'duplicate: {fi}')
+        except:
+                        print(f'major error in: {fi}')
+
+
+if False:
     path = config["polar_json"]["datapath"]
     # for year in range(2013, 2022):
     for year in range(2014, 2015):
@@ -19,7 +47,7 @@ if True:
             filename = fi.split("\\")[-1]
             mongad.put_jsonresume(path, filename)
 
-if True:
+if False:
     path = config["forerunner_xml"]["datapath"]
     for year in range(2004, 2008):
         files = glob.glob(os.path.join(path, str(year) + "*.xml"))
@@ -28,3 +56,6 @@ if True:
             mongad = MongoForerunner(database, "forerunner" + str(year))
             filename = fi.split("\\")[-1]
             mongad.put_jsonresume(path, filename)
+
+
+
