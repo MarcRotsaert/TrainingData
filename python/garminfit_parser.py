@@ -1,4 +1,4 @@
-import os
+import os, glob
 import tomli
 import numpy as np
 import fitdecode
@@ -16,6 +16,7 @@ class Garminfit_parser:
         config = tomli.load(open("config.toml", "rb"))
         self.path = config["garmin_fit"]["datapath"]
         self.filename = filename
+        self.config = config
 
     def _fit_parser(self) -> [FitDataMessage, ]:
         alaps_raw = self._extract_alaps()
@@ -115,6 +116,44 @@ class Garminfit_parser:
     def _semicircles2deg(self, value_in):
         degree = value_in * (180 / 2**31)
         return degree
+
+    def _get_dataframes(self):
+         
+         with fitdecode.FitReader(os.path.join(self.path, self.filename)) as fitreader:
+            dframe =[]
+            for frame in fitreader:
+                if frame.frame_type == fitdecode.FIT_FRAME_DATA:
+                    dframe.append(frame)
+            return dframe
+
+
+    def _extract_abstract_exercises(self):
+        framename = 'session'
+        fnames = ['start_time', 'total_elapsed_time', 'total_distance', 'sport', 
+                  'avg_cadence', 'max_cadence',
+                  'total_descent', 'total_ascent'
+                  # 'total_calories'
+        ]
+
+    def extract_abstract(self):
+        framename = 'session'
+        paramnames = ["startTime", "duration", "distance", "descent", "ascent", "maximumHeartRate", "averageHeartRate"]
+        dframe = self._get_dataframes()
+        i = 0
+        while dframe[i].name != 'session':
+            i += 1
+            if i == len(dframe):
+                return None
+        
+        abstract ={}
+        
+        paramconv = self.config['garmin_fit']['paramnameconversion']
+        frame = dframe[i]
+        for pn in paramnames:
+            abstract.update({pn: frame.get_value(paramconv[pn])})
+        return abstract
+        # framename = 'device'
+        # fnames = ['serial_number'] 
 
 
 class Lapparser(Garminfit_parser):
@@ -294,6 +333,23 @@ class Parser(Garminfit_parser):
 
 
 if __name__ == '__main__':
+    path = r'C:\Users\marcr\OneDrive\Documenten\logboek_looptracks\looptracks_garmin'
+    for file in glob.glob(os.path.join(path, '*.fit')):
+        x = Garminfit_parser(file.split('\\')[-1])
+        abst = x.extract_abstract()
+        
+        print(abst)
+
+    x = Garminfit_parser('marcrotsaert_220466005.fit')
+    dframe = x._get_dataframes()
+
+
+
+    for frame in dframe:
+        if frame.name == 'session':
+            print(frame)
+            #if x._find_onefield(frame,'lap') is not None:
+
     g = Sampleparser('marcrotsaert_220466005.fit')
     print(g._return_latlon(g.samples[100]))
     print(g._return_altitude(g.samples[100]))
