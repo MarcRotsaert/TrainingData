@@ -19,6 +19,8 @@ paramnameconversion.descent="total_descent"
 paramnameconversion.ascent="total_ascent"
 paramnameconversion.maximumHeartRate="max_heart_rate"
 paramnameconversion.averageHeartRate="avg_heart_rate"
+paramnameconversion.sport="sport"
+
 
 enhanced_record = ['altitude', 'speed']
 enhanced_lap = ['max_speed', 'avg_speed']

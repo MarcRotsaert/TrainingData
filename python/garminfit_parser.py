@@ -139,7 +139,8 @@ class Garminfit_parser:
 
     def extract_abstract(self):
         framename = 'session'
-        paramnames = ["startTime", "duration", "distance", "descent", "ascent", "maximumHeartRate", "averageHeartRate"]
+        paramnames = ["sport", "startTime", "duration", "distance", "descent", "ascent", "maximumHeartRate", "averageHeartRate"]
+        
         dframe = self._get_dataframes()
         i = 0
         while dframe[i].name != 'session':
@@ -152,7 +153,10 @@ class Garminfit_parser:
         paramconv = self.config['garmin_fit']['paramnameconversion']
         frame = dframe[i]
         for pn in paramnames:
-            abstract.update({pn: frame.get_value(paramconv[pn])})
+            value = frame.get_value(paramconv[pn])
+            if pn == "sport":
+                value = value.upper()
+            abstract.update({pn: value})
         return abstract
         # framename = 'device'
         # fnames = ['serial_number'] 
