@@ -1,21 +1,87 @@
+from typing import Any, NoReturn
 import unittest
 from training_classifier import MongoRunningClassifier as mrc
+from nosql_adapter import MongoQuery
+
 import nosql_adapter as mongodb
 import tomli
 
-class TestRunningClassifier(unittest.TestCase):
+
+class TestRunningClassifierPolar(unittest.TestCase):
     @classmethod
     def setUp(cls):
-        config = tomli.load(open("config.toml","rb"))
+        config = tomli.load(open("config.toml", "rb"))
 
         cls.testyear = "polartest"
-        cls.dbase = "polartest4"
+        cls.dbase = "unittest"
         cls.adapter = mongodb.MongoPolar(cls.dbase, cls.testyear)
         path = config["polar_json"]["datapath"]
-        filename = "training-session-2014-03-14-263911238-d1eefba4-26b5-4a68-9ed6-8571939ade8a.json"
-        cls.adapter.put_jsonresume(path, filename)
+        filename_easyrun = ""
+        # cls.adapter.put_jsonresume(path, filename_easyrun)
+        filename_interval = ""
+        # cls.adapter.put_jsonresume(path, filename_interval)
         cls.session = mrc(cls.dbase, cls.testyear)
 
-    def test_class_init(self):
-        session = mrc(self.dbase, 2014)
-        self.assertEqual(self.session.SPORT, "RUNNING")
+    @unittest.skip("file not selected ")
+    def test_return_easyrun(self):
+        pass
+
+    @unittest.skip("file not selected ")
+    def test_return_interval(self):
+        pass
+
+    @unittest.skip("file not selected ")
+    def test_set_easyrun(self):
+        pass
+
+    @unittest.skip("file not selected ")
+    def test_set_interval(self):
+        pass
+
+    @classmethod
+    def tearDown(cls):
+        cls.adapter.deleteCollection()
+
+
+class TestRunningClassifierGarmin(unittest.TestCase):
+    @classmethod
+    def setUp(cls):
+        config = tomli.load(open("config.toml", "rb"))
+
+        cls.testyear = "garmintest"
+        cls.dbase = "unittest"
+        cls.adapter = mongodb.MongoGarminfit(cls.dbase, cls.testyear)
+        path = config["garmin_fit"]["datapath"]
+        filename_easyrun = "marcrotsaert_162834949.fit"
+        cls.adapter.put_jsonresume(path, filename_easyrun)
+        filename_interval = "marcrotsaert_175152248.fit"
+        cls.adapter.put_jsonresume(path, filename_interval)
+        cls.session = mrc(cls.dbase, cls.testyear)
+
+    def test_return_easyrun(self):
+        easyrun, non_easyrun = self.session.return_easyrun()
+        self.assertEqual(easyrun, ["marcrotsaert_162834949.fit"])
+        self.assertEqual(non_easyrun, ["marcrotsaert_175152248.fit"])
+
+    def test_return_interval(self):
+        trainingen = self.session.return_interval()
+        self.assertIsInstance(trainingen, dict)
+        self.assertEqual(trainingen["marcrotsaert_175152248.fit"], "interval")
+
+    def test_set_easyrun(self):
+        self.session.set_easyrun()
+        curs = self.adapter.simplequery("trainingtype.easyrun", True)
+        res = list(curs)
+        self.assertEqual(len(res), 1)
+        self.assertEqual(res[0]["fname"], "marcrotsaert_162834949.fit")
+
+    def test_set_interval(self):
+        self.session.set_interval()
+        curs = self.adapter.simplequery("trainingtype.interval", "interval")
+        res = list(curs)
+        self.assertEqual(len(res), 1)
+        self.assertEqual(res[0]["fname"], "marcrotsaert_175152248.fit")
+
+    @classmethod
+    def tearDown(cls):
+        cls.adapter.deleteCollection()
