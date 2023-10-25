@@ -4,7 +4,7 @@ import tomli
 
 import garmin_analyzer as gar_an
 
-class ForerunnerAnalyzer(unittest.TestCase):
+class GarminAnalyzer(unittest.TestCase):
     @classmethod
     def setUp(cls) -> None:
         cls.startime = time.time()

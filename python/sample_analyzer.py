@@ -20,7 +20,11 @@ class SampleAnalyzerBasic:
         self.param = config["running"]["sample_param"]
         self.paces = config["running"]["sample_paces"]
 
-        self.len_samples = len(samples["speed"])
+        if "speed" in samples:
+            self.len_samples = len(samples["speed"])
+        else:
+            self.len_samples = 0
+
         try:
             self.len_route = len(samples["recordedRoute"])
         except KeyError:
