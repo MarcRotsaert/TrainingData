@@ -10,6 +10,7 @@ import polar_analyzer as pol_an
 import forerunner_analyzer as for_an
 import garmin_analyzer as gar_an
 
+
 class MongoAdapter:
     # Baseclass Mongo
     def __init__(self, mongoDB: str, collection: str):
@@ -129,7 +130,7 @@ class MongoPolar(MongoQuery):
         curs = self.simplequery("sport", "RUNNING")
         return curs
 
-    def put_fitresume(self, path: str, fname: str) -> None:
+    def put_jsonresume(self, path: str, fname: str) -> None:
         # Add fit-file to a collection
         sess = pol_an.Trainses_json(path, fname)
         resume = sess.abstract
@@ -159,6 +160,7 @@ class MongoGarminfit(MongoQuery):
         resume.update({"location": loc, "laps": sess.laps, "alaps": sess.alaps})
         self.insertOne(resume)
 
+
 class MongoForerunner(MongoQuery):
 
     """
@@ -178,6 +180,7 @@ class MongoForerunner(MongoQuery):
         loc = SamAnal.determine_s_location()
         resume.update({"location": loc, "laps": sess.laps})
         self.insertOne(resume)
+
 
 if __name__ == "__main__":
     # GET DATA FROM database

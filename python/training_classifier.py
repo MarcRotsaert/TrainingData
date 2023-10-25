@@ -9,8 +9,8 @@ class MongoRunningClassifier:
     def __init__(self, dbase: str, collection: str):
         self.mongo = mongodb.MongoPolar(dbase, collection)
         self.SPORT = "RUNNING"
-        config = tomli.load(open('config.toml',"rb"))
-        self.TRAININGTYPES = config['polar_json']['sport']
+        config = tomli.load(open("config.toml", "rb"))
+        self.TRAININGTYPES = config["polar_json"]["sport"]
 
     def print_trainingtypes(self) -> None:
         print(self.TRAININGTYPES)
@@ -126,7 +126,7 @@ class MongoRunningClassifier:
                     easyrun.append(training.abstract["fname"])
                 else:
                     no_easyrun.append(training.abstract["fname"])
-  
+
             else:
                 lapses = pol_an.RAutoLapAnalyzer(training.alaps)
                 if len(lapses.laps) == 0:
@@ -135,7 +135,7 @@ class MongoRunningClassifier:
                     easyrun.append(training.abstract["fname"])
                 else:
                     no_easyrun.append(training.abstract["fname"])
- 
+
         return easyrun, no_easyrun
 
     def set_sprint(self) -> list[str]:
@@ -159,23 +159,27 @@ class MongoRunningClassifier:
 
 
 if __name__ == "__main__":
-    config = tomli.load(open('config.toml', "rb"))
-    classif = MongoRunningClassifier(config['mongodb']['database'], "polar2014")
+    config = tomli.load(open("config.toml", "rb"))
+    # classif = MongoRunningClassifier(config["mongodb"]["database"], "polar2014")
+    classif = MongoRunningClassifier(config["mongodb"]["database"], "garminfit")
+    classif.set_interval()
+    interval = classif.mongo.simplequery("trainingtype.interval", "undetermined")
+    for train in interval:
+        print(train["laps"])
+        print("...........")
 
-    easyrun, no_easyrun = classif.return_easyrun()
     classif.set_easyrun()
+    easyrun, no_easyrun = classif.return_easyrun()
     road_races = classif.mongo.simplequery("trainingtype.easyrun", True)
     for rr in road_races:
         print(rr["fname"])
     print("___________________________________________________")
-    # xx
     classif.set_sprint()
     road_races = classif.mongo.simplequery("trainingtype.sprint", True)
     for rr in road_races:
         print(rr["fname"])
 
     print("___________________________________________________")
-    classif.set_interval()
     interval = classif.mongo.simplequery("trainingtype.interval", "interval, check1")
     for rr in interval:
         print(rr["fname"])
@@ -190,6 +194,4 @@ if __name__ == "__main__":
     road_races = classif.mongo.simplequery("trainingtype.roadrace", True)
     for rr in road_races:
         print(rr["fname"])
-    print("___________________________________________________")
-
-    XX
+    print("Finish___________________________________________________")

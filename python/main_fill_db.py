@@ -20,19 +20,21 @@ if True:
     for fi in files:
         # "training-session-2014-12-07-263916482-2cbe9312-6b71-4693-8519-a9a860a23cbc.json"
         try:
-            abstract = ga_pa.Garminfit_parser(fi.split('\\')[-1]).extract_abstract()
+            abstract = ga_pa.Garminfit_parser(fi.split("\\")[-1]).extract_abstract()
             if abstract is not None:
-                curs =  MongoQuery(database, "garminfit").simplequery('startTime', abstract['startTime'])
+                curs = MongoQuery(database, "garminfit").simplequery(
+                    "startTime", abstract["startTime"]
+                )
                 if len(list(curs)) == 0:
                     filename = fi.split("\\")[-1]
                     try:
                         mongad.put_jsonresume(path, filename)
                     except:
-                        print(f'error in: {fi}')
+                        print(f"error in: {fi}")
                 else:
-                    print(f'duplicate: {fi}')
+                    print(f"duplicate: {fi}")
         except:
-                        print(f'major error in: {fi}')
+            print(f"major error in: {fi}")
 
 
 if False:
@@ -40,7 +42,9 @@ if False:
     # for year in range(2013, 2022):
     for year in range(2014, 2015):
         mongad = MongoPolar(database, "polar" + str(year))
-        files = glob.glob(os.path.join(path, "training-session-" + str(year) + "-*.json"))
+        files = glob.glob(
+            os.path.join(path, "training-session-" + str(year) + "-*.json")
+        )
         pointcoll = []
         for fi in files:
             # "training-session-2014-12-07-263916482-2cbe9312-6b71-4693-8519-a9a860a23cbc.json"
@@ -56,6 +60,3 @@ if False:
             mongad = MongoForerunner(database, "forerunner" + str(year))
             filename = fi.split("\\")[-1]
             mongad.put_jsonresume(path, filename)
-
-
-

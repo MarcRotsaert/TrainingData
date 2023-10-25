@@ -15,7 +15,7 @@ class Trainses:
     def add_data(self, data: dict) -> None:
         def _set_data_nonexercise(data):
             self.laps = data.pop("laps")
-            self.alaps = data.pop("autolaps")
+            self.alaps = data.pop("alaps")
             return data
 
         def _set_data_exercise(data):
@@ -94,7 +94,7 @@ if __name__ == "__main__":
         except IndexError:
             dtRoute = samses.return_s_timeroute()
             dt = samses.return_s_timesamples()
-            print(file + ': export failed')
+            print(file + ": export failed")
 
     if False:
         files = [
@@ -107,8 +107,8 @@ if __name__ == "__main__":
             dtroute = samses.return_s_timeroute()
             dt = samses.return_s_timesamples()
 
-            idx1 = samses.return_idx_bytime(dtroute[0], 'samples')
-            idx2 = samses.return_idx_bytime(dtroute[-1], 'samples', 'last')
+            idx1 = samses.return_idx_bytime(dtroute[0], "samples")
+            idx2 = samses.return_idx_bytime(dtroute[-1], "samples", "last")
 
             try:
                 samses.export_geojson()
@@ -138,7 +138,6 @@ if __name__ == "__main__":
         samses.export_geojson()
 
         samses.plot("speed")
-
 
         laps = session.return_laps()
         lapses = RManualLapAnalyzer(laps)

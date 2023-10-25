@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Union, List
 import numpy as np
 
 import tomli
@@ -74,9 +74,7 @@ class RLapAnalyzerBasic:
         minspeed = np.max(speed)
         return stdspeed, maxspeed, minspeed
 
-    def _determine_accelaration(
-        self, ignorelaps: list[int] = []
-    ) -> np.array:
+    def _determine_accelaration(self, ignorelaps: list[int] = []) -> np.array:
         speed = np.array(self.return_paraslist("speed", "avg"))
         speed = np.delete(speed, ignorelaps)
         dspeed = speed[1:] - speed[0:-1]
@@ -139,10 +137,12 @@ class RManualLapAnalyzer(RLapAnalyzerBasic):
     def return_duration(self) -> list[str]:
         return self.laps["duration"]
 
-    def determine_startuprunoutlaps(self, su_speed=None) -> list[list, list]:
+    def determine_startuprunoutlaps(
+        self, su_speed=None
+    ) -> (Union[List[int], None], Union[List[int], None]):
         nodata = self._check_allempty_data("speed")
         if nodata:
-            return [], []
+            return None, None
         if su_speed is None:
             su_speed = self.paces["maxruninout"]
         idx_su = []
@@ -159,25 +159,35 @@ class RManualLapAnalyzer(RLapAnalyzerBasic):
                 else:
                     idx_su.append(i1)
                     i1 += 1
+        if len(idx_su) == 0:
+            idx_su = -1
 
         idx_ro = []
         i2 = len(self.laps["speed"]) - 1
         while self.laps["speed"][i2]["avg"] < su_speed and i2 > i1:
             idx_ro.append(i2)
             i2 -= 1
+        if len(idx_ro) == len(self.laps["speed"]) + 1:
+            idx_ro = 99999
+
         return idx_su, idx_ro
 
     def determine_lapswithoutsu(self) -> Union[dict, None]:
         su = self.determine_startuprunoutlaps()
-        if su == ([], []):
+        if su == (None, None):
             return None
 
-        su = su[0] + su[1]
-        su.sort()
-        su.reverse()
+        removerounds = []
+        if su[0] != -1:
+            removerounds += su[0]
+        if su[1] != 99999:
+            removerounds += su[1]
+        removerounds.sort()
+        removerounds.reverse()
+
         laps = self.laps.copy()
         for k in laps:
-            for i_la in su:
+            for i_la in removerounds:
                 if laps[k] is None:
                     break
                 laps[k].pop(i_la)
@@ -220,11 +230,12 @@ class RManualLapAnalyzer(RLapAnalyzerBasic):
         else:
             return "no interval, crit. 4, under investigation"
 
-    def identify_sprints(self, max_time: float = 20.0, min_cadence: int = 98) -> bool:
+    def identify_sprints(self, max_time: float = 20.0) -> bool:
         sprints = []
         for lnr in range(len(self.laps["duration"])):
-            lapdur_str = self.laps["duration"][lnr]
-            lapdur = float(lapdur_str.lstrip("PT").rstrip("S"))
+            lapdur = self.laps["duration"][lnr]
+            if isinstance(lapdur, str):
+                lapdur = float(lapdur.lstrip("PT").rstrip("S"))
             if lapdur < max_time:
                 sprints.append(lnr)
         result = len(sprints) > 3
