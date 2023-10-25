@@ -13,6 +13,8 @@ class Polar_parser:
         with open(os.path.join(self.path, self.filename)) as g:
             temp = g.read()
         data = json.loads(temp)
+        sport = data["exercises"][0]["sport"]
+        data.update({"sport": sport})
         return data
 
 
