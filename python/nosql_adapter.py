@@ -136,7 +136,7 @@ class MongoPolar(MongoQuery):
         resume = sess.abstract
         SamAnal = pol_an.SampleAnalyzerBasic(sess.samples)
         loc = SamAnal.determine_s_location()
-        resume.update({"location": loc, "laps": sess.laps, "autolaps": sess.alaps})
+        resume.update({"location": loc, "laps": sess.laps, "alaps": sess.alaps})
         self.insertOne(resume)
 
 
@@ -153,7 +153,7 @@ class MongoGarminfit(MongoQuery):
         # Add JSON-file to a collection
         sess = gar_an.Trainses_fit(path, fname)
         resume = sess.abstract
-        SamAnal = gar_an.SampleAnalyzerBasic(sess.samples)
+        SamAnal = gar_an.SamAnalExtra(sess.samples)
         loc = SamAnal.determine_s_location()
         # print(resume)
         # print(loc)

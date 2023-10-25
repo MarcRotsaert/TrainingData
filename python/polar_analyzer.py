@@ -15,7 +15,7 @@ class Trainses:
     def add_data(self, data: dict) -> None:
         def _set_data_nonexercise(data):
             self.laps = data.pop("laps")
-            self.alaps = data.pop("alaps")
+            self.alaps = data.pop("autolaps")
             return data
 
         def _set_data_exercise(data):
