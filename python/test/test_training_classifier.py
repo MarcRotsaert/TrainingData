@@ -1,26 +1,22 @@
-from typing import Any, NoReturn
 import unittest
-from training_classifier import MongoRunningClassifier as mrc
-from nosql_adapter import MongoQuery
-
-import nosql_adapter as mongodb
 import tomli
+from training_classifier import MongoRunningClassifier as mrc
+import nosql_adapter as mongodb
 
 
 class TestRunningClassifierPolar(unittest.TestCase):
     @classmethod
     def setUp(cls):
-        config = tomli.load(open("config.toml", "rb"))
-
         cls.testyear = "polartest"
         cls.dbase = "unittest"
         cls.adapter = mongodb.MongoPolar(cls.dbase, cls.testyear)
-        path = config["polar_json"]["datapath"]
-        filename_easyrun = ""
+        # config = tomli.load(open("config.toml", "rb"))
+        # path = config["polar_json"]["datapath"]
+        # filename_easyrun = ""
         # cls.adapter.put_jsonresume(path, filename_easyrun)
-        filename_interval = ""
+        # filename_interval = ""
         # cls.adapter.put_jsonresume(path, filename_interval)
-        cls.session = mrc(cls.dbase, cls.testyear)
+        # cls.session = mrc(cls.dbase, cls.testyear)
 
     @unittest.skip("file not selected ")
     def test_return_easyrun(self):

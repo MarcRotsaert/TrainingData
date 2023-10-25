@@ -230,12 +230,12 @@ class RManualLapAnalyzer(RLapAnalyzerBasic):
         else:
             return "no interval, crit. 4, under investigation"
 
-    def identify_sprints(self, max_time: float = 20.0, min_cadence: int = 98) -> bool:
+    def identify_sprints(self, max_time: float = 20.0) -> bool:
         sprints = []
         for lnr in range(len(self.laps["duration"])):
             lapdur = self.laps["duration"][lnr]
             if isinstance(lapdur, str):
-                lapdur = float(lapdur_str.lstrip("PT").rstrip("S"))
+                lapdur = float(lapdur.lstrip("PT").rstrip("S"))
             if lapdur < max_time:
                 sprints.append(lnr)
         result = len(sprints) > 3

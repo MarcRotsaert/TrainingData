@@ -167,14 +167,13 @@ if __name__ == "__main__":
     for train in interval:
         print(train["laps"])
         print("...........")
-    xx
+
     classif.set_easyrun()
     easyrun, no_easyrun = classif.return_easyrun()
     road_races = classif.mongo.simplequery("trainingtype.easyrun", True)
     for rr in road_races:
         print(rr["fname"])
     print("___________________________________________________")
-    # xx
     classif.set_sprint()
     road_races = classif.mongo.simplequery("trainingtype.sprint", True)
     for rr in road_races:
@@ -195,6 +194,4 @@ if __name__ == "__main__":
     road_races = classif.mongo.simplequery("trainingtype.roadrace", True)
     for rr in road_races:
         print(rr["fname"])
-    print("___________________________________________________")
-
-    XX
+    print("Finish___________________________________________________")

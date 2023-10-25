@@ -2,7 +2,7 @@ import tomli
 
 import garminfit_parser as gparser
 from lap_analyzer import RManualLapAnalyzer, RAutoLapAnalyzer
-from sample_analyzer import SampleAnalyzerBasic, SamAnalExtra
+from sample_analyzer import SamAnalExtra
 
 
 class Trainses:
