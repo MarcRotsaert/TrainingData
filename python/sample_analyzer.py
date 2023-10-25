@@ -20,8 +20,11 @@ class SampleAnalyzerBasic:
         self.param = config["running"]["sample_param"]
         self.paces = config["running"]["sample_paces"]
 
-        self.len_samples = len(samples['speed'])
-        self.len_route = len(samples['recordedRoute'])
+        self.len_samples = len(samples["speed"])
+        try:
+            self.len_route = len(samples["recordedRoute"])
+        except KeyError:
+            self.len_route = 0
 
     def return_samples(self) -> dict[list]:
         return self.samples
@@ -55,10 +58,7 @@ class SampleAnalyzerBasic:
 
     def return_s_timesamples(self) -> np.array:
         dump = self.return_s_speed()
-        dt = [
-            datetime.datetime.fromisoformat(d["dateTime"])
-            for d in dump
-        ]
+        dt = [datetime.datetime.fromisoformat(d["dateTime"]) for d in dump]
         dt = np.array(dt)
         return dt
 
@@ -114,8 +114,8 @@ class SampleAnalyzerBasic:
         pp.show()
 
     def return_v_sample(self, param: str, idx: int) -> Union[float, None]:
-        if 'value' in self.samples[param][idx]:
-            value = self.samples[param][idx]['value']
+        if "value" in self.samples[param][idx]:
+            value = self.samples[param][idx]["value"]
         else:
             value = None
         return value
@@ -125,17 +125,17 @@ class SamAnalTiming(SampleAnalyzerBasic):
     def __init__(self, samples: dict[list]):
         super(SamAnalTiming, self).__init__(samples)
 
-    def return_idx_bytime(self, dt: datetime.datetime,
-                          param: str,
-                          firstorlast: str = 'first') -> int:
-        if param.lower() == 'recordedroute':
+    def return_idx_bytime(
+        self, dt: datetime.datetime, param: str, firstorlast: str = "first"
+    ) -> int:
+        if param.lower() == "recordedroute":
             dtimearr = self.return_s_timeroute()
-        elif param.lower() == 'samples':
+        elif param.lower() == "samples":
             dtimearr = self.return_s_timesamples()
 
-        if firstorlast == 'first':
+        if firstorlast == "first":
             idx = np.where(dtimearr >= dt)[0][0]
-        elif firstorlast == 'last':
+        elif firstorlast == "last":
             idx = np.where(dtimearr <= dt)[0][0]
         return idx
 
@@ -146,14 +146,18 @@ class SamAnalTiming(SampleAnalyzerBasic):
         return diff_dt
 
     def _lineup_tr2ts(self) -> int:
-        if self.len_samples-self.len_route == 1:
+        if self.len_samples - self.len_route == 1:
             i_start = 1
         else:
             dt = self.return_s_timesamples()
             dtRoute = self.return_s_timeroute()
             diff_dt = self.determine_timediff_samp2route()
-          
-            if datetime.timedelta(0, -10, 0) < diff_dt[1] < datetime.timedelta(0, -1, 0):
+
+            if (
+                datetime.timedelta(0, -10, 0)
+                < diff_dt[1]
+                < datetime.timedelta(0, -1, 0)
+            ):
                 dtRoute = dtRoute + diff_dt[1]
 
             # Correction in time zone difference between samples and route
@@ -187,7 +191,7 @@ class SamAnalTiming(SampleAnalyzerBasic):
 
     @staticmethod
     def timeshift(dt: np.array, deltat: datetime.timedelta) -> np.array:
-        return dt+deltat
+        return dt + deltat
 
     def check_tzcoor_samples2route(self):
         """
@@ -268,9 +272,9 @@ class SamAnalExtra(SamAnalTiming):
         lon, lat = self.return_s_rcoord()
         dt = self.return_s_timesamples()
         i_start = self.lineup_troute2tsamples()
-        print('_______________________________________')
+        print("_______________________________________")
 
-        if abs(len(dt[i_start:])-len(dtRoute)) > 30:
+        if abs(len(dt[i_start:]) - len(dtRoute)) > 30:
             raise IndexError
 
         if len(dt[i_start:]) < len(dtRoute):
@@ -286,15 +290,10 @@ class SamAnalExtra(SamAnalTiming):
                 "distance": self.return_v_sample("distance", i + i_start),
                 "tijd": dt[i + i_start].isoformat(),
             }
-            level300 = {"type": "Point",
-                        "coordinates": [lon[i],
-                                        lat[i]]}
-            level20 = {"type": "Feature",
-                       "geometry": level300,
-                       "properties": level310}
+            level300 = {"type": "Point", "coordinates": [lon[i], lat[i]]}
+            level20 = {"type": "Feature", "geometry": level300, "properties": level310}
             features.append(level20)
-        level1 = {"type": "FeatureCollection",
-                  "features": features}
+        level1 = {"type": "FeatureCollection", "features": features}
         fp = open(os.path.join(pad, filename + "_punt.json"), "w")
         json.dump(level1, fp)
         fp.close()
@@ -303,12 +302,9 @@ class SamAnalExtra(SamAnalTiming):
         linecoordinates = [[lon[i], lat[i]] for i in range(len(lon))]
         level301 = {"type": "LineString", "coordinates": linecoordinates}
         level311 = {"sport": "dummy"}
-        level21 = {"type": "feature",
-                   "geometry": level301,
-                   "properties": level311}
+        level21 = {"type": "feature", "geometry": level301, "properties": level311}
         features.append(level21)
-        level1 = {"type": "FeatureCollection",
-                  "features": features}
+        level1 = {"type": "FeatureCollection", "features": features}
         fp = open(os.path.join(pad, filename + "_lijn.json"), "w")
         json.dump(level1, fp)
         fp.close()
