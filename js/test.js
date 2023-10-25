@@ -122,7 +122,7 @@ let result2 = name ?? text;
 console.log(result2)
 
 
-
+for (t;t<1;t++1){print('yolie')}
 for (t of text) 
     {console.log(t)}
 
@@ -132,3 +132,7 @@ for (t in text)
 array = [0,1,3];
 for (t of array) 
     {console.log(t)}
+
+// In your browser
+prompt('random text')
+alert("other random text")
