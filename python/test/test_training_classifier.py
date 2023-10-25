@@ -10,29 +10,58 @@ class TestRunningClassifierPolar(unittest.TestCase):
         cls.testyear = "polartest"
         cls.dbase = "unittest"
         cls.adapter = mongodb.MongoPolar(cls.dbase, cls.testyear)
-        # config = tomli.load(open("config.toml", "rb"))
-        # path = config["polar_json"]["datapath"]
-        # filename_easyrun = ""
-        # cls.adapter.put_jsonresume(path, filename_easyrun)
-        # filename_interval = ""
-        # cls.adapter.put_jsonresume(path, filename_interval)
-        # cls.session = mrc(cls.dbase, cls.testyear)
+        config = tomli.load(open("config.toml", "rb"))
+        path = config["polar_json"]["datapath"]
+        filename_easyrun = "training-session-2014-01-09-263914844-2b6b0088-52f9-4eb0-8434-f8837be097f4.json"
+        cls.adapter.put_jsonresume(path, filename_easyrun)
+        filename_interval = "training-session-2014-01-15-263914982-9576f971-b7fd-41f2-a257-436ffaa5aa3c.json"
+        cls.adapter.put_jsonresume(path, filename_interval)
+        cls.session = mrc(cls.dbase, cls.testyear)
 
-    @unittest.skip("file not selected ")
     def test_return_easyrun(self):
-        pass
+        easyrun, non_easyrun = self.session.return_easyrun()
+        self.assertEqual(
+            easyrun,
+            [
+                "training-session-2014-01-09-263914844-2b6b0088-52f9-4eb0-8434-f8837be097f4.json"
+            ],
+        )
+        self.assertEqual(
+            non_easyrun,
+            [
+                "training-session-2014-01-15-263914982-9576f971-b7fd-41f2-a257-436ffaa5aa3c.json"
+            ],
+        )
 
-    @unittest.skip("file not selected ")
     def test_return_interval(self):
-        pass
+        trainingen = self.session.return_interval()
+        self.assertIsInstance(trainingen, dict)
+        self.assertEqual(
+            trainingen[
+                "training-session-2014-01-15-263914982-9576f971-b7fd-41f2-a257-436ffaa5aa3c.json"
+            ],
+            "interval",
+        )
 
-    @unittest.skip("file not selected ")
     def test_set_easyrun(self):
-        pass
+        self.session.set_easyrun()
+        curs = self.adapter.simplequery("trainingtype.easyrun", True)
+        res = list(curs)
+        self.assertEqual(len(res), 1)
+        self.assertEqual(
+            res[0]["fname"],
+            "training-session-2014-01-09-263914844-2b6b0088-52f9-4eb0-8434-f8837be097f4.json",
+        )
 
-    @unittest.skip("file not selected ")
     def test_set_interval(self):
-        pass
+        self.session.set_interval()
+        curs = self.adapter.simplequery("trainingtype.interval", "interval")
+        res = list(curs)
+        self.assertEqual(len(res), 1)
+        self.assertEqual(
+            res[0]["fname"],
+            "training-session-2014-01-15-263914982-9576f971-b7fd-41f2-a257-436ffaa5aa3c.json",
+        )
 
     @classmethod
     def tearDown(cls):

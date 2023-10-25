@@ -160,12 +160,12 @@ class MongoRunningClassifier:
 
 if __name__ == "__main__":
     config = tomli.load(open("config.toml", "rb"))
-    # classif = MongoRunningClassifier(config["mongodb"]["database"], "polar2014")
-    classif = MongoRunningClassifier(config["mongodb"]["database"], "garminfit")
+    classif = MongoRunningClassifier(config["mongodb"]["database"], "polar2014")
+    # classif = MongoRunningClassifier(config["mongodb"]["database"], "garminfit")
     classif.set_interval()
-    interval = classif.mongo.simplequery("trainingtype.interval", "undetermined")
+    interval = classif.mongo.simplequery("trainingtype.interval", "interval")
     for train in interval:
-        print(train["laps"])
+        print(train)
         print("...........")
 
     classif.set_easyrun()

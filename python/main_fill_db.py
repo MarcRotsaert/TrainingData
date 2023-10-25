@@ -11,7 +11,7 @@ import tomli
 config = tomli.load(open("config.toml", "rb"))
 database = config["mongodb"]["database"]
 
-if True:
+if False:
     path = config["garmin_fit"]["datapath"]
     # for year in range(2013, 2022):
     files = glob.glob(os.path.join(path, "*.fit"))
@@ -37,7 +37,7 @@ if True:
             print(f"major error in: {fi}")
 
 
-if False:
+if True:
     path = config["polar_json"]["datapath"]
     # for year in range(2013, 2022):
     for year in range(2014, 2015):
