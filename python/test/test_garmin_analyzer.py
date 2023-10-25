@@ -53,8 +53,8 @@ class GarminAnalyzer(unittest.TestCase):
         with self.subTest():
             self.assertEqual(len(session.samples['recordedRoute']), 568)
         with self.subTest():
-            self.assertIn('heartRate', session.samples['recordedRoute'][0])
-            self.assertIn('speed', session.samples['recordedRoute'][0])
+            self.assertIn('heartRate', session.samples)
+            self.assertIn('speed', session.samples)
             self.assertIn('latitude', session.samples['recordedRoute'][0])
             self.assertIn('longitude', session.samples['recordedRoute'][0])
             self.assertIn('dateTime', session.samples['recordedRoute'][0])
