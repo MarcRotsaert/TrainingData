@@ -53,11 +53,17 @@ class MongoRunningClassifier:
 
     def _return_roadrace_laps(self, training):
         lapses = pol_an.RManualLapAnalyzer(training.laps)
-        su_laps = lapses.determine_startuprunoutlaps()
+        su, ro = lapses.determine_startuprunoutlaps()
         if (len(lapses.laps) != 0) & (lapses.laps["speed"] is not None):
-            if su_laps is None:
+            if su is None and ro is None:
                 return False
-            ignorelaps = su_laps[0] + su_laps[1]
+
+            ignorelaps = []
+            if su != [-1]:
+              ignorelaps.extend(su)
+            if ro != [ 99999 ]:
+              ignorelaps.extend(ro)
+
             isroadrace = lapses.identify_roadrace(ignorelaps)
             if isroadrace:
                 print(training.abstract["fname"])
