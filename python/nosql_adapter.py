@@ -81,6 +81,9 @@ class MongoAdapter:
 
 
 class MongoQuery(MongoAdapter):
+    def __init__(self, mongoDB: str, collection: str):
+        super().__init__(mongoDB, collection)
+
     def simplequery(self, keyn: any, valn: any) -> pymongo.cursor.Cursor:
         collection = self.getCollection()
         cursor = collection.find({keyn: valn})
