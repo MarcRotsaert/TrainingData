@@ -49,22 +49,23 @@ class Lapparser(Forerunner_parser):
         speed = 3600 * (distance / s_duration) / 1000
         return round(speed, 1)
 
-    def xml2laps(self) -> dict or list:
+    def xml2laps(self) -> list:
         if len(self.laps) > 1:
             json = self._xml2laps_multiplelap()
         else:
             json = self._xml2laps_onelap()
         return json
 
-    def _xml2laps_onelap(self) -> dict:
-        result = {
-            "startTime": self._return_starttime(self.laps[0]),
+    def _xml2laps_onelap(self) -> list:
+        result = [{
+            # "startTime": self._return_starttime(self.laps[0]),
+            # "latitude": self._return_latitude(self.laps[0]),
+            # "longitude": self._return_longitude(self.laps[0]),
+            "lapNumber": 0,
             "duration": self._return_duration(self.laps[0]),
-            "distance": self._return_distance(self.laps[0]),
-            "latitude": self._return_latitude(self.laps[0]),
-            "longitude": self._return_longitude(self.laps[0]),
             "speed": {"avg": self._return_speed(self.laps[0])},
-        }
+            "distance": self._return_distance(self.laps[0]),
+        }]
         return result
 
     def _xml2laps_multiplelap(self) -> list:
@@ -139,9 +140,6 @@ class Parser(Forerunner_parser):
 
 if __name__ == "__main__":
     x = Lapparser("20041008-170457.xml").xml2laps()
-    pprint.pprint(x)
-    # x = Lapparser('20050725-190632.xml').xml2laps()
-    # pprint.pprint(x)
-
+    x = Lapparser("20050725-190632.xml").xml2laps()
     y = Sampleparser("20050725-190632.xml").xml2samples()
     pprint.pprint(y)
