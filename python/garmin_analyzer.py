@@ -1,9 +1,6 @@
 import tomli
 
 import garminfit_parser as gparser
-from lap_analyzer import RManualLapAnalyzer, RAutoLapAnalyzer
-from sample_analyzer import SamAnalExtra
-
 
 class Trainses:
     def add_data(self, data: dict):
@@ -15,9 +12,6 @@ class Trainses:
         def _set_data_exercise(data):
             config = tomli.load(open("config.toml", "rb"))
             for dtype in config["garmin_fit"]["datatypes"]:
-                # if dtype == "autoLaps":
-                #    dtype_attr = "alaps"
-                # else:
                 dtype_attr = dtype
 
                 if dtype in data["exercises"][0]:
@@ -65,14 +59,6 @@ if __name__ == "__main__":
     if True:
         file = "marcrotsaert_175152248.fit"
         session = Trainses_fit(path, file)
-        lapses = RManualLapAnalyzer(session.laps)
-        lapses.identify_interval()
-        print(SamAnalExtra(session.samples).determine_s_location())
-        alapses = RAutoLapAnalyzer(session.alaps)
-        samses = SamAnalExtra(session.samples)
-        samses.export_geojson()
 
         file = "marcrotsaert_220466005.fit"
         session = Trainses_fit(path, file)
-        samses = SamAnalExtra(session.samples)
-        samses.export_geojson("marcrotsaert_220466005")
