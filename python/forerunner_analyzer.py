@@ -1,18 +1,15 @@
 import tomli
-import xml.etree.ElementTree as ET
 
 import forerunner_parser as fparser
-from lap_analyzer import RManualLapAnalyzer, RAutoLapAnalyzer
-from sample_analyzer import SampleAnalyzerBasic, SamAnalExtra
 
 
 class Trainses:
-    def add_data(self, data: dict):
+    def add_data(self, data: dict) -> dict:
         def _set_data_nonexercise(data):
             self.laps = data.pop("laps")
             return data
 
-        def _set_data_exercise(data):
+        def _set_data_exercise(data: dict) -> dict:
             config = tomli.load(open("config.toml", "rb"))
             for dtype in config["forerunner_xml"]["datatypes"]:
                 if dtype == "autoLaps":
@@ -32,17 +29,18 @@ class Trainses:
             data.pop("exercises")
             return data
 
-        if "exercises" in data:
-            data = _set_data_exercise(data)
-        else:
+        if "laps" in data:
             data = _set_data_nonexercise(data)
+        else:
+            data = _set_data_exercise(data)
         self.abstract = data
         self.data = True
 
 
 class Trainses_xml(Trainses):
-    def __init__(self, path: str, file: str):
-        self.path = path
+    def __init__(self, file: str):
+        config = tomli.load(open("config.toml", "rb"))
+        self.path = config["forerunner_xml"]["datapath"]        
         self.file = file
         self.laps = []
         self.alaps = []
@@ -52,7 +50,7 @@ class Trainses_xml(Trainses):
         self.add_data(data)
         self.data = True
 
-    def _read_xml(self) -> None:
+    def _read_xml(self) -> dict:
         data = fparser.Parser(self.file).xml2json()
         data.update({"fname": self.file})
         return data
@@ -64,10 +62,8 @@ if __name__ == "__main__":
 
     if True:
         file = "20050725-190632.xml"
-        session = Trainses_xml(path, file)
-        lapses = RManualLapAnalyzer(session.laps)
-        print(SamAnalExtra(session.samples).determine_s_location())
+        session = Trainses_xml(file)
 
         file = "20041008-170457.xml"
-        session = Trainses_xml(path, file)
+        session = Trainses_xml(file)
         print(session)
