@@ -58,10 +58,9 @@ class Lapparser(Forerunner_parser):
 
     def _xml2laps_onelap(self) -> list:
         result = [{
-            # "startTime": self._return_starttime(self.laps[0]),
-            # "latitude": self._return_latitude(self.laps[0]),
-            # "longitude": self._return_longitude(self.laps[0]),
-            "lapNumber": 0,
+            "startTime": self._return_starttime(self.laps[0]),
+            "latitude": self._return_latitude(self.laps[0]),
+            "longitude": self._return_longitude(self.laps[0]),
             "duration": self._return_duration(self.laps[0]),
             "speed": {"avg": self._return_speed(self.laps[0])},
             "distance": self._return_distance(self.laps[0]),
@@ -69,7 +68,9 @@ class Lapparser(Forerunner_parser):
         return result
 
     def _xml2laps_multiplelap(self) -> list:
-        laps = []
+        laps = [{ "startTime": self._return_starttime(self.laps[0]),
+            "latitude": self._return_latitude(self.laps[0]),
+            "longitude": self._return_longitude(self.laps[0])}]
         for i, lap in enumerate(self.laps):
             duration = self._return_duration(lap)
             distance = self._return_distance(lap)
@@ -126,19 +127,21 @@ class Parser(Forerunner_parser):
         laps = Lapparser(self.filename).xml2laps()
 
         recordedroute = Sampleparser(self.filename).xml2samples()
-        if isinstance(laps, list):
-            json = {
-                "exercises": [
-                    {"laps": laps, "samples": {"recordedRoute": recordedroute}}
-                ]
-            }
+        if len(laps)>1:
+            json = laps.pop(0)
+            json.update({'laps':laps})
         else:
-            json = laps
-            json.update({"exercises": [{"samples": {"recordedRoute": recordedroute}}]})
+            json = laps[0]
+        json.update({"exercises": [{"samples": {"recordedRoute": recordedroute}}]})
         return json
 
 
 if __name__ == "__main__":
+
+    z = Parser("20041008-170457.xml").xml2json()
+    z = Parser("20050725-190632.xml").xml2json()
+    x = Lapparser("20050725-190632.xml").xml2laps()
+
     x = Lapparser("20041008-170457.xml").xml2laps()
     x = Lapparser("20050725-190632.xml").xml2laps()
     y = Sampleparser("20050725-190632.xml").xml2samples()
