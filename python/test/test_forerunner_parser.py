@@ -14,7 +14,7 @@ class ForerunnerParser(unittest.TestCase):
         file = "20041227-191950.xml"
         laps = for_par.Lapparser(file).xml2laps()
         with self.subTest():
-            self.assertEqual(len(laps), 12)
+            self.assertEqual(len(laps), 13)
         
     def test_lapparser_singlelap(self):
         file = "20041222-171003.xml"
@@ -32,11 +32,11 @@ class ForerunnerParser(unittest.TestCase):
         file = "20041227-191950.xml"
         json = for_par.Parser(file).xml2json()
         with self.subTest():
-            self.assertIn("laps", json)
-        with self.subTest():
             self.assertIn("exercises", json)
         with self.subTest():
             self.assertEqual(len(json["exercises"]),1)
+        with self.subTest():
+            self.assertTrue('laps' in json["exercises"][0])
         with self.subTest():
             self.assertTrue('samples' in json["exercises"][0])
         with self.subTest():
@@ -46,11 +46,11 @@ class ForerunnerParser(unittest.TestCase):
         file = "20041222-171003.xml"
         json = for_par.Parser(file).xml2json()
         with self.subTest():
-            self.assertNotIn("laps", json)
-        with self.subTest():
             self.assertIn("exercises", json)
         with self.subTest():
             self.assertEqual(len(json["exercises"]),1)
+        with self.subTest():
+            self.assertTrue('laps' not in json["exercises"][0])
         with self.subTest():
             self.assertTrue('samples' in json["exercises"][0])
         with self.subTest():

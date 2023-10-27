@@ -1,7 +1,5 @@
 import unittest
 import time
-import tomli
-
 import forerunner_analyzer as for_an
 
 class ForerunnerAnalyzer(unittest.TestCase):

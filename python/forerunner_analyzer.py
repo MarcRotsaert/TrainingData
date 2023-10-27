@@ -5,9 +5,6 @@ import forerunner_parser as fparser
 
 class Trainses:
     def add_data(self, data: dict) -> dict:
-        def _set_data_nonexercise(data):
-            self.laps = data.pop("laps")
-            return data
 
         def _set_data_exercise(data: dict) -> dict:
             config = tomli.load(open("config.toml", "rb"))
@@ -29,9 +26,7 @@ class Trainses:
             data.pop("exercises")
             return data
 
-        if "laps" in data:
-            data = _set_data_nonexercise(data)
-        else:
+        if 'exercises' in data:
             data = _set_data_exercise(data)
         self.abstract = data
         self.data = True

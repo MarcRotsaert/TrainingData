@@ -125,14 +125,14 @@ class Parser(Forerunner_parser):
 
     def xml2json(self):
         laps = Lapparser(self.filename).xml2laps()
-
         recordedroute = Sampleparser(self.filename).xml2samples()
-        if len(laps)>1:
-            json = laps.pop(0)
-            json.update({'laps':laps})
-        else:
-            json = laps[0]
-        json.update({"exercises": [{"samples": {"recordedRoute": recordedroute}}]})
+        
+        abstract = laps.pop(0)
+        exercise = {"samples": {"recordedRoute": recordedroute}}
+        if len(laps) > 1:
+            exercise.update({"laps": laps })
+        json = abstract
+        json.update({"exercises": [exercise]})
         return json
 
 
