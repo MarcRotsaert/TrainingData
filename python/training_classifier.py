@@ -1,9 +1,8 @@
 # Determine training type en set info in Mongo DB.
 from typing import Generator
 import tomli
-import polar_analyzer as pol_an
 import nosql_adapter as mongodb
-
+from trainsession import Trainsession_mongo
 
 class MongoRunningClassifier:
     def __init__(self, dbase: str, collection: str):
@@ -15,8 +14,8 @@ class MongoRunningClassifier:
     def print_trainingtypes(self) -> None:
         print(self.TRAININGTYPES)
 
-    def _return_session(self, mongorecord) -> pol_an.Trainses_mongo:
-        return pol_an.Trainses_mongo(mongorecord)
+    def _return_session(self, mongorecord) -> Trainsession_mongo:
+        return Trainsession_mongo(mongorecord)
 
     def _generator_training(self) -> Generator:
         # yield all trainingen, from self.SPORT
@@ -52,9 +51,9 @@ class MongoRunningClassifier:
         return set1.union(set2)
 
     def _return_roadrace_laps(self, training):
-        lapses = pol_an.RManualLapAnalyzer(training.laps)
-        su, ro = lapses.determine_startuprunoutlaps()
-        if (len(lapses.laps) != 0) & (lapses.laps["speed"] is not None):
+        # lapses = Trainsession_mongo(training)
+        su, ro = training.RManualLapAnalyzer.determine_startuprunoutlaps()
+        if (len(training.laps) != 0) & (training.laps[0]["speed"] is not None):
             if su is None and ro is None:
                 return False
 
@@ -64,19 +63,22 @@ class MongoRunningClassifier:
             if ro != [ 99999 ]:
               ignorelaps.extend(ro)
 
-            isroadrace = lapses.identify_roadrace(ignorelaps)
+            isroadrace = training.RManualLapAnalyzer.identify_roadrace(ignorelaps)
             if isroadrace:
                 print(training.abstract["fname"])
                 return training.abstract["fname"]
             else:
                 return False
 
-    def _return_roadrace_alaps(self, training: dict) -> str or False:
-        alapses = pol_an.RAutoLapAnalyzer(training.alaps)
-        if len(alapses.laps) == 0:
+    def _return_roadrace_alaps(self, training: Trainsession_mongo) -> str or False:
+        alapses = training
+        if training.alaps is None:
+            return False
+        
+        if len(training.alaps) == 0:
             return False
 
-        isroadrace = alapses.identify_roadrace()
+        isroadrace = training.RAutoLapAnalyzer.identify_roadrace()
         if isroadrace:
             print(training.abstract["fname"])
             return training.abstract["fname"]
@@ -99,9 +101,9 @@ class MongoRunningClassifier:
         intervaltr = {}
         for training in traingen:
             if training.laps is not None:
-                lapses = pol_an.RManualLapAnalyzer(training.laps)
-                if (len(lapses.laps) != 0) & (lapses.laps["speed"] is not None):
-                    result = lapses.identify_interval()
+                # lapses = training.RManualLapAnalyzer
+                if (len(training.laps) != 0) & (training.laps[0]["speed"] is not None):
+                    result = training.RManualLapAnalyzer.identify_interval()
                     intervaltr.update({training.abstract["fname"]: result})
         return intervaltr
 
@@ -127,17 +129,17 @@ class MongoRunningClassifier:
 
         for training in trainingen:
             if training.laps is not None and len(training.laps) > 2:
-                lapses = pol_an.RManualLapAnalyzer(training.laps)
-                if lapses.identify_easyrun():
+                if training.RManualLapAnalyzer.identify_easyrun():
                     easyrun.append(training.abstract["fname"])
                 else:
                     no_easyrun.append(training.abstract["fname"])
 
             else:
-                lapses = pol_an.RAutoLapAnalyzer(training.alaps)
-                if len(lapses.laps) == 0:
+                if training.laps is None:
                     continue
-                if lapses.identify_easyrun():
+                if len(training.laps) == 0:
+                    continue
+                if training.RAutoLapAnalyzer.identify_easyrun():
                     easyrun.append(training.abstract["fname"])
                 else:
                     no_easyrun.append(training.abstract["fname"])
@@ -157,7 +159,7 @@ class MongoRunningClassifier:
         sprint = []
         for training in traingen:
             if training.laps is not None:
-                lapses = pol_an.RManualLapAnalyzer(training.laps)
+                lapses = training.RManualLapAnalyzer(training.laps)
                 if (len(lapses.laps) != 0) & (lapses.laps["speed"] is not None):
                     if lapses.identify_sprints():
                         sprint.append(training.abstract["fname"])
@@ -168,18 +170,22 @@ if __name__ == "__main__":
     config = tomli.load(open("config.toml", "rb"))
     classif = MongoRunningClassifier(config["mongodb"]["database"], "polar2014")
     # classif = MongoRunningClassifier(config["mongodb"]["database"], "garminfit")
-    classif.set_interval()
-    interval = classif.mongo.simplequery("trainingtype.interval", "interval")
-    for train in interval:
-        print(train)
-        print("...........")
-
     classif.set_easyrun()
     easyrun, no_easyrun = classif.return_easyrun()
     road_races = classif.mongo.simplequery("trainingtype.easyrun", True)
     for rr in road_races:
         print(rr["fname"])
     print("___________________________________________________")
+    classif.set_roadrace()
+    road_races = classif.mongo.simplequery("trainingtype.roadrace", True)
+
+
+    classif.set_interval()
+    interval = classif.mongo.simplequery("trainingtype.interval", "interval")
+    for train in interval:
+        print(train)
+        print("...........")
+
     classif.set_sprint()
     road_races = classif.mongo.simplequery("trainingtype.sprint", True)
     for rr in road_races:
@@ -195,9 +201,7 @@ if __name__ == "__main__":
     interval = classif.mongo.simplequery("trainingtype.interval", "interval")
     for rr in interval:
         print(rr["fname"])
-    print("___________________________________________________")
-    classif.set_roadrace()
-    road_races = classif.mongo.simplequery("trainingtype.roadrace", True)
     for rr in road_races:
+        print("___________________________________________________")
         print(rr["fname"])
     print("Finish___________________________________________________")
