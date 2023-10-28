@@ -14,7 +14,7 @@ class PolarAnalyzerJson(unittest.TestCase):
 
     def test_read_data1(self):
         file = "training-session-2019-07-04-3666956261-8c8d9764-332d-42d1-bed3-f502dbc4c273.json"
-        session = pol_an.Trainses_json(self.path, file)
+        session = pol_an.Trainses_json(file)
         with self.subTest():
             self.assertEqual(len(session.alaps), 7)
         with self.subTest():
@@ -24,7 +24,7 @@ class PolarAnalyzerJson(unittest.TestCase):
 
     def test_read_data2(self):
         file = "training-session-2017-09-21-1766006650-5ffee761-22e6-4c0b-9590-ae130c929649.json"
-        session = pol_an.Trainses_json(self.path, file)
+        session = pol_an.Trainses_json(file)
         with self.subTest():
             self.assertEqual(len(session.alaps), 15)
         with self.subTest():
@@ -47,6 +47,7 @@ class PolarAnalyzerMongo(unittest.TestCase):
         )
         cls.record = cursor.next()
 
+    @unittest.skip("not yet implemented")
     def test_read_data1(self):
         session = pol_an.Trainses_mongo(self.record)
         with self.subTest():

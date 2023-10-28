@@ -1,11 +1,33 @@
 import tomli
 
+from  trainsession import Trainsession_file
 import forerunner_parser as fparser
+# from lap_analyzer import RManualLapAnalyzer, RAutoLapAnalyzer
+# from sample_analyzer import SampleAnalyzerBasic, SamAnalExtra
 
+class Trainses_xml(Trainsession_file):
+    def __init__(self, file: str):
+        super().__init__(file)
+        # self.path = self._return_path()
+        # self.file = file
+        # self.laps = []
+        # self.alaps = []
+        # self.abstract = {}
 
-class Trainses:
+        # data = self._read_xml()
+        # self.add_data(data)
+        # self.data = True
+
+    def _read_file(self) -> dict:
+        data = fparser.Parser(self.file).xml2json()
+        data.update({"fname": self.file})
+        return data
+    
+    def _return_path(self) -> str:
+        config = tomli.load(open("config.toml", "rb"))
+        return config["forerunner_xml"]["datapath"]    
+
     def add_data(self, data: dict) -> dict:
-
         def _set_data_exercise(data: dict) -> dict:
             config = tomli.load(open("config.toml", "rb"))
             for dtype in config["forerunner_xml"]["datatypes"]:
@@ -30,26 +52,6 @@ class Trainses:
             data = _set_data_exercise(data)
         self.abstract = data
         self.data = True
-
-
-class Trainses_xml(Trainses):
-    def __init__(self, file: str):
-        config = tomli.load(open("config.toml", "rb"))
-        self.path = config["forerunner_xml"]["datapath"]        
-        self.file = file
-        self.laps = []
-        self.alaps = []
-        self.abstract = {}
-        data = self._read_xml()
-
-        self.add_data(data)
-        self.data = True
-
-    def _read_xml(self) -> dict:
-        data = fparser.Parser(self.file).xml2json()
-        data.update({"fname": self.file})
-        return data
-
 
 if __name__ == "__main__":
     config = tomli.load(open("config.toml", "rb"))

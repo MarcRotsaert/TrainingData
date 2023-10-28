@@ -6,12 +6,16 @@ import pprint
 import tomli
 from matplotlib import pyplot as pp
 
+from trainsession import Trainsession_file
 import polar_parser as pparser
-from lap_analyzer import RManualLapAnalyzer, RAutoLapAnalyzer
-from sample_analyzer import SampleAnalyzerBasic, SamAnalExtra
+# from lap_analyzer import RManualLapAnalyzer, RAutoLapAnalyzer
+# from sample_analyzer import SampleAnalyzerBasic, SamAnalExtra
 
 
-class Trainses:
+class Trainses_json(Trainsession_file):
+    def __init__(self, file):
+        super().__init__(file)
+
     def add_data(self, data: dict) -> None:
         def _set_data_nonexercise(data):
             self.laps = data.pop("laps")
@@ -55,28 +59,14 @@ class Trainses:
     def return_sport(self) -> str:
         return self.abstract["sport"]
 
-
-class Trainses_json(Trainses):
-    def __init__(self, path: str, file: str):
-        self.path = path
-        self.file = file
-        self.laps = []
-        self.alaps = []
-        self.abstract = {}
-        data = self._read_json()
-
-        self.add_data(data)
-        self.data = True
-
-    def _read_json(self) -> dict:
+    def _read_file(self) -> dict:
         data = pparser.Parser(self.file).json2json()
         data.update({"fname": self.file})
         return data
 
-
-class Trainses_mongo(Trainses):
-    def __init__(self, mongorecord):
-        self.add_data(mongorecord)
+# class Trainses_mongo(Trainses):
+#     def __init__(self, mongorecord):
+#         self.add_data(mongorecord)
 
 
 if __name__ == "__main__":
@@ -85,16 +75,16 @@ if __name__ == "__main__":
 
     files = glob.glob(os.path.join(path, "training-session-2015-*.json"))
     for file in files:
-        session = Trainses_json(path, file)
-        samses = SamAnalExtra(session.samples)
-        try:
-            samses.export_geojson(file[-63:])
-            print(samses.determine_timediff_samp2route())
-            # print(file + ': export ended')
-        except IndexError:
-            dtRoute = samses.return_s_timeroute()
-            dt = samses.return_s_timesamples()
-            print(file + ": export failed")
+        session = Trainses_json(file)
+        # samses = SamAnalExtra(session.samples)
+        # try:
+        #     samses.export_geojson(file[-63:])
+        #     print(samses.determine_timediff_samp2route())
+        #     # print(file + ': export ended')
+        # except IndexError:
+        #     dtRoute = samses.return_s_timeroute()
+        #     dt = samses.return_s_timesamples()
+        #     print(file + ": export failed")
 
     if False:
         files = [

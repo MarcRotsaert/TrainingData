@@ -8,12 +8,12 @@ class GarminAnalyzer(unittest.TestCase):
     @classmethod
     def setUp(cls) -> None:
         cls.startime = time.time()
-        config = tomli.load(open("config.toml", "rb"))
-        cls.path = config["forerunner_xml"]["datapath"]
+        # config = tomli.load(open("config.toml", "rb"))
+        # cls.path = config["forerunner_xml"]["datapath"]
 
     def test_read_data_general(self):
         file = "marcrotsaert_217112806.fit"
-        session = gar_an.Trainses_fit(self.path, file)
+        session = gar_an.Trainses_fit(file)
         with self.subTest():
             self.assertTrue(hasattr(session, 'abstract'))
             self.assertTrue(hasattr(session, 'laps'))
@@ -24,7 +24,7 @@ class GarminAnalyzer(unittest.TestCase):
 
     def test_read_data_manuallap(self):
         file = "marcrotsaert_217112806.fit"
-        session = gar_an.Trainses_fit(self.path, file)
+        session = gar_an.Trainses_fit(file)
         with self.subTest():
             self.assertTrue(hasattr(session, 'abstract'))
             self.assertTrue(hasattr(session, 'laps'))
@@ -35,7 +35,7 @@ class GarminAnalyzer(unittest.TestCase):
 
     def test_read_data_autolap(self):
         file = "marcrotsaert_651691100.fit"
-        session = gar_an.Trainses_fit(self.path, file)
+        session = gar_an.Trainses_fit(file)
         with self.subTest():
             self.assertEqual(len(session.alaps), 8)
         with self.subTest():
@@ -47,7 +47,7 @@ class GarminAnalyzer(unittest.TestCase):
 
     def test_read_data_samples(self):
         file = "marcrotsaert_651691100.fit"
-        session = gar_an.Trainses_fit(self.path, file)
+        session = gar_an.Trainses_fit(file)
         with self.subTest():
             self.assertIn( 'recordedRoute', session.samples)
         with self.subTest():

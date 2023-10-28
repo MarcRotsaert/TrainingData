@@ -133,11 +133,11 @@ class MongoPolar(MongoQuery):
         curs = self.simplequery("sport", "RUNNING")
         return curs
 
-    def put_jsonresume(self, path: str, fname: str) -> None:
+    def put_jsonresume(self, fname: str) -> None:
         # Add fit-file to a collection
-        sess = pol_an.Trainses_json(path, fname)
+        sess = pol_an.Trainses_json(fname)
         resume = sess.abstract
-        SamAnal = pol_an.SampleAnalyzerBasic(sess.samples)
+        SamAnal = sess.SampleAnalyzerBasic(sess.samples)
         loc = SamAnal.determine_s_location()
         resume.update({"location": loc, "laps": sess.laps, "alaps": sess.alaps})
         self.insertOne(resume)
@@ -152,11 +152,11 @@ class MongoGarminfit(MongoQuery):
         # initiate collection
         super().__init__(mongoDB, collection)
 
-    def put_jsonresume(self, path: str, fname: str) -> None:
+    def put_jsonresume(self, fname: str) -> None:
         # Add JSON-file to a collection
-        sess = gar_an.Trainses_fit(path, fname)
+        sess = gar_an.Trainses_fit(fname)
         resume = sess.abstract
-        SamAnal = gar_an.SamAnalExtra(sess.samples)
+        SamAnal = sess.SamAnalExtra(sess.samples)
         loc = SamAnal.determine_s_location()
         # print(resume)
         # print(loc)
@@ -175,11 +175,11 @@ class MongoForerunner(MongoQuery):
         # initiate collection
         super().__init__(mongoDB, collection)
 
-    def put_jsonresume(self, path: str, fname: str) -> None:
+    def put_jsonresume(self, fname: str) -> None:
         # Add JSON-file to a collection
-        sess = for_an.Trainses_xml(path, fname)
+        sess = for_an.Trainses_xml(fname)
         resume = sess.abstract
-        SamAnal = for_an.SampleAnalyzerBasic(sess.samples)
+        SamAnal = sess.SampleAnalyzerBasic(sess.samples)
         loc = SamAnal.determine_s_location()
         resume.update({"location": loc, "laps": sess.laps})
         self.insertOne(resume)
