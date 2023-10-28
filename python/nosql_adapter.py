@@ -188,17 +188,17 @@ if __name__ == "__main__":
 
     path = config["garmin_fit"]["datapath"]
 
-    monggf = MongoGarminfit(config["mongodb"]["database"], "garminfit")
-    monggf.put_jsonresume(path, "marcrotsaert_169919458.fit")
+    monggf = MongoGarminfit("testdatabase", "garminfit")
+    monggf.put_jsonresume("marcrotsaert_169919458.fit")
 
-    mongfr = MongoForerunner(config["mongodb"]["database"], "polar2004")
+    mongfr = MongoForerunner("testdatabase", "polar2004")
     mongfr.showDocs()
 
     path = config["forerunner_xml"]["datapath"]
-    mongfr.put_jsonresume(path, "20050725-190632.xml")
+    mongfr.put_jsonresume("20050725-190632.xml")
     print(mongfr.returnDocs())
 
-    mongad = MongoPolar(config["mongodb"]["database"], "polar2014")
+    mongad = MongoPolar("testdatabase", "polar2014")
     mongad.showConnections()
     coll = mongad.getCollection()
     mongad.delete_duplicates()
@@ -207,8 +207,6 @@ if __name__ == "__main__":
         mongad.showConnections()
         coll = mongad.getCollection()
         docs = mongad.returnDocs()
-        ids = docs[0]["_id"]
-        print(ids)
 
     if True:
         docs = mongad.return_docsrunning()

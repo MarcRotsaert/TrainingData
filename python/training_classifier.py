@@ -1,6 +1,6 @@
 # Determine training type and set traing info in Mongo DB.
 import abc
-from typing import Generator
+from typing import Generator, Union
 import tomli
 
 import nosql_adapter as mongodb
@@ -58,24 +58,27 @@ class MongoRunningClassifier(MongoClassifier):
         set2 = set(race_alaps)
         return set1.union(set2)
 
-    def _return_roadrace_laps(self, training):
+    def _return_roadrace_laps(self, training: Trainsession_mongo) -> Union[bool, str]:
         su, ro = training.RManualLapAnalyzer.determine_startuprunoutlaps()
-        if (len(training.laps) != 0) & (training.laps[0]["speed"] is not None):
-            if su is None and ro is None:
-                return False
+        if su is None and ro is None:
+            return False
+        # if len(training.laps) != 0:
+        #     return False
+        # if training.laps[0]["speed"] is None:
+        #     return False
 
-            ignorelaps = []
-            if su != [-1]:
-                ignorelaps.extend(su)
-            if ro != [99999]:
-                ignorelaps.extend(ro)
+        ignorelaps = []
+        if su != [-1]:
+            ignorelaps.extend(su)
+        if ro != [99999]:
+            ignorelaps.extend(ro)
 
-            isroadrace = training.RManualLapAnalyzer.identify_roadrace(ignorelaps)
-            if isroadrace:
-                print(training.abstract["fname"])
-                return training.abstract["fname"]
-            else:
-                return False
+        isroadrace = training.RManualLapAnalyzer.identify_roadrace(ignorelaps)
+        if isroadrace:
+            print(training.abstract["fname"])
+            return training.abstract["fname"]
+        else:
+            return False
 
     def _return_roadrace_alaps(self, training: Trainsession_mongo) -> str or False:
         if training.alaps is None:
@@ -174,8 +177,8 @@ class MongoRunningClassifier(MongoClassifier):
 
 if __name__ == "__main__":
     config = tomli.load(open("config.toml", "rb"))
-    classif = MongoRunningClassifier(config["mongodb"]["database"], "polar2014")
-    # classif = MongoRunningClassifier(config["mongodb"]["database"], "garminfit")
+    # classif = MongoRunningClassifier(config["mongodb"]["database"], "polar2014")
+    classif = MongoRunningClassifier(config["mongodb"]["database"], "garminfit")
     classif.set_easyrun()
     easyrun, no_easyrun = classif.return_easyrun()
     road_races = classif.mongo.simplequery("trainingtype.easyrun", True)
