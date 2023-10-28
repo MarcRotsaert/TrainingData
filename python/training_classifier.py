@@ -4,6 +4,7 @@ import tomli
 import nosql_adapter as mongodb
 from trainsession import Trainsession_mongo
 
+
 class MongoRunningClassifier:
     def __init__(self, dbase: str, collection: str):
         self.mongo = mongodb.MongoPolar(dbase, collection)
@@ -52,18 +53,22 @@ class MongoRunningClassifier:
 
     def _return_roadrace_laps(self, training):
         # lapses = Trainsession_mongo(training)
-        su, ro = training.RManualLapAnalyzer.determine_startuprunoutlaps()
+        su, ro = training.RManualLapAnalyzer(
+            training.laps
+        ).determine_startuprunoutlaps()
         if (len(training.laps) != 0) & (training.laps[0]["speed"] is not None):
             if su is None and ro is None:
                 return False
 
             ignorelaps = []
             if su != [-1]:
-              ignorelaps.extend(su)
-            if ro != [ 99999 ]:
-              ignorelaps.extend(ro)
+                ignorelaps.extend(su)
+            if ro != [99999]:
+                ignorelaps.extend(ro)
 
-            isroadrace = training.RManualLapAnalyzer.identify_roadrace(ignorelaps)
+            isroadrace = training.RManualLapAnalyzer(training.laps).identify_roadrace(
+                ignorelaps
+            )
             if isroadrace:
                 print(training.abstract["fname"])
                 return training.abstract["fname"]
@@ -74,11 +79,11 @@ class MongoRunningClassifier:
         alapses = training
         if training.alaps is None:
             return False
-        
+
         if len(training.alaps) == 0:
             return False
 
-        isroadrace = training.RAutoLapAnalyzer.identify_roadrace()
+        isroadrace = training.RAutoLapAnalyzer(training.alaps).identify_roadrace()
         if isroadrace:
             print(training.abstract["fname"])
             return training.abstract["fname"]
@@ -102,8 +107,10 @@ class MongoRunningClassifier:
         for training in traingen:
             if training.laps is not None:
                 # lapses = training.RManualLapAnalyzer
-                if (len(training.laps) != 0) & (training.laps[0]["speed"] is not None):
-                    result = training.RManualLapAnalyzer.identify_interval()
+                if len(training.laps) != 0:
+                    result = training.RManualLapAnalyzer(
+                        training.laps
+                    ).identify_interval()
                     intervaltr.update({training.abstract["fname"]: result})
         return intervaltr
 
@@ -129,17 +136,17 @@ class MongoRunningClassifier:
 
         for training in trainingen:
             if training.laps is not None and len(training.laps) > 2:
-                if training.RManualLapAnalyzer.identify_easyrun():
+                if training.RManualLapAnalyzer(training.laps).identify_easyrun():
                     easyrun.append(training.abstract["fname"])
                 else:
                     no_easyrun.append(training.abstract["fname"])
 
             else:
-                if training.laps is None:
+                if training.alaps is None:
                     continue
-                if len(training.laps) == 0:
+                if len(training.alaps) == 0:
                     continue
-                if training.RAutoLapAnalyzer.identify_easyrun():
+                if training.RAutoLapAnalyzer(training.alaps).identify_easyrun():
                     easyrun.append(training.abstract["fname"])
                 else:
                     no_easyrun.append(training.abstract["fname"])
@@ -178,7 +185,6 @@ if __name__ == "__main__":
     print("___________________________________________________")
     classif.set_roadrace()
     road_races = classif.mongo.simplequery("trainingtype.roadrace", True)
-
 
     classif.set_interval()
     interval = classif.mongo.simplequery("trainingtype.interval", "interval")

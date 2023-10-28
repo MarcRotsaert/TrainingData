@@ -21,13 +21,12 @@ class Trainsession_file(metaclass=abc.ABCMeta):
         self.SampleAnalyzerBasic = SampleAnalyzerBasic
         self.SamAnalExtra = SamAnalExtra
 
-
     @classmethod
-    def _read_file(self)-> dict:
+    def _read_file(self) -> dict:
         pass
 
     @classmethod
-    def add_data(self, data: dict)->None:
+    def add_data(self, data: dict) -> None:
         pass
 
     @classmethod
@@ -38,17 +37,17 @@ class Trainsession_file(metaclass=abc.ABCMeta):
 class Trainsession_mongo(metaclass=abc.ABCMeta):
     def __init__(self, mongorecord):
         try:
-            self.laps = mongorecord.pop('laps')
+            self.laps = mongorecord.pop("laps")
         except AttributeError:
             self.laps = []
         try:
-            self.alaps = mongorecord.pop('alaps')
+            self.alaps = mongorecord.pop("alaps")
         except AttributeError:
             self.alaps = []
 
         # self.file = mongorecord.pop('fname')
         self.abstract = mongorecord
-        self.RManualLapAnalyzer = RManualLapAnalyzer(self.laps)
-        self.RAutoLapAnalyzer = RAutoLapAnalyzer(self.alaps)
+        self.RManualLapAnalyzer = RManualLapAnalyzer
+        self.RAutoLapAnalyzer = RAutoLapAnalyzer
         self.SampleAnalyzerBasic = SampleAnalyzerBasic
         self.SamAnalExtra = SamAnalExtra
