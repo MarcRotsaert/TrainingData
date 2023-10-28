@@ -14,7 +14,7 @@ class RLapAnalyzerBasic:
         self.param = config["running"]["lap_param"]
         self.paces = config["running"]["lap_paces"]
 
-        self.laps = self._reshapelaps(laps)
+        self.laps_an = self._reshapelaps(laps)
 
     def _reshapelaps(self, laps) -> dict:
         result = {}
@@ -30,16 +30,16 @@ class RLapAnalyzerBasic:
 
     def _check_allempty_data(self, param: str):
         empty = []
-        for i, data in enumerate(self.laps[param]):
+        for i, data in enumerate(self.laps_an[param]):
             if len(data) == 0:
                 empty.append(i)
-        if len(empty) == len(self.laps[param]):
+        if len(empty) == len(self.laps_an[param]):
             return True
         else:
             return False
 
     def return_paraslist(self, par: str, *arg: str) -> list[float]:
-        temp = self.laps[par]
+        temp = self.laps_an[par]
         values = []
         if len(arg) == 0:
             values = temp
@@ -53,10 +53,10 @@ class RLapAnalyzerBasic:
         return values
 
     def print_nrlaps(self) -> None:
-        print(len(self.laps["speed"]))
+        print(len(self.laps_an["speed"]))
 
     def compare_hr_sp(self) -> Union[None, np.ndarray[float, float]]:
-        if self.laps["heartRate"] is None or self.laps["speed"] is None:
+        if self.laps_an["heartRate"] is None or self.laps_an["speed"] is None:
             print("no heartrate or speed")
             return None
         else:
@@ -112,7 +112,7 @@ class RLapAnalyzerBasic:
             max_speed = self.paces["maxeasy"]
 
         speed = []
-        for sp in self.laps["speed"]:
+        for sp in self.laps_an["speed"]:
             if len(sp) != 0:
                 speed.append(sp["avg"])
         speed = np.array(speed)
@@ -132,10 +132,10 @@ class RManualLapAnalyzer(RLapAnalyzerBasic):
         super().__init__(laps)
 
     def return_distance(self) -> list[float]:
-        return self.laps["distance"]
+        return self.laps_an["distance"]
 
     def return_duration(self) -> list[str]:
-        return self.laps["duration"]
+        return self.laps_an["duration"]
 
     def determine_startuprunoutlaps(
         self, su_speed=None
@@ -149,7 +149,7 @@ class RManualLapAnalyzer(RLapAnalyzerBasic):
         i1 = 0
 
         # code hieronder kan niet omgaan met een lege dictionaryin laps["speed"]
-        for speed in self.laps["speed"]:
+        for speed in self.laps_an["speed"]:
             if len(speed) == 0:
                 idx_su.append(i1)
                 i1 += 1
@@ -160,17 +160,17 @@ class RManualLapAnalyzer(RLapAnalyzerBasic):
                     idx_su.append(i1)
                     i1 += 1
         if len(idx_su) == 0:
-            idx_su = [ -1 ]
+            idx_su = [-1]
 
         idx_ro = []
-        i2 = len(self.laps["speed"]) - 1
-        while self.laps["speed"][i2]["avg"] < su_speed and i2 > i1:
+        i2 = len(self.laps_an["speed"]) - 1
+        while self.laps_an["speed"][i2]["avg"] < su_speed and i2 > i1:
             idx_ro.append(i2)
             i2 -= 1
-        if len(idx_ro) == len(self.laps["speed"]) + 1:
-            idx_ro = [ 99999 ]
+        if len(idx_ro) == len(self.laps_an["speed"]) + 1:
+            idx_ro = [99999]
         elif len(idx_ro) == 0:
-            idx_ro = [ 99999 ]
+            idx_ro = [99999]
 
         return idx_su, idx_ro
 
@@ -182,12 +182,12 @@ class RManualLapAnalyzer(RLapAnalyzerBasic):
         removerounds = []
         if su != [-1]:
             removerounds.extend(su)
-        if ro != [ 99999] :
+        if ro != [99999]:
             removerounds.extend(ro)
         removerounds.sort()
         removerounds.reverse()
 
-        laps = self.laps.copy()
+        laps = self.laps_an.copy()
         for k in laps:
             for i_la in removerounds:
                 if laps[k] is None:
@@ -201,7 +201,8 @@ class RManualLapAnalyzer(RLapAnalyzerBasic):
 
         dspeed_int = self.paces["dspeedinterval"]
         laps = self.determine_lapswithoutsu()
-        if not laps:
+
+        if laps is None:
             return "undetermined"
 
         speed = np.array([sp["avg"] for sp in laps["speed"]])
@@ -209,8 +210,10 @@ class RManualLapAnalyzer(RLapAnalyzerBasic):
         easyrun = self.identify_easyrun()
 
         if speed.shape[0] < 5:
+            # Not enough laps
             return "no interval, crit. 1"
         elif sprint or easyrun:
+            # Training is sprint or easy_run
             return "no interval, crit. 2"
 
         dspeed = speed[1:] - speed[0:-1]
@@ -225,6 +228,7 @@ class RManualLapAnalyzer(RLapAnalyzerBasic):
             return "interval"
 
         if len(speed) > 8 and len(dspeed[dspeed == -1]) / len(dspeed) > 1 / 3:
+            # Almost certain
             return "interval, check1"
 
         if len(speed) == 5 and len(dspeed[dspeed == -1]) == 2:
@@ -234,8 +238,8 @@ class RManualLapAnalyzer(RLapAnalyzerBasic):
 
     def identify_sprints(self, max_time: float = 20.0) -> bool:
         sprints = []
-        for lnr in range(len(self.laps["duration"])):
-            lapdur = self.laps["duration"][lnr]
+        for lnr in range(len(self.laps_an["duration"])):
+            lapdur = self.laps_an["duration"][lnr]
             if isinstance(lapdur, str):
                 lapdur = float(lapdur.lstrip("PT").rstrip("S"))
             if lapdur < max_time:

@@ -12,8 +12,6 @@ curs = conn.simplequery("trainingtype.easyrun", False)
 trainings = list(curs)
 pprint.pprint(trainings[1])
 
-
-path = config["polar_json"]["datapath"]
 fnames = (
     "training-session-2014-01-27-263915162-07e7d91b-d3aa-4f89-b2f5-036d8a023f3e.json",
     "training-session-2014-01-28-263915222-2eae615f-9203-4444-a264-5bb5cfdef6e4.json",
@@ -27,9 +25,9 @@ fnames = (
 )
 
 for fname in fnames:
-    training = pol_an.Trainses_json(path, fname)
+    training = pol_an.Trainses_json(fname)
 
-    lap_an = pol_an.RManualLapAnalyzer(training.laps)
+    lap_an = training.RManualLapAnalyzer(training.laps)
     # try:
     print(lap_an.identify_easyrun())
     # except:

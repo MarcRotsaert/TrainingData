@@ -1,23 +1,16 @@
 import tomli
 
-from  trainsession import Trainsession_file
+from trainsession import Trainsession_file
 import garminfit_parser as gparser
+
 
 class Trainses_fit(Trainsession_file):
     def __init__(self, file: str):
         super().__init__(file)
-        # self.path = path
-        # self.file = file
-        # self.laps = []
-        # self.alaps = []
-        # self.abstract = {}
-        # data = self._read_fit()
 
-        # self.add_data(data)
-        # self.data = True
     def _return_path(self):
         config = tomli.load(open("config.toml", "rb"))
-        return config["garmin_fit"]["datapath"]    
+        return config["garmin_fit"]["datapath"]
 
     def _read_file(self) -> None:
         data = gparser.Parser(self.file).fit2json()
@@ -28,6 +21,7 @@ class Trainses_fit(Trainsession_file):
         def _set_data_nonexercise(data):
             self.laps = data.pop("laps")
             self.alaps = data.pop("alaps")
+            self.samples = data.pop("samples")
             return data
 
         def _set_data_exercise(data):
@@ -53,6 +47,7 @@ class Trainses_fit(Trainsession_file):
             data = _set_data_nonexercise(data)
         self.abstract = data
         self.data = True
+
 
 if __name__ == "__main__":
     config = tomli.load(open("config.toml", "rb"))

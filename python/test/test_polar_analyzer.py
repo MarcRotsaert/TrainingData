@@ -6,7 +6,7 @@ import polar_analyzer as pol_an
 import time
 
 
-class PolarAnalyzerJson(unittest.TestCase):
+class PolarAnalyzer(unittest.TestCase):
     @classmethod
     def setUp(cls) -> None:
         cls.startime = time.time()

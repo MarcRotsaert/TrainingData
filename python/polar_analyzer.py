@@ -8,13 +8,20 @@ from matplotlib import pyplot as pp
 
 from trainsession import Trainsession_file
 import polar_parser as pparser
-# from lap_analyzer import RManualLapAnalyzer, RAutoLapAnalyzer
-# from sample_analyzer import SampleAnalyzerBasic, SamAnalExtra
 
 
 class Trainses_json(Trainsession_file):
     def __init__(self, file):
         super().__init__(file)
+
+    def _return_path(self):
+        config = tomli.load(open("config.toml", "rb"))
+        return config["polar_json"]["datapath"]
+
+    def _read_file(self) -> dict:
+        data = pparser.Parser(self.file).json2json()
+        data.update({"fname": self.file})
+        return data
 
     def add_data(self, data: dict) -> None:
         def _set_data_nonexercise(data):
@@ -22,7 +29,7 @@ class Trainses_json(Trainsession_file):
             self.alaps = data.pop("alaps")
             return data
 
-        def _set_data_exercise(data):
+        def _set_data_exercise(data: dict):
             config = tomli.load(open("config.toml", "rb"))
             for dtype in config["polar_json"]["datatypes"]:
                 if dtype == "autoLaps":
@@ -49,24 +56,6 @@ class Trainses_json(Trainsession_file):
             data = _set_data_nonexercise(data)
         self.abstract = data
         self.data = True
-
-    def return_laps(self) -> list[dict]:
-        return self.laps
-
-    def return_autolaps(self) -> list[dict]:
-        return self.alaps
-
-    def return_sport(self) -> str:
-        return self.abstract["sport"]
-
-    def _read_file(self) -> dict:
-        data = pparser.Parser(self.file).json2json()
-        data.update({"fname": self.file})
-        return data
-
-# class Trainses_mongo(Trainses):
-#     def __init__(self, mongorecord):
-#         self.add_data(mongorecord)
 
 
 if __name__ == "__main__":
