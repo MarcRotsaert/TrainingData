@@ -16,7 +16,7 @@ database = config["mongodb"]["database"]
 if True:
     path = config["polar_json"]["datapath"]
     # for year in range(2013, 2022):
-    for year in range(2014, 2016):
+    for year in [2014, 2015, 2017]:
         mongad = MongoPolar(database, "polar" + str(year))
         files = glob.glob(
             os.path.join(path, "training-session-" + str(year) + "-*.json")

@@ -5,7 +5,6 @@ import nosql_adapter as nos_adap
 
 config = tomli.load(open("config.toml", "rb"))
 
-
 database = config["mongodb"]["database"]
 conn = nos_adap.MongoQuery(database, "polar2014")
 curs = conn.simplequery("trainingtype.easyrun", False)
@@ -27,8 +26,6 @@ fnames = (
 for fname in fnames:
     training = pol_an.Trainses_json(fname)
 
-    lap_an = training.RManualLapAnalyzer(training.laps)
-    # try:
+    lap_an = training.RManualLapAnalyzer
+
     print(lap_an.identify_easyrun())
-    # except:
-    # print(fname)
