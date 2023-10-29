@@ -38,6 +38,12 @@ class RLapAnalyzerBasic:
         else:
             return False
 
+    def return_distance(self) -> list[float]:
+        return self.laps_an["distance"]
+
+    def return_duration(self) -> list[str]:
+        return self.laps_an["duration"]
+
     def return_paraslist(self, par: str, *arg: str) -> list[float]:
         temp = self.laps_an[par]
         values = []
@@ -130,12 +136,6 @@ class RAutoLapAnalyzer(RLapAnalyzerBasic):
 class RManualLapAnalyzer(RLapAnalyzerBasic):
     def __init__(self, laps: dict):
         super().__init__(laps)
-
-    def return_distance(self) -> list[float]:
-        return self.laps_an["distance"]
-
-    def return_duration(self) -> list[str]:
-        return self.laps_an["duration"]
 
     def determine_startuprunoutlaps(
         self, su_speed=None
