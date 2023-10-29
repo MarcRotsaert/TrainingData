@@ -20,7 +20,7 @@ for res in result:
     continue
 
 # xx
-if False:
+if True:
     result = mongad.morecomplexquery({"trainingtype": {"$exists": False}})
     for res in result:
         session = Trainsession_mongo(res)
@@ -39,7 +39,7 @@ if False:
             print(sum(result))
             fname = session.abstract["fname"]
             ses = pj.Trainses(fname)
-            samses = pj.SamAnalExtra
+            samses = pj.SamAnalRunning
             samses.plot("speed")
             time.sleep(1)
 
@@ -55,7 +55,7 @@ result = mongad.morecomplexquery(
         ]
     }
 )
-if False:
+if True:
     for res in result:
         session = Trainsession_mongo(res)
         # print(res)
@@ -74,7 +74,7 @@ if False:
             fname = session.abstract["fname"]
             print(fname)
             ses = pj.Trainses_json(fname)
-            samses = ses.SamAnalExtra
+            samses = ses.SamAnalRunning
             samses.plot("speed")
             time.sleep(1)
 

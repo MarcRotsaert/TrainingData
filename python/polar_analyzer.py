@@ -65,7 +65,7 @@ if __name__ == "__main__":
     files = glob.glob(os.path.join(path, "training-session-2015-*.json"))
     for file in files:
         session = Trainses_json(file)
-        # samses = SamAnalExtra(session.samples)
+        # samses = SamAnalRunning(session.samples)
         # try:
         #     samses.export_geojson(file[-63:])
         #     print(samses.determine_timediff_samp2route())
@@ -82,7 +82,7 @@ if __name__ == "__main__":
         ]
         for file in files:
             session = Trainses_json(path, file)
-            samses = SamAnalExtra(session.samples)
+            samses = SamAnalRunning(session.samples)
             dtroute = samses.return_s_timeroute()
             dt = samses.return_s_timesamples()
 
@@ -104,7 +104,7 @@ if __name__ == "__main__":
         # training-session-2015-10-24-263861018-3690058d-71c0-47c3-8539-e7b67e8099fe.json
         # training-session-2015-10-17-263860916-1b563b91-c4f4-4991-878c-5c1225f84b2c.json
         session = Trainses_json(path, file)
-        samses = SamAnalExtra(session.samples)
+        samses = SamAnalRunning(session.samples)
         normroute = samses.return_normalizedroute()
         normheading = samses.return_normalizedheading()
         head2wind = samses.return_normalizedrelwind(360)
@@ -138,8 +138,7 @@ if __name__ == "__main__":
         lapses = RManualLapAnalyzer(session.laps)
 
     if False:
-        samses = SampleAnalyzerBasic(session.samples)
-        samses = SamAnalExtra(session.samples)
+        samses = SamAnalRunning(session.samples)
         X = samses.return_idxlowmovement()
 
     if False:
@@ -173,7 +172,7 @@ if __name__ == "__main__":
 
                 print("_______________________________")
             if False:
-                samses = SamAnalExtra(session.samples)
+                samses = SamAnalRunning(session.samples)
                 samses.plot("speed")
             if True:
                 samples = samses.return_samples()

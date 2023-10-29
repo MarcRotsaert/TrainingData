@@ -137,7 +137,7 @@ class MongoPolar(MongoQuery):
         # Add fit-file to a collection
         sess = pol_an.Trainses_json(fname)
         resume = sess.abstract
-        loc = sess.SamAnalExtra.determine_s_location()
+        loc = sess.SamAnalRunning.determine_s_location()
         resume.update({"location": loc, "laps": sess.laps, "alaps": sess.alaps})
         self.insertOne(resume)
 
@@ -155,7 +155,7 @@ class MongoGarminfit(MongoQuery):
         # Add JSON-file to a collection
         sess = gar_an.Trainses_fit(fname)
         resume = sess.abstract
-        loc = sess.SamAnalExtra.determine_s_location()
+        loc = sess.SamAnalRunning.determine_s_location()
         # print(resume)
         # print(loc)
         resume.update({"location": loc, "laps": sess.laps, "alaps": sess.alaps})
@@ -177,7 +177,7 @@ class MongoForerunner(MongoQuery):
         # Add JSON-file to a collection
         sess = for_an.Trainses_xml(fname)
         resume = sess.abstract
-        loc = sess.SamAnalExtra.determine_s_location()
+        loc = sess.SamAnalRunning.determine_s_location()
         resume.update({"location": loc, "laps": sess.laps})
         self.insertOne(resume)
 

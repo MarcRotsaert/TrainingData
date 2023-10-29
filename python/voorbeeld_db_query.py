@@ -57,7 +57,7 @@ if True:
         print("_________________")
         print(fname)
         Ses = pj.Trainses_json(fname)
-        Samp = Ses.SamAnalExtra
+        Samp = Ses.SamAnalRunning
 
         Samp.plot("speed")
         time.sleep(1)
@@ -75,7 +75,7 @@ if True:
         fname = it["fname"]
         print("_________________")
         Ses = pj.Trainses_json(fname)
-        Samp = Ses.SamAnalExtra
+        Samp = Ses.SamAnalRunning
 
         Samp.plot("speed")
         time.sleep(1)

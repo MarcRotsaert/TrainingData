@@ -1,11 +1,11 @@
 import os
 from typing import Tuple, Iterable, Union
-import numpy as np
 import datetime
-
 import json
+
 from matplotlib import pyplot as pp
 import shapely as shp
+import numpy as np
 import geopandas as gpd
 import tomli
 
@@ -13,12 +13,11 @@ import vector
 
 
 class SampleAnalyzerBasic:
-    def __init__(self, samples: dict):
+    def __init__(self, samples: dict[list]):
         config = tomli.load(open("config.toml", "rb"))
         self.samples = samples
-        self.locations = config["running"]["sample_loc"]
-        self.param = config["running"]["sample_param"]
-        self.paces = config["running"]["sample_paces"]
+        self.locations = config["generalsport"]["sample_loc"]
+        self.param = config["generalsport"]["sample_param"]
 
         if "speed" in samples:
             self.len_samples = len(samples["speed"])
@@ -127,7 +126,7 @@ class SampleAnalyzerBasic:
 
 class SamAnalTiming(SampleAnalyzerBasic):
     def __init__(self, samples: dict[list]):
-        super(SamAnalTiming, self).__init__(samples)
+        super().__init__(samples)
 
     def return_idx_bytime(
         self, dt: datetime.datetime, param: str, firstorlast: str = "first"
@@ -206,20 +205,9 @@ class SamAnalTiming(SampleAnalyzerBasic):
 
 class SamAnalExtra(SamAnalTiming):
     def __init__(self, samples: dict[list]):
-        super(SamAnalExtra, self).__init__(samples)
-
-    def return_idxlowmovement(self) -> Tuple[Union[int, None], Union[int, None]]:
-        # return index of  low activity at beginning and end of a session
-        speed = self.return_s_speed()
-        speedlist = [sp["value"] for sp in speed]
-        speed_arr = np.array(speedlist)
-        i_b = np.argwhere(speed_arr > self.paces["low_movement"])[0][0]
-        i_e = np.where(speed_arr > self.paces["low_movement"])[0][-1]
-        if i_e == speed_arr.shape[0] - 1:
-            i_e = None
-        if i_b == 0:
-            i_e = None
-        return i_b, i_e
+        super().__init__(samples)
+        # config = tomli.load(open("config.toml", "rb"))
+        # self.paces = config["running"]["sample_paces"]
 
     def extract_heading(self) -> list[float]:
         """
@@ -312,3 +300,23 @@ class SamAnalExtra(SamAnalTiming):
         fp = open(os.path.join(pad, filename + "_lijn.json"), "w")
         json.dump(level1, fp)
         fp.close()
+
+
+class SamAnalRunning(SamAnalExtra):
+    def __init__(self, samples: dict):
+        super().__init__(samples)
+        config = tomli.load(open("config.toml", "rb"))
+        self.paces = config["running"]["sample_paces"]
+
+    def return_idxlowmovement(self) -> Tuple[Union[int, None], Union[int, None]]:
+        # return index of  low activity at beginning and end of a session
+        speed = self.return_s_speed()
+        speedlist = [sp["value"] for sp in speed]
+        speed_arr = np.array(speedlist)
+        i_b = np.argwhere(speed_arr > self.paces["low_movement"])[0][0]
+        i_e = np.where(speed_arr > self.paces["low_movement"])[0][-1]
+        if i_e == speed_arr.shape[0] - 1:
+            i_e = None
+        if i_b == 0:
+            i_e = None
+        return i_b, i_e
