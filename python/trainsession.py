@@ -52,11 +52,11 @@ class Trainsession_mongo(Trainsession):
     def __init__(self, mongorecord):
         try:
             self.laps = mongorecord.pop("laps")
-        except AttributeError:
+        except KeyError:
             self.laps = []
         try:
             self.alaps = mongorecord.pop("alaps")
-        except AttributeError:
+        except KeyError:
             self.alaps = []
 
         self.abstract = mongorecord

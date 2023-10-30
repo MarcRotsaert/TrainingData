@@ -59,7 +59,10 @@ if True:
     pp.subplot(2, 1, 2, sharex=ax1)
     pp.plot(head2wind)
     pp.show()
-    samses.export_geojson()
+    try:
+        samses.export_geojson()
+    except IndexError:
+        print("Lineup problem:" + file)
     samses.plot("speed")
 
 

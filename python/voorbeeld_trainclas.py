@@ -7,7 +7,6 @@ import nosql_adapter as mongodb
 import analyzer.polar_analyzer as pj
 
 
-
 mongad = mongodb.MongoPolar("polartest4", "polar2014")
 result = mongad.simplequery("location", "baanbras")
 
@@ -21,7 +20,7 @@ for res in result:
 
 if True:
     result = mongad.morecomplexquery({"trainingtype": {"$exists": False}})
-    resultlist = list(result) 
+    resultlist = list(result)
     for res in random.choices(resultlist, k=5):
         session = Trainsession_mongo(res)
         if "trainingtype" in session.abstract:
@@ -30,7 +29,7 @@ if True:
             print("no type")
         # continue
         laps = session.return_laps()
-        if laps != None:
+        if laps is not None:
             lapses = session.RManualLapAnalyzer
             su = lapses.determine_startuprunoutlaps()
             result = lapses._determine_accelaration(ignorelaps=su[0] + su[1])
@@ -60,7 +59,7 @@ if True:
         else:
             print("no type")
         laps = session.return_laps()
-        if laps != None:
+        if laps is not None:
             lapses = session.RManualLapAnalyzer
             su = lapses.determine_startuprunoutlaps()
             result = lapses._determine_accelaration(ignorelaps=su[0] + su[1])
@@ -77,7 +76,7 @@ if True:
         session = Trainsession_mongo(res)
         laps = session.return_laps()
         if session.abstract["location"] == "baanbras":
-            if laps != None:
+            if laps is not None:
                 lapses = session.RManualLapAnalyzer
                 print(session.abstract["fname"])
                 # try:
@@ -93,11 +92,10 @@ result = mongad.returnDocs()
 for res in result:
     session = Trainsession_mongo(res)
     laps = session.return_laps()
-    if laps != None:
+    if laps is not None:
         lapses = session.RManualLapAnalyzer
         print(session.abstract["fname"])
         print(session.abstract["location"])
-        # try:
         int_identity = lapses.identify_interval()
         print(int_identity)
         if int_identity == "interval" or int_identity == "interval, check":
@@ -115,7 +113,7 @@ for res in result:
                 session.abstract["_id"], {"hr_reliability": hr_reliability}
             )
 
-            Ses = pj.Trainses_json(session.abstract['fname'])
+            Ses = pj.Trainses_json(session.abstract["fname"])
             Samp = Ses.SamAnalRunning
 
             Samp.plot("speed")
@@ -125,6 +123,4 @@ for res in result:
                 Samp.plot("heartRate")
                 time.sleep(1)
                 pp.close()
-            # except:
-            #     pass
     print("__________________________")
