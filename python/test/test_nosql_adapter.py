@@ -69,7 +69,7 @@ class TestMongoPolar_adddata(unittest.TestCase):
         filename = "training-session-2014-03-14-263911238-d1eefba4-26b5-4a68-9ed6-8571939ade8a.json"
 
         docs_voor = self.adapter.returnDocs()
-        self.adapter.put_jsonresume(path, filename)
+        self.adapter.put_jsonresume(filename)
 
         docs_na = self.adapter.returnDocs()
         self.assertEqual(len(docs_na) - len(docs_voor), 1)
@@ -91,8 +91,8 @@ class TestMongoPolar_deletedata(unittest.TestCase):
         path = config["polar_json"]["datapath"]
         filename = "training-session-2014-01-07-263914646-19f7d47a-6fd0-4a4b-bdf5-56df34741458.json"
 
-        self.adapter.put_jsonresume(path, filename)
-        self.adapter.put_jsonresume(path, filename)
+        self.adapter.put_jsonresume(filename)
+        self.adapter.put_jsonresume(filename)
 
         self.adapter.delete_duplicates()
         docs_na = self.adapter.returnDocs()
@@ -117,7 +117,7 @@ class TestMongoForerunner_adddata(unittest.TestCase):
         filename = "20040922-132041.xml"
 
         docs_voor = self.adapter.returnDocs()
-        self.adapter.put_jsonresume(path, filename)
+        self.adapter.put_jsonresume(filename)
 
         docs_na = self.adapter.returnDocs()
         self.assertEqual(len(docs_na) - len(docs_voor), 1)
@@ -139,8 +139,8 @@ class TestMongoForerunner_deletedata(unittest.TestCase):
         path = config["forerunner_xml"]["datapath"]
         filename = "20040922-132041.xml"
 
-        self.adapter.put_jsonresume(path, filename)
-        self.adapter.put_jsonresume(path, filename)
+        self.adapter.put_jsonresume(filename)
+        self.adapter.put_jsonresume(filename)
 
         self.adapter.delete_duplicates()
         docs_na = self.adapter.returnDocs()

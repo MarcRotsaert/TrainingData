@@ -13,9 +13,9 @@ class TestRunningClassifierPolar(unittest.TestCase):
         config = tomli.load(open("config.toml", "rb"))
         path = config["polar_json"]["datapath"]
         filename_easyrun = "training-session-2014-01-09-263914844-2b6b0088-52f9-4eb0-8434-f8837be097f4.json"
-        cls.adapter.put_jsonresume(path, filename_easyrun)
+        cls.adapter.put_jsonresume(filename_easyrun)
         filename_interval = "training-session-2014-01-15-263914982-9576f971-b7fd-41f2-a257-436ffaa5aa3c.json"
-        cls.adapter.put_jsonresume(path, filename_interval)
+        cls.adapter.put_jsonresume(filename_interval)
         cls.session = mrc(cls.dbase, cls.testyear)
 
     def test_return_easyrun(self):
@@ -78,9 +78,9 @@ class TestRunningClassifierGarmin(unittest.TestCase):
         cls.adapter = mongodb.MongoGarminfit(cls.dbase, cls.testyear)
         path = config["garmin_fit"]["datapath"]
         filename_easyrun = "marcrotsaert_162834949.fit"
-        cls.adapter.put_jsonresume(path, filename_easyrun)
+        cls.adapter.put_jsonresume(filename_easyrun)
         filename_interval = "marcrotsaert_175152248.fit"
-        cls.adapter.put_jsonresume(path, filename_interval)
+        cls.adapter.put_jsonresume(filename_interval)
         cls.session = mrc(cls.dbase, cls.testyear)
 
     def test_return_easyrun(self):

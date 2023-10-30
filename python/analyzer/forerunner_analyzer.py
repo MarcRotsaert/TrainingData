@@ -1,18 +1,24 @@
 import tomli
-import xml.etree.ElementTree as ET
 
-import forerunner_parser as fparser
-from lap_analyzer import RManualLapAnalyzer, RAutoLapAnalyzer
-from sample_analyzer import SampleAnalyzerBasic, SamAnalExtra
+from trainsession import Trainsession_file
+import parsing.forerunner_parser as fparser
 
 
-class Trainses:
-    def add_data(self, data: dict):
-        def _set_data_nonexercise(data):
-            self.laps = data.pop("laps")
-            return data
+class Trainses_xml(Trainsession_file):
+    def __init__(self, file: str):
+        super().__init__(file)
 
-        def _set_data_exercise(data):
+    def _read_file(self) -> dict:
+        data = fparser.Parser(self.file).xml2json()
+        data.update({"fname": self.file})
+        return data
+
+    def _return_path(self) -> str:
+        config = tomli.load(open("config.toml", "rb"))
+        return config["forerunner_xml"]["datapath"]
+
+    def add_data(self, data: dict) -> dict:
+        def _set_data_exercise(data: dict) -> dict:
             config = tomli.load(open("config.toml", "rb"))
             for dtype in config["forerunner_xml"]["datatypes"]:
                 if dtype == "autoLaps":
@@ -34,28 +40,8 @@ class Trainses:
 
         if "exercises" in data:
             data = _set_data_exercise(data)
-        else:
-            data = _set_data_nonexercise(data)
         self.abstract = data
         self.data = True
-
-
-class Trainses_xml(Trainses):
-    def __init__(self, path: str, file: str):
-        self.path = path
-        self.file = file
-        self.laps = []
-        self.alaps = []
-        self.abstract = {}
-        data = self._read_xml()
-
-        self.add_data(data)
-        self.data = True
-
-    def _read_xml(self) -> None:
-        data = fparser.Parser(self.file).xml2json()
-        data.update({"fname": self.file})
-        return data
 
 
 if __name__ == "__main__":
@@ -64,10 +50,8 @@ if __name__ == "__main__":
 
     if True:
         file = "20050725-190632.xml"
-        session = Trainses_xml(path, file)
-        lapses = RManualLapAnalyzer(session.laps)
-        print(SamAnalExtra(session.samples).determine_s_location())
+        session = Trainses_xml(file)
 
         file = "20041008-170457.xml"
-        session = Trainses_xml(path, file)
+        session = Trainses_xml(file)
         print(session)

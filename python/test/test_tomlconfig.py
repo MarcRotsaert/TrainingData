@@ -40,6 +40,7 @@ class TomliRead(unittest.TestCase):
                    "forerunner_xml",
                    "garmin_fit",
                    "mongodb",
+                   "generalsport",
                    "running",
         )
 

@@ -6,9 +6,9 @@ import tomli
 from pymongo import MongoClient
 import pymongo
 
-import polar_analyzer as pol_an
-import forerunner_analyzer as for_an
-import garmin_analyzer as gar_an
+import analyzer.polar_analyzer as pol_an
+import analyzer.forerunner_analyzer as for_an
+import analyzer.garmin_analyzer as gar_an
 
 
 class MongoAdapter:
@@ -133,12 +133,11 @@ class MongoPolar(MongoQuery):
         curs = self.simplequery("sport", "RUNNING")
         return curs
 
-    def put_jsonresume(self, path: str, fname: str) -> None:
+    def put_jsonresume(self, fname: str) -> None:
         # Add fit-file to a collection
-        sess = pol_an.Trainses_json(path, fname)
+        sess = pol_an.Trainses_json(fname)
         resume = sess.abstract
-        SamAnal = pol_an.SampleAnalyzerBasic(sess.samples)
-        loc = SamAnal.determine_s_location()
+        loc = sess.SamAnalRunning.determine_s_location()
         resume.update({"location": loc, "laps": sess.laps, "alaps": sess.alaps})
         self.insertOne(resume)
 
@@ -152,12 +151,11 @@ class MongoGarminfit(MongoQuery):
         # initiate collection
         super().__init__(mongoDB, collection)
 
-    def put_jsonresume(self, path: str, fname: str) -> None:
+    def put_jsonresume(self, fname: str) -> None:
         # Add JSON-file to a collection
-        sess = gar_an.Trainses_fit(path, fname)
+        sess = gar_an.Trainses_fit(fname)
         resume = sess.abstract
-        SamAnal = gar_an.SamAnalExtra(sess.samples)
-        loc = SamAnal.determine_s_location()
+        loc = sess.SamAnalRunning.determine_s_location()
         # print(resume)
         # print(loc)
         resume.update({"location": loc, "laps": sess.laps, "alaps": sess.alaps})
@@ -175,86 +173,10 @@ class MongoForerunner(MongoQuery):
         # initiate collection
         super().__init__(mongoDB, collection)
 
-    def put_jsonresume(self, path: str, fname: str) -> None:
+    def put_jsonresume(self, fname: str) -> None:
         # Add JSON-file to a collection
-        sess = for_an.Trainses_xml(path, fname)
+        sess = for_an.Trainses_xml(fname)
         resume = sess.abstract
-        SamAnal = for_an.SampleAnalyzerBasic(sess.samples)
-        loc = SamAnal.determine_s_location()
+        loc = sess.SamAnalRunning.determine_s_location()
         resume.update({"location": loc, "laps": sess.laps})
         self.insertOne(resume)
-
-
-if __name__ == "__main__":
-    # GET DATA FROM database
-    config = tomli.load(open("config.toml", "rb"))
-
-    path = config["garmin_fit"]["datapath"]
-
-    monggf = MongoGarminfit(config["mongodb"]["database"], "garminfit")
-    monggf.put_jsonresume(path, "marcrotsaert_169919458.fit")
-
-    mongfr = MongoForerunner(config["mongodb"]["database"], "polar2004")
-    mongfr.showDocs()
-
-    path = config["forerunner_xml"]["datapath"]
-    mongfr.put_jsonresume(path, "20050725-190632.xml")
-    print(mongfr.returnDocs())
-
-    mongad = MongoPolar(config["mongodb"]["database"], "polar2014")
-    mongad.showConnections()
-    coll = mongad.getCollection()
-    mongad.delete_duplicates()
-
-    if True:
-        mongad.showConnections()
-        coll = mongad.getCollection()
-        docs = mongad.returnDocs()
-        ids = docs[0]["_id"]
-        print(ids)
-
-    if True:
-        docs = mongad.return_docsrunning()
-        for it in docs:
-            print(it["fname"])
-
-    if True:
-        #
-        curs = mongad.simplequery("exportVersion", "1.6")
-        curs = mongad.morecomplexquery({"latitude": {"$gt": 0}})
-        curs = mongad.morecomplexquery({"physicalInformationSnapshot.sex": "MALE"})
-        curs = mongad.morecomplexquery({"exercises[0].distance": 8960.0})
-        curs = mongad.morecomplexquery({"exercises.speed.avg": {"$gt": 14}})
-        curs = mongad.morecomplexquery(
-            {
-                "exercises.speed.avg": {"$gt": 14},
-                "exercises.heartRate.avg": {"$gt": 140},
-            }
-        )
-        curs = mongad.morecomplexquery(
-            {"trainingtype.interval": "interval, check", "trainingtype.easyrun": True}
-        )
-        curs = mongad.simplequery("trainingtype.interval", "interval, check")
-        # print(dir(curs))
-        for c in curs:
-            print(c["fname"])
-
-    if True:
-        # remove fields
-        items1 = mongad.getbyField("hr_reliability")
-        for it in items1:
-            mongad.deleteField(it["_id"], "hr_reliability")
-
-        items2 = mongad.getbyField("hr_reliability")
-        i = 0
-        for it in items2:
-            i += 1
-        print(i)
-
-    # CHANGE DATABASE
-    docs = mongad.returnDocs()
-    ids = docs[0]["_id"]
-    print(ids)
-    if True:
-        mongad.updateOne(ids, {"exportVersion": "69.0"})
-    print("____________________________________")

@@ -128,15 +128,6 @@ class Garminfit_parser:
                     dframe.append(frame)
             return dframe
 
-
-    def _extract_abstract_exercises(self):
-        framename = 'session'
-        fnames = ['start_time', 'total_elapsed_time', 'total_distance', 'sport', 
-                  'avg_cadence', 'max_cadence',
-                  'total_descent', 'total_ascent'
-                  # 'total_calories'
-        ]
-
     def extract_abstract(self):
         framename = 'session'
         paramnames = ["sport", "startTime", "duration", "distance", "descent", "ascent", "maximumHeartRate", "averageHeartRate"]
@@ -346,7 +337,6 @@ if __name__ == '__main__':
     for file in glob.glob(os.path.join(path, '*.fit')):
         x = Garminfit_parser(file.split('\\')[-1])
         abst = x.extract_abstract()
-        
         print(abst)
 
     x = Garminfit_parser('marcrotsaert_220466005.fit')
