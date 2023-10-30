@@ -1,26 +1,44 @@
 #!/usr/bin/python
 import os
 import glob
+
 import tomli
+from matplotlib import pyplot as pp
 
 from nosql_adapter import MongoPolar
 import analyzer.polar_analyzer as pj
-import time
-from matplotlib import pyplot as pp
 
 config = tomli.load(open("config.toml", "rb"))
-path = config["polar_json"]["datapath"]
-# path = r"C:\Users\marcr\Polar\Polar\data\polar-user-data-export"
+path = config["polar_json"]["datapath"]  # path = r"C:\Users\marcr\Polar\Polar\data\polar-user-data-export"
 files = glob.glob(os.path.join(path, "training-session-2014-*.json"))
 
 database = config["mongodb"]["database"]
+
 mongad = MongoPolar(database, "polar2014")
-print(mongad.collection)
+if True:
+    #
+    curs = mongad.simplequery("exportVersion", "1.6")
+    curs = mongad.morecomplexquery({"latitude": {"$gt": 0}})
+    curs = mongad.morecomplexquery({"physicalInformationSnapshot.sex": "MALE"})
+    curs = mongad.morecomplexquery({"exercises[0].distance": 8960.0})
+    curs = mongad.morecomplexquery({"exercises.speed.avg": {"$gt": 14}})
+    curs = mongad.morecomplexquery({"trainingtype": {"$exists": False}})
+    curs = mongad.morecomplexquery(
+        {
+            "exercises.speed.avg": {"$gt": 14},
+            "exercises.heartRate.avg": {"$gt": 140},
+        }
+    )
+    curs = mongad.morecomplexquery(
+        {"trainingtype.interval": "interval, check", "trainingtype.easyrun": True}
+    )
+    for c in curs:
+        print(c)
 
+    curs = mongad.simplequery("trainingtype.interval", "interval, check")
+    for c in curs:
+        print(c["fname"])
 
-# mongad = MongoPolar(database, "forerunner2006")
-# cursor = mongad.simplequery("location", None)
-# res = list(cursor)
 
 pointcoll = []
 # items = mongad.returnDocs()
@@ -33,12 +51,13 @@ pointcoll = []
 result = mongad.simplequery("trainingtype.roadrace", True)
 for res in result:
     print(res["trainingtype"])
-# xx
+
 result = mongad.morecomplexquery(
-    {"$and": [{"trainingtype.sprint": True}, {"trainingtype.easyrun": True}]}
+    {"$and": [{"trainingtype.sprint": True}, 
+              {"trainingtype.easyrun": True}]}
 )
 for res in result:
-    print(res)
+    print(res['fname'])
 
 mongad = MongoPolar(database, "polar2015")
 if True:
@@ -52,16 +71,10 @@ if True:
     items2 = mongad.simplequery("trainingtype.easyrun", True)
     # items2 = mongad.simplequery("interval", "interval, check")
 
-    for it in items2[0:3]:
+    for it in items2:
         fname = it["fname"]
         print("_________________")
         print(fname)
-        Ses = pj.Trainses_json(fname)
-        Samp = Ses.SamAnalRunning
-
-        Samp.plot("speed")
-        time.sleep(1)
-        pp.close()
 
 if True:
     items2 = mongad.getbyField("interval")
@@ -71,16 +84,7 @@ if True:
 if True:
     items2 = mongad.morecomplexquery({"trainingtype.interval": "interval"})
 
-    for it in items2[0:5]:
+    for it in items2:
         fname = it["fname"]
         print("_________________")
-        Ses = pj.Trainses_json(fname)
-        Samp = Ses.SamAnalRunning
 
-        Samp.plot("speed")
-        time.sleep(1)
-        pp.close()
-        # if ("hr_reliability" in it) and (it["hr_reliability"] == "good"):
-        #     Samp.plot("heartRate")
-        #     time.sleep(1)
-        #     pp.close()
