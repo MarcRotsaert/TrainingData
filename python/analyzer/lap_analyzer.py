@@ -4,21 +4,13 @@ import numpy as np
 import tomli
 
 
-class RLapAnalyzerBasic:
-    """
-    basic class for analyzing manual/automatic laps
-    """
+class LapAnalyzer:
+    def __init__(self, laps: list, params: list):
+        self.laps_an = self._reshapelaps(laps, params)
 
-    def __init__(self, laps: dict):
-        config = tomli.load(open("config.toml", "rb"))
-        self.param = config["running"]["lap_param"]
-        self.paces = config["running"]["lap_paces"]
-
-        self.laps_an = self._reshapelaps(laps)
-
-    def _reshapelaps(self, laps) -> dict:
+    def _reshapelaps(self, laps:list, params: list) -> dict:
         result = {}
-        for par in self.param:
+        for par in params:
             try:
                 temp = {par: [la[par] for la in laps]}
             except KeyError:
@@ -96,6 +88,18 @@ class RLapAnalyzerBasic:
         minhrt = np.max(hrt)
         return stdhrt, maxhrt, minhrt
 
+
+class RLapAnalyzerBasic(LapAnalyzer):
+    """
+    basic class for analyzing manual/automatic laps
+    """
+
+    def __init__(self, laps: dict):
+        config = tomli.load(open("config.toml", "rb"))
+        self.param = config["running"]["lap_param"]
+        self.paces = config["running"]["lap_paces"]
+        super().__init__(laps, self.param)
+
     def identify_roadrace(
         self, ignorelaps: list = [], min_speed: float or None = None
     ) -> bool:
@@ -130,7 +134,7 @@ class RLapAnalyzerBasic:
 
 class RAutoLapAnalyzer(RLapAnalyzerBasic):
     def __init__(self, alaps: dict):
-        super().__init__(alaps)
+        super().__init__(alaps,)
 
 
 class RManualLapAnalyzer(RLapAnalyzerBasic):
