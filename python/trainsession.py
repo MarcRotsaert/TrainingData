@@ -1,7 +1,7 @@
 import abc
 
 from analyzer.lap_analyzer import RManualLapAnalyzer, RAutoLapAnalyzer
-from analyzer.sample_analyzer import SamAnalExtra
+from analyzer.sample_analyzer import SamAnalRunning
 
 
 class Trainsession(metaclass=abc.ABCMeta):
@@ -30,7 +30,7 @@ class Trainsession_file(Trainsession, metaclass=abc.ABCMeta):
 
         self.RManualLapAnalyzer = RManualLapAnalyzer(self.laps)
         self.RAutoLapAnalyzer = RAutoLapAnalyzer(self.alaps)
-        self.SamAnalRunning = SamAnalExtra(self.samples)
+        self.SamAnalRunning = SamAnalRunning(self.samples)
 
     @abc.abstractmethod
     def _read_file(self) -> dict:
