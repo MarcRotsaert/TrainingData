@@ -1,5 +1,5 @@
 import pprint
-import polar_analyzer as pol_an
+import analyzer.polar_analyzer as pol_an
 import tomli
 import nosql_adapter as nos_adap
 

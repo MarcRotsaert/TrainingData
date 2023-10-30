@@ -6,9 +6,9 @@ import tomli
 from pymongo import MongoClient
 import pymongo
 
-import polar_analyzer as pol_an
-import forerunner_analyzer as for_an
-import garmin_analyzer as gar_an
+import analyzer.polar_analyzer as pol_an
+import analyzer.forerunner_analyzer as for_an
+import analyzer.garmin_analyzer as gar_an
 
 
 class MongoAdapter:

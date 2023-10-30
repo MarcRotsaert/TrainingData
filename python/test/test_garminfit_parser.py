@@ -3,7 +3,7 @@ import unittest
 import time
 import tomli
 
-import garminfit_parser as gar_par
+import parsing.garminfit_parser as gar_par
 
 
 class GarminfitParser(unittest.TestCase):

@@ -1,7 +1,7 @@
 import abc
 
-from lap_analyzer import RManualLapAnalyzer, RAutoLapAnalyzer
-from sample_analyzer import SamAnalExtra
+from analyzer.lap_analyzer import RManualLapAnalyzer, RAutoLapAnalyzer
+from analyzer.sample_analyzer import SamAnalExtra
 
 
 class Trainsession(metaclass=abc.ABCMeta):

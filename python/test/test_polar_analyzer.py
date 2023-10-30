@@ -2,7 +2,7 @@ import unittest
 import tomli
 
 
-import polar_analyzer as pol_an
+import analyzer.polar_analyzer as pol_an
 import time
 
 

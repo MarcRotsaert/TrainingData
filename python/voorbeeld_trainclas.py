@@ -1,4 +1,4 @@
-import polar_analyzer as pj
+import analyzer.polar_analyzer as pj
 import nosql_adapter as mongodb
 import time
 

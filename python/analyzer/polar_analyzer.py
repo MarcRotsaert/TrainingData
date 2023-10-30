@@ -7,7 +7,7 @@ import tomli
 from matplotlib import pyplot as pp
 
 from trainsession import Trainsession_file
-import polar_parser as pparser
+import parsing.polar_parser as pparser
 
 
 class Trainses_json(Trainsession_file):

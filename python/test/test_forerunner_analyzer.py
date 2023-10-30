@@ -1,6 +1,6 @@
 import unittest
 import time
-import forerunner_analyzer as for_an
+import analyzer.forerunner_analyzer as for_an
 
 class ForerunnerAnalyzer(unittest.TestCase):
     @classmethod

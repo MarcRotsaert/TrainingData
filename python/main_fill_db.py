@@ -4,7 +4,7 @@ import glob
 from nosql_adapter import MongoPolar, MongoForerunner
 from nosql_adapter import MongoGarminfit, MongoQuery
 
-import garminfit_parser as ga_pa
+import parsing.garminfit_parser as ga_pa
 
 import tomli
 
@@ -13,7 +13,7 @@ database = config["mongodb"]["database"]
 # database = "testdb"
 
 
-if True:
+if False:
     path = config["polar_json"]["datapath"]
     # for year in range(2013, 2022):
     for year in [2014, 2015, 2017]:
@@ -38,7 +38,7 @@ if False:
             mongad.put_jsonresume(filename)
 
 
-if False:
+if True:
     path = config["garmin_fit"]["datapath"]
     # for year in range(2013, 2022):
     files = glob.glob(os.path.join(path, "*.fit"))

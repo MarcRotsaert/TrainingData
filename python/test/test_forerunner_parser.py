@@ -2,7 +2,7 @@ import unittest
 import time
 import tomli
 
-import forerunner_parser as for_par
+import parsing.forerunner_parser as for_par
 
 
 class ForerunnerParser(unittest.TestCase):

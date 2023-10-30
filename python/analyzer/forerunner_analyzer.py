@@ -1,33 +1,30 @@
 import tomli
 
 from trainsession import Trainsession_file
-import garminfit_parser as gparser
+import parsing.forerunner_parser as fparser
 
 
-class Trainses_fit(Trainsession_file):
+class Trainses_xml(Trainsession_file):
     def __init__(self, file: str):
         super().__init__(file)
 
-    def _return_path(self):
-        config = tomli.load(open("config.toml", "rb"))
-        return config["garmin_fit"]["datapath"]
-
-    def _read_file(self) -> None:
-        data = gparser.Parser(self.file).fit2json()
+    def _read_file(self) -> dict:
+        data = fparser.Parser(self.file).xml2json()
         data.update({"fname": self.file})
         return data
 
-    def add_data(self, data: dict):
-        def _set_data_nonexercise(data):
-            self.laps = data.pop("laps")
-            self.alaps = data.pop("alaps")
-            self.samples = data.pop("samples")
-            return data
+    def _return_path(self) -> str:
+        config = tomli.load(open("config.toml", "rb"))
+        return config["forerunner_xml"]["datapath"]
 
-        def _set_data_exercise(data):
+    def add_data(self, data: dict) -> dict:
+        def _set_data_exercise(data: dict) -> dict:
             config = tomli.load(open("config.toml", "rb"))
-            for dtype in config["garmin_fit"]["datatypes"]:
-                dtype_attr = dtype
+            for dtype in config["forerunner_xml"]["datatypes"]:
+                if dtype == "autoLaps":
+                    dtype_attr = "alaps"
+                else:
+                    dtype_attr = dtype
 
                 if dtype in data["exercises"][0]:
                     setattr(self, dtype_attr, data["exercises"][0].pop(dtype))
@@ -43,19 +40,18 @@ class Trainses_fit(Trainsession_file):
 
         if "exercises" in data:
             data = _set_data_exercise(data)
-        else:
-            data = _set_data_nonexercise(data)
         self.abstract = data
         self.data = True
 
 
 if __name__ == "__main__":
     config = tomli.load(open("config.toml", "rb"))
-    # path = config["garmin_fit"]["datapath"]
+    path = config["forerunner_xml"]["datapath"]
 
     if True:
-        file = "marcrotsaert_175152248.fit"
-        session = Trainses_fit(file)
+        file = "20050725-190632.xml"
+        session = Trainses_xml(file)
 
-        file = "marcrotsaert_220466005.fit"
-        session = Trainses_fit(file)
+        file = "20041008-170457.xml"
+        session = Trainses_xml(file)
+        print(session)

@@ -4,7 +4,7 @@ import glob
 import tomli
 
 from nosql_adapter import MongoPolar
-import polar_analyzer as pj
+import analyzer.polar_analyzer as pj
 import time
 from matplotlib import pyplot as pp
 

@@ -2,7 +2,7 @@ import unittest
 import time
 import tomli
 
-import garmin_analyzer as gar_an
+import analyzer.garmin_analyzer as gar_an
 
 class GarminAnalyzer(unittest.TestCase):
     @classmethod
