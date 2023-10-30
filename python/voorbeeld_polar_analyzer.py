@@ -1,11 +1,11 @@
-import os 
+import os
 import glob
 import random
 import pprint
-import tomli 
+import tomli
 from matplotlib import pyplot as pp
 
-from analyzer.polar_analyzer import Trainses_json  
+from analyzer.polar_analyzer import Trainses_json
 
 config = tomli.load(open("config.toml", "rb"))
 path = config["polar_json"]["datapath"]
@@ -14,13 +14,10 @@ if True:
     file = "training-session-2015-04-18-263883440-3be46e75-6a93-4746-a320-96c9660f809c.json"
     session = Trainses_json(file)
     laps = session.return_laps()
-    lapses = session.RManualLapAnalyzer
+    lapses = session.RAutoLapAnalyzer
     x = lapses.return_paraslist("speed")
-    result = lapses.determine_startuprunoutlaps()
-    pprint.pprint(lapses.identify_interval())
 
 if True:
-    
     files = [
         "training-session-2019-10-30-4009640085-5105bf47-b37c-47c3-a96c-d74653ae0d5a.json",
         "training-session-2015-06-26-263879702-2d485ab0-ef26-4100-b2ae-1ca9c5f144d6.json",
@@ -66,7 +63,6 @@ if True:
     samses.plot("speed")
 
 
-
 if True:
     file = "training-session-2015-01-14-263888618-3d72bde3-4957-4db4-8fa6-662a180a2d23.json"
     session = Trainses_json(file)
@@ -100,10 +96,9 @@ if True:
                 result = lapses.identify_easyrun()
                 pprint.pprint("easyrun?" + str(result))
             except KeyError:
-                print('not passed:', session.file)
+                print("not passed:", session.file)
 
         print("_______________________________")
         samses = session.SamAnalRunning
         samses.plot("speed")
         pprint.pprint(samses.determine_s_location())
-
