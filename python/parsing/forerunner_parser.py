@@ -1,6 +1,5 @@
 import os
 import tomli
-import pprint
 import xml.etree.ElementTree as ET
 
 
@@ -135,14 +134,3 @@ class Parser(Forerunner_parser):
         json.update({"exercises": [exercise]})
         return json
 
-
-if __name__ == "__main__":
-
-    z = Parser("20041008-170457.xml").xml2json()
-    z = Parser("20050725-190632.xml").xml2json()
-    x = Lapparser("20050725-190632.xml").xml2laps()
-
-    x = Lapparser("20041008-170457.xml").xml2laps()
-    x = Lapparser("20050725-190632.xml").xml2laps()
-    y = Sampleparser("20050725-190632.xml").xml2samples()
-    pprint.pprint(y)

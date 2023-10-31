@@ -1,4 +1,4 @@
-import os, glob
+import os
 import tomli
 import numpy as np
 import fitdecode
@@ -330,40 +330,3 @@ class Parser(Garminfit_parser):
         #    json.update({"exercises": [{"samples": {"recordedRoute": recordedroute}}]})
 
         return json
-
-
-if __name__ == '__main__':
-    path = r'C:\Users\marcr\OneDrive\Documenten\logboek_looptracks\looptracks_garmin'
-    for file in glob.glob(os.path.join(path, '*.fit')):
-        x = Garminfit_parser(file.split('\\')[-1])
-        abst = x.extract_abstract()
-        print(abst)
-
-    x = Garminfit_parser('marcrotsaert_220466005.fit')
-    dframe = x._get_dataframes()
-
-
-
-    for frame in dframe:
-        if frame.name == 'session':
-            print(frame)
-            #if x._find_onefield(frame,'lap') is not None:
-
-    g = Sampleparser('marcrotsaert_220466005.fit')
-    print(g._return_latlon(g.samples[100]))
-    print(g._return_altitude(g.samples[100]))
-    print(g._return_speed(g.samples[100]))
-    print(g._return_heartrate(g.samples[100]))
-    print(g.fit2samples())
-    g = Sampleparser('marcrotsaert_711735968.fit')
-    print(g.fit2samples())
-
-    x = Lapparser('marcrotsaert_711735968.fit')
-    alaps = x.fit2laps('alaps')
-    laps = x.fit2laps('laps')
-
-    for lap in laps:
-        y = Lapparser('marcrotsaert_712321869.fit')._return_heartrate(lap)
-        print(y)
-        y = Lapparser('marcrotsaert_712321869.fit')._return_cadence(lap)
-        print(y)

@@ -22,9 +22,3 @@ class Parser(Polar_parser):
     def json2json(self):
         return self._read_json()
 
-
-if __name__ == "__main__":
-    filename = "training-session-2014-01-03-263915750-ce8ea79c-8a35-43ed-8bc4-65733b407692.json"
-    popa = Parser(filename).json2json()
-    print(popa["exercises"][0])
-    # popa.Lapparser()
