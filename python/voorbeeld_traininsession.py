@@ -32,10 +32,11 @@ if True:
         if laps is not None:
             lapses = session.RManualLapAnalyzer
             su = lapses.determine_startuprunoutlaps()
-            result = lapses._determine_accelaration(ignorelaps=su[0] + su[1])
-            print(result)
-            print(sum(result))
-            fname = session.abstract["fname"]
+            if su != (None, None):
+                result = lapses._determine_accelaration(ignorelaps=su[0] + su[1])
+                print(result)
+                print(sum(result))
+                fname = session.abstract["fname"]
 
 if True:
     result = mongad.morecomplexquery(
@@ -59,11 +60,12 @@ if True:
         if laps is not None:
             lapses = session.RManualLapAnalyzer
             su = lapses.determine_startuprunoutlaps()
-            result = lapses._determine_accelaration(ignorelaps=su[0] + su[1])
-            print(result)
-            print(sum(result))
-            fname = session.abstract["fname"]
-            print(fname)
+            if su != (None, None):
+                acc = lapses._determine_accelaration(ignorelaps=su[0] + su[1])
+                print(acc)
+                print(sum(acc))
+                fname = session.abstract["fname"]
+                print(fname)
 
     for res in result:
         session = Trainsession_mongo(res)

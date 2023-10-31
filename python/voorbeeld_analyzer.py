@@ -10,9 +10,9 @@ from analyzer.polar_analyzer import Trainses_json
 from analyzer.garmin_analyzer import Trainses_fit
 from analyzer.forerunner_analyzer import Trainses_xml
 
-
 config = tomli.load(open("config.toml", "rb"))
 path = config["polar_json"]["datapath"]
+
 def ex_polar_lapanalyzer():
 
     file = "training-session-2015-04-18-263883440-3be46e75-6a93-4746-a320-96c9660f809c.json"

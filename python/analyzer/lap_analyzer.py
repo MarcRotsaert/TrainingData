@@ -164,7 +164,7 @@ class RManualLapAnalyzer(RLapAnalyzerBasic):
                     idx_su.append(i1)
                     i1 += 1
         if len(idx_su) == 0:
-            idx_su = [-1]
+            idx_su = []
 
         idx_ro = []
         i2 = len(self.laps_an["speed"]) - 1
@@ -172,10 +172,9 @@ class RManualLapAnalyzer(RLapAnalyzerBasic):
             idx_ro.append(i2)
             i2 -= 1
         if len(idx_ro) == len(self.laps_an["speed"]) + 1:
-            idx_ro = [99999]
+            idx_ro = []
         elif len(idx_ro) == 0:
-            idx_ro = [99999]
-
+            idx_ro = []    
         return idx_su, idx_ro
 
     def determine_lapswithoutsu(self) -> Union[dict, None]:
