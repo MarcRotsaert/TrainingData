@@ -51,5 +51,3 @@ class Trainses_json(Trainsession_file):
             data = _set_data_nonexercise(data)
         self.abstract = data
         self.data = True
-
-

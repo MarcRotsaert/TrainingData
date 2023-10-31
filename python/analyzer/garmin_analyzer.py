@@ -47,15 +47,3 @@ class Trainses_fit(Trainsession_file):
             data = _set_data_nonexercise(data)
         self.abstract = data
         self.data = True
-
-
-if __name__ == "__main__":
-    config = tomli.load(open("config.toml", "rb"))
-    # path = config["garmin_fit"]["datapath"]
-
-    if True:
-        file = "marcrotsaert_175152248.fit"
-        session = Trainses_fit(file)
-
-        file = "marcrotsaert_220466005.fit"
-        session = Trainses_fit(file)

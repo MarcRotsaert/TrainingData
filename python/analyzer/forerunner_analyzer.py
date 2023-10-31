@@ -42,16 +42,3 @@ class Trainses_xml(Trainsession_file):
             data = _set_data_exercise(data)
         self.abstract = data
         self.data = True
-
-
-if __name__ == "__main__":
-    config = tomli.load(open("config.toml", "rb"))
-    path = config["forerunner_xml"]["datapath"]
-
-    if True:
-        file = "20050725-190632.xml"
-        session = Trainses_xml(file)
-
-        file = "20041008-170457.xml"
-        session = Trainses_xml(file)
-        print(session)

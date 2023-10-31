@@ -206,8 +206,6 @@ class SamAnalTiming(SampleAnalyzerBasic):
 class SamAnalExtra(SamAnalTiming):
     def __init__(self, samples: dict[list]):
         super().__init__(samples)
-        # config = tomli.load(open("config.toml", "rb"))
-        # self.paces = config["running"]["sample_paces"]
 
     def extract_heading(self) -> list[float]:
         """
