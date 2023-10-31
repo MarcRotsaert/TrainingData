@@ -8,7 +8,7 @@ class LapAnalyzer:
     def __init__(self, laps: list, params: list):
         self.laps_an = self._reshapelaps(laps, params)
 
-    def _reshapelaps(self, laps:list, params: list) -> dict:
+    def _reshapelaps(self, laps: list, params: list) -> dict:
         result = {}
         for par in params:
             try:
@@ -134,11 +134,13 @@ class RLapAnalyzerBasic(LapAnalyzer):
 
 class RAutoLapAnalyzer(RLapAnalyzerBasic):
     def __init__(self, alaps: dict):
-        super().__init__(alaps,)
+        # TODO: check on Alaps
+        super().__init__(alaps)
 
 
 class RManualLapAnalyzer(RLapAnalyzerBasic):
     def __init__(self, laps: dict):
+        # TODO: check on laps
         super().__init__(laps)
 
     def determine_startuprunoutlaps(
@@ -174,7 +176,7 @@ class RManualLapAnalyzer(RLapAnalyzerBasic):
         if len(idx_ro) == len(self.laps_an["speed"]) + 1:
             idx_ro = []
         elif len(idx_ro) == 0:
-            idx_ro = []    
+            idx_ro = []
         return idx_su, idx_ro
 
     def determine_lapswithoutsu(self) -> Union[dict, None]:

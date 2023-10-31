@@ -5,9 +5,6 @@ import parsing.forerunner_parser as fparser
 
 
 class Trainses_xml(Trainsession_file):
-    def __init__(self, file: str):
-        super().__init__(file)
-
     def _read_file(self) -> dict:
         data = fparser.Parser(self.file).xml2json()
         data.update({"fname": self.file})

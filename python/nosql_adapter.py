@@ -81,9 +81,6 @@ class MongoAdapter:
 
 
 class MongoQuery(MongoAdapter):
-    def __init__(self, mongoDB: str, collection: str):
-        super().__init__(mongoDB, collection)
-
     def simplequery(self, keyn: any, valn: any) -> pymongo.cursor.Cursor:
         collection = self.getCollection()
         cursor = collection.find({keyn: valn})
@@ -125,10 +122,6 @@ class MongoPolar(MongoQuery):
     Data for
     """
 
-    def __init__(self, mongoDB: str, collection: str):
-        # initiate collection
-        super().__init__(mongoDB, collection)
-
     def return_docsrunning(self) -> pymongo.cursor.Cursor:
         curs = self.simplequery("sport", "RUNNING")
         return curs
@@ -147,10 +140,6 @@ class MongoGarminfit(MongoQuery):
     Mongo-extension for Garmin Fit data.
     """
 
-    def __init__(self, mongoDB: str, collection: str):
-        # initiate collection
-        super().__init__(mongoDB, collection)
-
     def put_jsonresume(self, fname: str) -> None:
         # Add JSON-file to a collection
         sess = gar_an.Trainses_fit(fname)
@@ -168,10 +157,6 @@ class MongoForerunner(MongoQuery):
     Mongo-extension for Forerunner data.
     Data for
     """
-
-    def __init__(self, mongoDB: str, collection: str):
-        # initiate collection
-        super().__init__(mongoDB, collection)
 
     def put_jsonresume(self, fname: str) -> None:
         # Add JSON-file to a collection

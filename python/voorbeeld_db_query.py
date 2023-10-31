@@ -3,17 +3,17 @@ import os
 import glob
 
 import tomli
-from matplotlib import pyplot as pp
 
 from nosql_adapter import MongoPolar
 import analyzer.polar_analyzer as pj
 
 config = tomli.load(open("config.toml", "rb"))
-path = config["polar_json"]["datapath"]  # path = r"C:\Users\marcr\Polar\Polar\data\polar-user-data-export"
+path = config["polar_json"][
+    "datapath"
+]  # path = r"C:\Users\marcr\Polar\Polar\data\polar-user-data-export"
 files = glob.glob(os.path.join(path, "training-session-2014-*.json"))
 
 database = config["mongodb"]["database"]
-
 mongad = MongoPolar(database, "polar2014")
 if True:
     #
@@ -53,11 +53,10 @@ for res in result:
     print(res["trainingtype"])
 
 result = mongad.morecomplexquery(
-    {"$and": [{"trainingtype.sprint": True}, 
-              {"trainingtype.easyrun": True}]}
+    {"$and": [{"trainingtype.sprint": True}, {"trainingtype.easyrun": True}]}
 )
 for res in result:
-    print(res['fname'])
+    print(res["fname"])
 
 mongad = MongoPolar(database, "polar2015")
 if True:
@@ -87,4 +86,3 @@ if True:
     for it in items2:
         fname = it["fname"]
         print("_________________")
-

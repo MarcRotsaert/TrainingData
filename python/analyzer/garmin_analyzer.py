@@ -5,9 +5,6 @@ import parsing.garminfit_parser as gparser
 
 
 class Trainses_fit(Trainsession_file):
-    def __init__(self, file: str):
-        super().__init__(file)
-
     def _return_path(self):
         config = tomli.load(open("config.toml", "rb"))
         return config["garmin_fit"]["datapath"]

@@ -1,13 +1,16 @@
 # Determine training type and set traing info in Mongo DB.
 import abc
 from typing import Generator, Union
-import tomli
 
 import nosql_adapter as mongodb
 from trainsession import Trainsession_mongo
 
 
 class MongoClassifier(metaclass=abc.ABCMeta):
+    def __init__(self, dbase: str, collection: str):
+        self.mongo = mongodb.MongoPolar(dbase, collection)
+        self.sport = "RUNNING"
+
     @abc.abstractmethod
     def _return_session(self, mongorecord: dict) -> Trainsession_mongo:
         pass
@@ -18,10 +21,6 @@ class MongoClassifier(metaclass=abc.ABCMeta):
 
 
 class MongoRunningClassifier(MongoClassifier):
-    def __init__(self, dbase: str, collection: str):
-        self.mongo = mongodb.MongoPolar(dbase, collection)
-        self.sport = "RUNNING"
-
     def _return_session(self, mongorecord) -> Trainsession_mongo:
         return Trainsession_mongo(mongorecord)
 

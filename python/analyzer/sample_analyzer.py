@@ -125,9 +125,6 @@ class SampleAnalyzerBasic:
 
 
 class SamAnalTiming(SampleAnalyzerBasic):
-    def __init__(self, samples: dict[list]):
-        super().__init__(samples)
-
     def return_idx_bytime(
         self, dt: datetime.datetime, param: str, firstorlast: str = "first"
     ) -> int:
@@ -204,9 +201,6 @@ class SamAnalTiming(SampleAnalyzerBasic):
 
 
 class SamAnalExtra(SamAnalTiming):
-    def __init__(self, samples: dict[list]):
-        super().__init__(samples)
-
     def extract_heading(self) -> list[float]:
         """
         Haal ruwe heading to uit de route
