@@ -15,8 +15,25 @@ path = config["polar_json"]["datapath"]
 
 
 def ex_polar_lapanalyzer():
+    file = "training-session-2014-03-16-263911274-403459ca-e3b5-447d-b45b-e622e723e967.json"
+    session = Trainses_json(file)
+    res = session.RManualLapAnalyzer.determine_intervals()
+
+    file = "training-session-2015-02-17-263886464-81c22d89-24ce-41b2-b130-98f85cec4dbe.json"
+    session = Trainses_json(file)
+    res = session.RManualLapAnalyzer.determine_intervals()
+
+    file = "training-session-2015-01-07-263888486-2d791dc2-1ee2-4964-bb44-558579c19c6f.json"
+    session = Trainses_json(file)
+    res = session.RManualLapAnalyzer.determine_intervals()
+
+    file = "training-session-2014-03-16-263911274-403459ca-e3b5-447d-b45b-e622e723e967.json"
+    session = Trainses_json(file)
+    res = session.RManualLapAnalyzer.determine_intervals()
+
     file = "training-session-2015-04-18-263883440-3be46e75-6a93-4746-a320-96c9660f809c.json"
     session = Trainses_json(file)
+
     laps = session.return_laps()
     lapses = session.RAutoLapAnalyzer
     x = lapses.return_paraslist("speed")
@@ -37,6 +54,7 @@ def ex_lapanalyzer_identify():
 
         if session.laps is not None:
             lapses = session.RManualLapAnalyzer
+
             print(lapses.compare_hr_sp())
             result = lapses.identify_interval()
             pprint.pprint(result)
@@ -67,6 +85,7 @@ def ex_polar_sampleanalyzer():
     ]
     for file in files:
         session = Trainses_json(file)
+
         samses = session.SamAnalRunning
 
         dtroute = samses.return_s_timeroute()

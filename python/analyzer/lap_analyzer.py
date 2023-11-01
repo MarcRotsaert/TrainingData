@@ -200,11 +200,89 @@ class RManualLapAnalyzer(RLapAnalyzerBasic):
                 laps[k].pop(i_la)
         return laps
 
+    @staticmethod
+    def _rounded_distance(distance, rounding_distance: float=100):
+        return rounding_distance*round(distance/rounding_distance)
+
+    @staticmethod
+    def _rounded_duration(duration, rounding_time: float=15):
+        if isinstance(duration, str):
+            duration = float(duration.lstrip("PT").rstrip("S"))
+
+        return rounding_time*round(duration/rounding_time)
+
+    def determine_intervals(self) -> np.array:
+        """determine if lapinterval is based upon distance or time"""
+
+        idx_su, idx_ru = self.determine_startuprunoutlaps()
+        idx_int = set(range(len(self.laps_an['speed']))).difference(idx_su+idx_ru)
+
+        classif = self._classifylap_recoveryspeed(self.laps_an)
+        for i in idx_su+idx_ru:
+            classif[i] = 0
+
+        rounded_distance = [] 
+        rounded_duration = []
+        for distance in self.laps_an['distance']:
+            rounded_distance.append(self._rounded_distance(distance))
+        rounded_distance = np.array(rounded_distance)
+        for duration in self.laps_an['duration']:
+            rounded_duration.append(self._rounded_duration(duration))
+        rounded_duration = np.array(rounded_duration)
+        dif_dis = self.laps_an['distance'] - rounded_distance
+        dif_dur = self.laps_an['duration'] - rounded_duration
+
+        interval_dist = dif_dis[classif==1]
+        recovery_dist = dif_dis[classif==-1]
+
+        recovery_duration = dif_dur[classif==1]
+        interval_duration = dif_dur[classif==-1]
+
+        if interval_duration.std() < 2:
+            interval = 'time'
+        elif interval_dist.std() < 30 and interval_duration.std() >4:
+            interval = 'distance'
+        else:
+            interval = 'undetermined'
+
+        if recovery_duration.std() < 1: 
+            recovery = 'time'
+        elif recovery_dist.std() < 30 and recovery_duration.std() >3:
+            recovery = 'distance'
+        else:
+            recovery = 'undetermined'
+        return interval, recovery 
+
+
+
+    def _classifylap_recoveryspeed(self, laps):
+        """
+        element in de 
+        -1 = recovery 
+        1 = interval
+
+        """
+        dspeed_int = self.paces["dspeedinterval"]
+        speed = np.array([sp["avg"] for sp in laps["speed"]])
+        dspeed = speed[1:] - speed[0:-1]
+        dspeed[(dspeed < dspeed_int) & (dspeed > -dspeed_int)] = 0
+        dspeed[dspeed > dspeed_int] = 1
+        dspeed[dspeed < -dspeed_int] = -1
+
+        if dspeed[0] == 1:
+            result = np.hstack([-1, dspeed])
+        elif dspeed[0] == -1: 
+            result = np.hstack([1, dspeed])
+        else:
+            result = np.hstack([0, dspeed])
+
+        return result
+
     def identify_interval(self) -> str:
         if self._check_allempty_data("speed"):
             return "undetermined"
 
-        dspeed_int = self.paces["dspeedinterval"]
+        # dspeed_int = self.paces["dspeedinterval"]
         laps = self.determine_lapswithoutsu()
 
         if laps is None:
@@ -221,22 +299,23 @@ class RManualLapAnalyzer(RLapAnalyzerBasic):
             # Training is sprint or easy_run
             return "no interval, crit. 2"
 
-        dspeed = speed[1:] - speed[0:-1]
-        dspeed[(dspeed < dspeed_int) & (dspeed > -dspeed_int)] = 0
-        dspeed[dspeed > dspeed_int] = 1
-        dspeed[dspeed < -dspeed_int] = -1
-        if np.count_nonzero(dspeed == 0) / len(dspeed) > 0.25:
+        recovspeed = self._classifylap_recoveryspeed(laps)
+        # dspeed = speed[1:] - speed[0:-1]
+        # dspeed[(dspeed < dspeed_int) & (dspeed > -dspeed_int)] = 0
+        # dspeed[dspeed > dspeed_int] = 1
+        # dspeed[dspeed < -dspeed_int] = -1
+        if np.count_nonzero(recovspeed == 0) / len(recovspeed) > 0.25:
             return "no interval, crit. 3, under investigation."
 
-        deriv = dspeed[1:] + dspeed[0:-1]
+        deriv = recovspeed[1:] + recovspeed[0:-1]
         if sum(deriv) == 0:
             return "interval"
 
-        if len(speed) > 8 and len(dspeed[dspeed == -1]) / len(dspeed) > 1 / 3:
+        if len(speed) > 8 and len(recovspeed[recovspeed == -1]) / len(recovspeed) > 1 / 3:
             # Almost certain
             return "interval, check1"
 
-        if len(speed) == 5 and len(dspeed[dspeed == -1]) == 2:
+        if len(speed) == 5 and len(recovspeed[recovspeed == -1]) == 2:
             return "interval, check2"
         else:
             return "no interval, crit. 4, under investigation"

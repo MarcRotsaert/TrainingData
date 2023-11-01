@@ -15,8 +15,19 @@ class Polar_parser:
         data = json.loads(temp)
         sport = data["exercises"][0]["sport"]
         data.update({"sport": sport})
+        data = self._tconv_duration(data)
         return data
+    
+    def _tconv_duration(self, data):
+        data['duration'] = float( data['duration'].lstrip("PT").rstrip("S"))
+        if 'laps' in data['exercises'][0]:
+            for lap in data['exercises'][0]['laps']:
+                lap['duration'] = float(lap['duration'].lstrip("PT").rstrip("S"))
+        if 'autoLaps' in data['exercises'][0]:
+            for alap in data['exercises'][0]['autoLaps']:
+                alap['duration'] = float(alap['duration'].lstrip("PT").rstrip("S"))
 
+        return data
 
 class Parser(Polar_parser):
     def json2json(self):
