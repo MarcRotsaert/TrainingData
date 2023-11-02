@@ -1,4 +1,5 @@
 from typing import Union, List
+from datetime import timedelta
 import numpy as np
 
 import tomli
@@ -213,17 +214,16 @@ class RManualLapAnalyzer(RLapAnalyzerBasic):
         return laps
 
     @staticmethod
-    def _rounded_distance(distance, rounding_distance: float = 100):
+    def _rounded_distance(distance: float, rounding_distance: int = 100) -> int:
         return rounding_distance * round(distance / rounding_distance)
 
     @staticmethod
-    def _rounded_duration(duration, rounding_time: float = 30):
+    def _rounded_duration(duration: float, rounding_time: int = 30) -> int:
         if isinstance(duration, str):
             duration = float(duration.lstrip("PT").rstrip("S"))
-
         return rounding_time * round(duration / rounding_time)
 
-    def _classify_timedistance(self, duration: list, distance: list) -> np.array:
+    def _classify_timedistance(self, duration: list, distance: list) -> str:
         """determine if lapinterval is based upon distance or time"""
         rounded_distance = []
         rounded_duration = []
@@ -238,15 +238,24 @@ class RManualLapAnalyzer(RLapAnalyzerBasic):
         dif_dur = np.abs(duration - rounded_duration)
 
         if dif_dur.mean() < 4:
-            classification = "time"
+            classification = ["time", rounded_duration]
         elif dif_dis.std() < 15 and dif_dur.mean() >= 4:
-            classification = "distance"
+            classification = ["distance", rounded_distance]
         else:
-            classification = "undetermined"
+            classification = ["undetermined", None]
 
         return classification
 
-    def determine_intervals(self) -> np.array:
+    @staticmethod
+    def _return_lap_length(distance, duration, clas_timedis):
+        if clas_timedis == "time":
+            return duration
+        elif clas_timedis == "distance":
+            return distance
+        elif clas_timedis == "undetermined":
+            return None
+
+    def determine_intervals(self):
         """determine lapinterval size in distance or time"""
         idx_su, idx_ru = self.determine_startuprunoutlaps()
 
@@ -268,8 +277,57 @@ class RManualLapAnalyzer(RLapAnalyzerBasic):
         regis_recovery = self._classify_timedistance(
             duration_recovery, distance_recovery
         )
+        if regis_recovery[0] != "undetermined" and regis_interval[0] != "undetermined":
+            trainingstr = self.convertor_length2str(regis_interval, regis_recovery)
+        else:
+            trainingstr = "undetermined"
 
-        return regis_interval, regis_recovery
+        return trainingstr
+
+    def convertor_length2str(self, regis_interval, regis_recovery):
+        # conversion2str
+        interval_strtype = regis_interval[0]
+        intervals = regis_interval[1]
+        recovery_strtype = regis_recovery[0]
+        recoveries = regis_recovery[1]
+
+        trainingstr = ""
+        for i in range(len(recoveries)):
+            if interval_strtype == "time":
+                trainingstr += self._convertor_lapduration2str(intervals[i]) + ","
+            elif interval_strtype == "distance":
+                trainingstr += self._convertor_lapdistance2str(intervals[i]) + ","
+
+            trainingstr += "P"
+            if recovery_strtype == "time":
+                trainingstr += self._convertor_lapduration2str(recoveries[i]) + ","
+            elif recovery_strtype == "distance":
+                trainingstr += self._convertor_lapdistance2str(recoveries[i]) + ","
+
+        if interval_strtype == "time":
+            trainingstr += self._convertor_lapduration2str(intervals[i]) + ","
+        elif interval_strtype == "distance":
+            trainingstr += self._convertor_lapdistance2str(intervals[i]) + ","
+
+        return trainingstr
+
+    @staticmethod
+    def _convertor_lapduration2str(duration: int) -> str:
+        td = timedelta(0, int(duration), 0)
+        minutes, seconds = divmod(td.seconds, 60)
+        if minutes <= 1:
+            duration_str = str(duration) + "s"
+        else:
+            duration_str = str(minutes) + ":" + "{:>02}".format(seconds)
+        return duration_str
+
+    @staticmethod
+    def _convertor_lapdistance2str(distance: int) -> str:
+        if distance >= 1000:
+            distance_str = str(round(distance / 1000, 1)) + "km"
+        else:
+            distance_str = str(distance) + "m"
+        return distance_str
 
     def _classifylap_speedupspeeddown(self, laps):
         """
@@ -298,7 +356,6 @@ class RManualLapAnalyzer(RLapAnalyzerBasic):
         if self._check_allempty_data("speed"):
             return "undetermined"
 
-        # dspeed_int = self.paces["dspeedinterval"]
         laps = self.determine_lapswithoutsu()
 
         if laps is None:
@@ -316,10 +373,7 @@ class RManualLapAnalyzer(RLapAnalyzerBasic):
             return "no interval, crit. 2"
 
         recovspeed = self._classifylap_speedupspeeddown(laps)
-        # dspeed = speed[1:] - speed[0:-1]
-        # dspeed[(dspeed < dspeed_int) & (dspeed > -dspeed_int)] = 0
-        # dspeed[dspeed > dspeed_int] = 1
-        # dspeed[dspeed < -dspeed_int] = -1
+
         if np.count_nonzero(recovspeed == 0) / len(recovspeed) > 0.25:
             return "no interval, crit. 3, under investigation."
 
