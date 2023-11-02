@@ -30,11 +30,23 @@ class LapAnalyzer:
         else:
             return False
 
-    def return_distance(self) -> list[float]:
-        return self.laps_an["distance"]
+    def return_distance(self, lapidx: list[int] = []) -> list[float]:
+        distance = []
+        if len(lapidx) == 0:
+            distance = self.laps_an["distance"]
+        else:
+            for i in lapidx:
+                distance.append(self.laps_an["distance"][i])
+        return distance
 
-    def return_duration(self) -> list[str]:
-        return self.laps_an["duration"]
+    def return_duration(self, lapidx: list = []) -> list[float]:
+        duration = []
+        if len(lapidx) == 0:
+            duration = self.laps_an["duration"]
+        else:
+            for i in lapidx:
+                duration.append(self.laps_an["duration"][i])
+        return duration
 
     def return_paraslist(self, par: str, *arg: str) -> list[float]:
         temp = self.laps_an[par]
@@ -201,64 +213,68 @@ class RManualLapAnalyzer(RLapAnalyzerBasic):
         return laps
 
     @staticmethod
-    def _rounded_distance(distance, rounding_distance: float=100):
-        return rounding_distance*round(distance/rounding_distance)
+    def _rounded_distance(distance, rounding_distance: float = 100):
+        return rounding_distance * round(distance / rounding_distance)
 
     @staticmethod
-    def _rounded_duration(duration, rounding_time: float=15):
+    def _rounded_duration(duration, rounding_time: float = 30):
         if isinstance(duration, str):
             duration = float(duration.lstrip("PT").rstrip("S"))
 
-        return rounding_time*round(duration/rounding_time)
+        return rounding_time * round(duration / rounding_time)
+
+    def _classify_timedistance(self, duration: list, distance: list) -> np.array:
+        """determine if lapinterval is based upon distance or time"""
+        rounded_distance = []
+        rounded_duration = []
+        for dur in duration:
+            rounded_duration.append(self._rounded_duration(dur))
+        for dis in distance:
+            rounded_distance.append(self._rounded_distance(dis))
+        rounded_distance = np.array(rounded_distance)
+        rounded_duration = np.array(rounded_duration)
+
+        dif_dis = np.abs(distance - rounded_distance)
+        dif_dur = np.abs(duration - rounded_duration)
+
+        if dif_dur.mean() < 4:
+            classification = "time"
+        elif dif_dis.std() < 15 and dif_dur.mean() >= 4:
+            classification = "distance"
+        else:
+            classification = "undetermined"
+
+        return classification
 
     def determine_intervals(self) -> np.array:
-        """determine if lapinterval is based upon distance or time"""
-
+        """determine lapinterval size in distance or time"""
         idx_su, idx_ru = self.determine_startuprunoutlaps()
-        idx_int = set(range(len(self.laps_an['speed']))).difference(idx_su+idx_ru)
 
-        classif = self._classifylap_recoveryspeed(self.laps_an)
-        for i in idx_su+idx_ru:
+        classif = self._classifylap_speedupspeeddown(self.laps_an)
+        for i in idx_su + idx_ru:
             classif[i] = 0
 
-        rounded_distance = [] 
-        rounded_duration = []
-        for distance in self.laps_an['distance']:
-            rounded_distance.append(self._rounded_distance(distance))
-        rounded_distance = np.array(rounded_distance)
-        for duration in self.laps_an['duration']:
-            rounded_duration.append(self._rounded_duration(duration))
-        rounded_duration = np.array(rounded_duration)
-        dif_dis = self.laps_an['distance'] - rounded_distance
-        dif_dur = self.laps_an['duration'] - rounded_duration
+        idx = np.where(classif == 1)[0]
+        distance_interval = self.return_distance(idx)
+        duration_interval = self.return_duration(idx)
 
-        interval_dist = dif_dis[classif==1]
-        recovery_dist = dif_dis[classif==-1]
+        idx = np.where(classif == -1)[0]
+        distance_recovery = self.return_distance(idx)
+        duration_recovery = self.return_duration(idx)
 
-        recovery_duration = dif_dur[classif==1]
-        interval_duration = dif_dur[classif==-1]
+        regis_interval = self._classify_timedistance(
+            duration_interval, distance_interval
+        )
+        regis_recovery = self._classify_timedistance(
+            duration_recovery, distance_recovery
+        )
 
-        if interval_duration.std() < 2:
-            interval = 'time'
-        elif interval_dist.std() < 30 and interval_duration.std() >4:
-            interval = 'distance'
-        else:
-            interval = 'undetermined'
+        return regis_interval, regis_recovery
 
-        if recovery_duration.std() < 1: 
-            recovery = 'time'
-        elif recovery_dist.std() < 30 and recovery_duration.std() >3:
-            recovery = 'distance'
-        else:
-            recovery = 'undetermined'
-        return interval, recovery 
-
-
-
-    def _classifylap_recoveryspeed(self, laps):
+    def _classifylap_speedupspeeddown(self, laps):
         """
-        element in de 
-        -1 = recovery 
+        element in de
+        -1 = recovery
         1 = interval
 
         """
@@ -271,7 +287,7 @@ class RManualLapAnalyzer(RLapAnalyzerBasic):
 
         if dspeed[0] == 1:
             result = np.hstack([-1, dspeed])
-        elif dspeed[0] == -1: 
+        elif dspeed[0] == -1:
             result = np.hstack([1, dspeed])
         else:
             result = np.hstack([0, dspeed])
@@ -299,7 +315,7 @@ class RManualLapAnalyzer(RLapAnalyzerBasic):
             # Training is sprint or easy_run
             return "no interval, crit. 2"
 
-        recovspeed = self._classifylap_recoveryspeed(laps)
+        recovspeed = self._classifylap_speedupspeeddown(laps)
         # dspeed = speed[1:] - speed[0:-1]
         # dspeed[(dspeed < dspeed_int) & (dspeed > -dspeed_int)] = 0
         # dspeed[dspeed > dspeed_int] = 1
@@ -311,7 +327,10 @@ class RManualLapAnalyzer(RLapAnalyzerBasic):
         if sum(deriv) == 0:
             return "interval"
 
-        if len(speed) > 8 and len(recovspeed[recovspeed == -1]) / len(recovspeed) > 1 / 3:
+        if (
+            len(speed) > 8
+            and len(recovspeed[recovspeed == -1]) / len(recovspeed) > 1 / 3
+        ):
             # Almost certain
             return "interval, check1"
 

@@ -15,21 +15,52 @@ path = config["polar_json"]["datapath"]
 
 
 def ex_polar_lapanalyzer():
-    file = "training-session-2014-03-16-263911274-403459ca-e3b5-447d-b45b-e622e723e967.json"
-    session = Trainses_json(file)
-    res = session.RManualLapAnalyzer.determine_intervals()
-
     file = "training-session-2015-02-17-263886464-81c22d89-24ce-41b2-b130-98f85cec4dbe.json"
     session = Trainses_json(file)
     res = session.RManualLapAnalyzer.determine_intervals()
+    print(res)
+
+    file = "training-session-2015-01-25-263888810-887b73d8-5599-4534-833c-521322b8c28b.json"
+    session = Trainses_json(file)
+    res = session.RManualLapAnalyzer.determine_intervals()
+    print(res)
+
+    file = "training-session-2015-03-11-263884640-0e71a9a2-88f6-4a50-a478-4401c7e9128c.json"
+    session = Trainses_json(file)
+    res = session.RManualLapAnalyzer.determine_intervals()
+    print(res)
+
+    files = glob.glob(os.path.join(path, "training-session-2015-*.json"))
+    k = 0
+    while k < 10:
+        file = random.choice(files)
+        session = Trainses_json(file)
+        if session.return_laps() is not None:
+            if session.RManualLapAnalyzer.identify_interval() in [
+                "interval",
+                "interval, check1",
+                "interval, check2",
+            ]:
+                print(session.abstract["fname"])
+                res = session.RManualLapAnalyzer.determine_intervals()
+                print(res)
+                k += 1
+    #
+    # training-session-2015-01-25-263888810-887b73d8-5599-4534-833c-521322b8c28b.json
+    # training-session-2015-03-11-263884640-0e71a9a2-88f6-4a50-a478-4401c7e9128c.json
 
     file = "training-session-2015-01-07-263888486-2d791dc2-1ee2-4964-bb44-558579c19c6f.json"
     session = Trainses_json(file)
     res = session.RManualLapAnalyzer.determine_intervals()
+    print(res)
 
     file = "training-session-2014-03-16-263911274-403459ca-e3b5-447d-b45b-e622e723e967.json"
     session = Trainses_json(file)
     res = session.RManualLapAnalyzer.determine_intervals()
+    print(res)
+
+    "training-session-2015-10-02-263860694-a0cc566f-63e0-4a22-ae42-e2b50b649e81.json"
+    file = "training-session-2014-03-16-263911274-403459ca-e3b5-447d-b45b-e622e723e967.json"
 
     file = "training-session-2015-04-18-263883440-3be46e75-6a93-4746-a320-96c9660f809c.json"
     session = Trainses_json(file)
