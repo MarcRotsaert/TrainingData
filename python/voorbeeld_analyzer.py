@@ -15,15 +15,16 @@ path = config["polar_json"]["datapath"]
 
 
 def ex_polar_lapanalyzer():
+    file = "training-session-2015-01-25-263888810-887b73d8-5599-4534-833c-521322b8c28b.json"
+    session = Trainses_json(file)
+    res = session.RManualLapAnalyzer.determine_intervals()
+    print(res)
+
     file = "training-session-2015-02-17-263886464-81c22d89-24ce-41b2-b130-98f85cec4dbe.json"
     session = Trainses_json(file)
     res = session.RManualLapAnalyzer.determine_intervals()
     print(res)
 
-    file = "training-session-2015-01-25-263888810-887b73d8-5599-4534-833c-521322b8c28b.json"
-    session = Trainses_json(file)
-    res = session.RManualLapAnalyzer.determine_intervals()
-    print(res)
 
     file = "training-session-2015-03-11-263884640-0e71a9a2-88f6-4a50-a478-4401c7e9128c.json"
     session = Trainses_json(file)
@@ -77,6 +78,14 @@ def ex_polar_lapanalyzer():
 
 
 def ex_lapanalyzer_identify():
+
+    file = "training-session-2017-03-15-1202520256-b65156be-3420-4164-a6c9-6e34d0caafbd.json"
+    session = Trainses_json(file)
+    lapses = session.RManualLapAnalyzer
+    lapses.identify_interval()
+    
+
+
     files = glob.glob(os.path.join(path, "training-session-2021-*.json"))
     for fi in random.choices(files, k=5):
         filename = fi.split("\\")[-1]
@@ -194,8 +203,8 @@ def ex_garminfit_analyzer():
 
 if __name__ == "__main__":
     ex_polar_lapanalyzer()
-    ex_polar_sampleanalyzer()
     ex_lapanalyzer_identify()
+    ex_polar_sampleanalyzer()
     ex_sampleanalyzer_wind()
     ex_garminfit_analyzer()
     ex_forerunner_analyzer()
