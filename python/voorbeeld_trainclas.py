@@ -1,6 +1,6 @@
 from training_classifier import MongoRunningClassifier
 
-classif = MongoRunningClassifier("polartest4", "polar2014")
+classif = MongoRunningClassifier("polartest4", "polar2017")
 
 classif.set_easyrun()
 easyrun, no_easyrun = classif.return_easyrun()
@@ -32,9 +32,11 @@ for rr in interval:
 interval = classif.mongo.simplequery("trainingtype.interval", "interval")
 for rr in interval:
     print(rr["fname"])
+
 for rr in road_races:
     print("___________________________________________________")
     print(rr["fname"])
+
 print("Finish___________________________________________________")
 
 classif.set_traindescription()

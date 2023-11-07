@@ -176,6 +176,7 @@ class MongoRunningClassifier(MongoClassifier):
     def set_traindescription(self):
         traingen = self._generator_training()
         for training in traingen:
+            # print(training.abstract["fname"])
             if training.laps is None:
                 continue
             if "trainingtype" not in training.abstract:
@@ -190,5 +191,4 @@ class MongoRunningClassifier(MongoClassifier):
                 result = self.mongo.simplequery("fname", training.abstract["fname"])
                 for res in result:
                     objid = res["_id"]
-
                     self.mongo.updateOne(objid, {"trainingdescription": description})

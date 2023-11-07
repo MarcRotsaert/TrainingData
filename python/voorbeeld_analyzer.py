@@ -15,10 +15,15 @@ path = config["polar_json"]["datapath"]
 
 
 def ex_polar_lapanalyzer():
-    # file = "training-session-2015-06-10-263879420-179087dd-448d-4a57-9d5f-caaa193b05f8.json"
-    # session = Trainses_json(file)
-    # res = session.RManualLapAnalyzer.determine_intervals()
-    # print(res)
+    file = "training-session-2015-06-10-263879420-179087dd-448d-4a57-9d5f-caaa193b05f8.json"
+    session = Trainses_json(file)
+    res = session.RManualLapAnalyzer.determine_intervals()
+    print(res)
+
+    file = "training-session-2014-06-27-263907116-7cb098dc-3364-47b5-9d68-94ec381b08f7.json"
+    session = Trainses_json(file)
+    res = session.RManualLapAnalyzer.determine_intervals()
+    print(res)
 
     file = "training-session-2015-01-25-263888810-887b73d8-5599-4534-833c-521322b8c28b.json"
     session = Trainses_json(file)
@@ -82,13 +87,10 @@ def ex_polar_lapanalyzer():
 
 
 def ex_lapanalyzer_identify():
-
     file = "training-session-2017-03-15-1202520256-b65156be-3420-4164-a6c9-6e34d0caafbd.json"
     session = Trainses_json(file)
     lapses = session.RManualLapAnalyzer
     lapses.identify_interval()
-    
-
 
     files = glob.glob(os.path.join(path, "training-session-2021-*.json"))
     for fi in random.choices(files, k=5):

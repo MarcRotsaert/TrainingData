@@ -216,7 +216,7 @@ class RManualLapAnalyzer(RLapAnalyzerBasic):
         dspeed = speed[1:] - speed[0:-1]
 
         dspeed[(dspeed < dspeed_int) & (dspeed > -dspeed_int)] = 0
-        dspeed[dspeed > dspeed_int] = 1
+        dspeed[dspeed >= dspeed_int] = 1
         dspeed[dspeed < -dspeed_int] = -1
 
         if dspeed[0] == 1:
@@ -229,7 +229,9 @@ class RManualLapAnalyzer(RLapAnalyzerBasic):
         return result
 
     @staticmethod
-    def _difference2rounded(values: list, rounding_value: float) -> [np.array, np.array]:
+    def _difference2rounded(
+        values: list, rounding_value: float
+    ) -> [np.array, np.array]:
         """determine difference between recorded and rounded lap values"""
         rounded_values = []
         for val in values:
@@ -239,16 +241,20 @@ class RManualLapAnalyzer(RLapAnalyzerBasic):
         dif = np.abs(values - rounded_values)
         return dif, rounded_values
 
-    def _classify_timedistance(self, distance: list, duration: list) -> list[str, Union[float, None]]:
+    def _classify_timedistance(
+        self, distance: list, duration: list
+    ) -> list[str, Union[float, None]]:
         """determine if lapinterval is based upon distance or time"""
-        #criteria for classification
+        # criteria for classification
         dif_dur_mean = 4  # sec
         dif_dis_std = 15  # m
 
         rounding_time = 30  # sec
         rounding_distance = 100  # m
 
-        dif_dis, rounded_distance = self._difference2rounded(distance, rounding_distance)
+        dif_dis, rounded_distance = self._difference2rounded(
+            distance, rounding_distance
+        )
         dif_dur, rounded_duration = self._difference2rounded(duration, rounding_time)
 
         if dif_dur.mean() < dif_dur_mean:
@@ -260,14 +266,16 @@ class RManualLapAnalyzer(RLapAnalyzerBasic):
 
         return classification
 
-    def _group_intervalorrecovery(self, classif, intervalrecovery) -> [np.array, np.array]:
-        if intervalrecovery=='interval':
+    def _group_intervalorrecovery(
+        self, classif, intervalrecovery
+    ) -> [np.array, np.array]:
+        if intervalrecovery == "interval":
             cl_index = 1
-        elif intervalrecovery=='recovery':
+        elif intervalrecovery == "recovery":
             cl_index = -1
         idx = np.where(classif == cl_index)[0]
         duration_values = self.return_duration(idx)
-        
+
         idx = np.where(classif == cl_index)[0]
         distance_values = self.return_distance(idx)
         return distance_values, duration_values
@@ -281,26 +289,36 @@ class RManualLapAnalyzer(RLapAnalyzerBasic):
         for i in idx_su + idx_ru:
             classif[i] = 0
 
-        distance_interval, duration_interval = self._group_intervalorrecovery(classif, "interval")
-        distance_recovery, duration_recovery = self._group_intervalorrecovery(classif, "recovery")
+        distance_interval, duration_interval = self._group_intervalorrecovery(
+            classif, "interval"
+        )
+        distance_recovery, duration_recovery = self._group_intervalorrecovery(
+            classif, "recovery"
+        )
 
         regis_interval = self._classify_timedistance(
-             distance_interval,duration_interval
+            distance_interval, duration_interval
         )
         regis_recovery = self._classify_timedistance(
-            distance_recovery, duration_recovery 
+            distance_recovery, duration_recovery
         )
-        
+
         if regis_recovery[0] != "undetermined" and regis_interval[0] != "undetermined":
-            regis_laps = self._prepare_convertorl2str(regis_interval, regis_recovery)
-            trainingstr = self.convertor_length2str(regis_laps)
+            if len(regis_interval) - len(regis_recovery) == 1:
+                regis_laps = self._prepare_convertorl2str(
+                    regis_interval, regis_recovery
+                )
+                trainingstr = self.convertor_length2str(regis_laps)
+            else:
+                trainingstr = "error: nr. interval laps equals nr recovery laps"
+
         else:
             trainingstr = "undetermined"
 
         return trainingstr
 
     def _prepare_convertorl2str(self, regis_interval, regis_recovery):
-        #Special preparation for interval training 2 string, combine interval and recover
+        # Special preparation for interval training 2 string, combine interval and recover
         interval_strtype = regis_interval[0]
         intervals = regis_interval[1]
         recovery_strtype = regis_recovery[0]
@@ -309,11 +327,11 @@ class RManualLapAnalyzer(RLapAnalyzerBasic):
         convertlist = []
         for i in range(len(recoveries)):
             convertlist.append([intervals[i], interval_strtype])
-            convertlist.append([recoveries[i], 'P'+recovery_strtype])
-        
-        convertlist.append([intervals[i+1], interval_strtype])
+            convertlist.append([recoveries[i], "P" + recovery_strtype])
+
+        convertlist.append([intervals[i + 1], interval_strtype])
         return convertlist
-            
+
     def convertor_length2str(self, regis_laps: list) -> str:
         """ """
         trainingstr = ""
@@ -323,9 +341,9 @@ class RManualLapAnalyzer(RLapAnalyzerBasic):
             elif r_lap[1] == "distance":
                 trainingstr += self._convertor_lapdistance2str(r_lap[0]) + ","
             elif r_lap[1] == "Ptime":
-                trainingstr +='P'+self._convertor_lapduration2str(r_lap[0]) + ","
+                trainingstr += "P" + self._convertor_lapduration2str(r_lap[0]) + ","
             elif r_lap[1] == "Pdistance":
-                trainingstr += 'P'+self._convertor_lapdistance2str(r_lap[0]) + ","
+                trainingstr += "P" + self._convertor_lapdistance2str(r_lap[0]) + ","
 
         return trainingstr
 
