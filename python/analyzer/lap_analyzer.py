@@ -75,16 +75,6 @@ class LapAnalyzer:
             avgspeed = self.return_paraslist("speed", "avg")
             return np.corrcoef(avgspeed, avgheartr)[0, 1]
 
-    def determine_speedvariability(
-        self, ignorelaps: list[int] = []
-    ) -> (float, float, float):
-        speed = np.array(self.return_paraslist("speed", "avg"))
-        speed = np.delete(speed, ignorelaps)
-        stdspeed = np.std(speed)
-        maxspeed = np.max(speed)
-        minspeed = np.max(speed)
-        return stdspeed, maxspeed, minspeed
-
     def _determine_accelaration(self, ignorelaps: list[int] = []) -> np.array:
         speed = np.array(self.return_paraslist("speed", "avg"))
         speed = np.delete(speed, ignorelaps)
@@ -213,9 +203,34 @@ class RManualLapAnalyzer(RLapAnalyzerBasic):
                 laps[k].pop(i_la)
         return laps
 
+    def _classifylap_speedupspeeddown(self, speedlist: list) -> np.array:
+        """
+        element in de
+        -1 = recovery
+        1 = interval
+
+        """
+        dspeed_int = self.paces["dspeedinterval"]
+
+        speed = np.array(speedlist)
+        dspeed = speed[1:] - speed[0:-1]
+
+        dspeed[(dspeed < dspeed_int) & (dspeed > -dspeed_int)] = 0
+        dspeed[dspeed > dspeed_int] = 1
+        dspeed[dspeed < -dspeed_int] = -1
+
+        if dspeed[0] == 1:
+            result = np.hstack([-1, dspeed])
+        elif dspeed[0] == -1:
+            result = np.hstack([1, dspeed])
+        else:
+            result = np.hstack([0, dspeed])
+
+        return result
+
     @staticmethod
-    def _difference2rounded(values: list, rounding_value: float) -> np.array:
-        """determine difference between recorded and rounded values"""
+    def _difference2rounded(values: list, rounding_value: float) -> [np.array, np.array]:
+        """determine difference between recorded and rounded lap values"""
         rounded_values = []
         for val in values:
             rounded_val = rounding_value * round(val / rounding_value)
@@ -224,15 +239,14 @@ class RManualLapAnalyzer(RLapAnalyzerBasic):
         dif = np.abs(values - rounded_values)
         return dif, rounded_values
 
-    def _classify_timedistance(self, duration: list, distance: list) -> list[str, Union[float, None]]:
-        """determine if lapinterval is based upon distance or time  
-        """
+    def _classify_timedistance(self, distance: list, duration: list) -> list[str, Union[float, None]]:
+        """determine if lapinterval is based upon distance or time"""
         #criteria for classification
         dif_dur_mean = 4  # sec
-        dif_dis_std = 15 # m
+        dif_dis_std = 15  # m
 
-        rounding_time = 30 # sec
-        rounding_distance = 100 # m
+        rounding_time = 30  # sec
+        rounding_distance = 100  # m
 
         dif_dis, rounded_distance = self._difference2rounded(distance, rounding_distance)
         dif_dur, rounded_duration = self._difference2rounded(duration, rounding_time)
@@ -246,8 +260,19 @@ class RManualLapAnalyzer(RLapAnalyzerBasic):
 
         return classification
 
+    def _group_intervalorrecovery(self, classif, intervalrecovery) -> [np.array, np.array]:
+        if intervalrecovery=='interval':
+            cl_index = 1
+        elif intervalrecovery=='recovery':
+            cl_index = -1
+        idx = np.where(classif == cl_index)[0]
+        duration_values = self.return_duration(idx)
+        
+        idx = np.where(classif == cl_index)[0]
+        distance_values = self.return_distance(idx)
+        return distance_values, duration_values
 
-    def determine_intervals(self) ->str:
+    def determine_intervals(self) -> str:
         """determine lapinterval size in distance or time"""
         idx_su, idx_ru = self.determine_startuprunoutlaps()
 
@@ -256,20 +281,16 @@ class RManualLapAnalyzer(RLapAnalyzerBasic):
         for i in idx_su + idx_ru:
             classif[i] = 0
 
-        idx = np.where(classif == 1)[0]
-        distance_interval = self.return_distance(idx)
-        duration_interval = self.return_duration(idx)
-
-        idx = np.where(classif == -1)[0]
-        distance_recovery = self.return_distance(idx)
-        duration_recovery = self.return_duration(idx)
+        distance_interval, duration_interval = self._group_intervalorrecovery(classif, "interval")
+        distance_recovery, duration_recovery = self._group_intervalorrecovery(classif, "recovery")
 
         regis_interval = self._classify_timedistance(
-            duration_interval, distance_interval
+             distance_interval,duration_interval
         )
         regis_recovery = self._classify_timedistance(
-            duration_recovery, distance_recovery
+            distance_recovery, duration_recovery 
         )
+        
         if regis_recovery[0] != "undetermined" and regis_interval[0] != "undetermined":
             regis_laps = self._prepare_convertorl2str(regis_interval, regis_recovery)
             trainingstr = self.convertor_length2str(regis_laps)
@@ -277,23 +298,24 @@ class RManualLapAnalyzer(RLapAnalyzerBasic):
             trainingstr = "undetermined"
 
         return trainingstr
-    
+
     def _prepare_convertorl2str(self, regis_interval, regis_recovery):
         #Special preparation for interval training 2 string, combine interval and recover
         interval_strtype = regis_interval[0]
         intervals = regis_interval[1]
         recovery_strtype = regis_recovery[0]
         recoveries = regis_recovery[1]
-        
+
         convertlist = []
         for i in range(len(recoveries)):
             convertlist.append([intervals[i], interval_strtype])
             convertlist.append([recoveries[i], 'P'+recovery_strtype])
+        
         convertlist.append([intervals[i+1], interval_strtype])
         return convertlist
             
     def convertor_length2str(self, regis_laps: list) -> str:
-
+        """ """
         trainingstr = ""
         for r_lap in regis_laps:
             if r_lap[1] == "time":
@@ -324,31 +346,6 @@ class RManualLapAnalyzer(RLapAnalyzerBasic):
         else:
             distance_str = str(distance) + "m"
         return distance_str
-
-    def _classifylap_speedupspeeddown(self, speedlist: list):
-        """
-        element in de
-        -1 = recovery
-        1 = interval
-
-        """
-        dspeed_int = self.paces["dspeedinterval"]
-
-        # speed = np.array([sp["avg"] for sp in laps["speed"]])
-        speed = np.array(speedlist)
-        dspeed = speed[1:] - speed[0:-1]
-        dspeed[(dspeed < dspeed_int) & (dspeed > -dspeed_int)] = 0
-        dspeed[dspeed > dspeed_int] = 1
-        dspeed[dspeed < -dspeed_int] = -1
-
-        if dspeed[0] == 1:
-            result = np.hstack([-1, dspeed])
-        elif dspeed[0] == -1:
-            result = np.hstack([1, dspeed])
-        else:
-            result = np.hstack([0, dspeed])
-
-        return result
 
     def identify_interval(self) -> str:
         if self._check_allempty_data("speed"):

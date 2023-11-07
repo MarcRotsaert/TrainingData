@@ -1,6 +1,6 @@
 from training_classifier import MongoRunningClassifier
 
-classif = MongoRunningClassifier("polartest4", "polar2017")
+classif = MongoRunningClassifier("polartest4", "polar2014")
 
 classif.set_easyrun()
 easyrun, no_easyrun = classif.return_easyrun()

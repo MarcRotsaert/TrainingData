@@ -15,6 +15,11 @@ path = config["polar_json"]["datapath"]
 
 
 def ex_polar_lapanalyzer():
+    # file = "training-session-2015-06-10-263879420-179087dd-448d-4a57-9d5f-caaa193b05f8.json"
+    # session = Trainses_json(file)
+    # res = session.RManualLapAnalyzer.determine_intervals()
+    # print(res)
+
     file = "training-session-2015-01-25-263888810-887b73d8-5599-4534-833c-521322b8c28b.json"
     session = Trainses_json(file)
     res = session.RManualLapAnalyzer.determine_intervals()
@@ -24,7 +29,6 @@ def ex_polar_lapanalyzer():
     session = Trainses_json(file)
     res = session.RManualLapAnalyzer.determine_intervals()
     print(res)
-
 
     file = "training-session-2015-03-11-263884640-0e71a9a2-88f6-4a50-a478-4401c7e9128c.json"
     session = Trainses_json(file)
