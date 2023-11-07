@@ -15,8 +15,66 @@ path = config["polar_json"]["datapath"]
 
 
 def ex_polar_lapanalyzer():
+    file = "training-session-2015-06-10-263879420-179087dd-448d-4a57-9d5f-caaa193b05f8.json"
+    session = Trainses_json(file)
+    res = session.RManualLapAnalyzer.determine_intervals()
+    print(res)
+
+    file = "training-session-2014-06-27-263907116-7cb098dc-3364-47b5-9d68-94ec381b08f7.json"
+    session = Trainses_json(file)
+    res = session.RManualLapAnalyzer.determine_intervals()
+    print(res)
+
+    file = "training-session-2015-01-25-263888810-887b73d8-5599-4534-833c-521322b8c28b.json"
+    session = Trainses_json(file)
+    res = session.RManualLapAnalyzer.determine_intervals()
+    print(res)
+
+    file = "training-session-2015-02-17-263886464-81c22d89-24ce-41b2-b130-98f85cec4dbe.json"
+    session = Trainses_json(file)
+    res = session.RManualLapAnalyzer.determine_intervals()
+    print(res)
+
+    file = "training-session-2015-03-11-263884640-0e71a9a2-88f6-4a50-a478-4401c7e9128c.json"
+    session = Trainses_json(file)
+    res = session.RManualLapAnalyzer.determine_intervals()
+    print(res)
+
+    files = glob.glob(os.path.join(path, "training-session-2015-*.json"))
+    k = 0
+    while k < 10:
+        file = random.choice(files)
+        session = Trainses_json(file)
+        if session.return_laps() is not None:
+            if session.RManualLapAnalyzer.identify_interval() in [
+                "interval",
+                "interval, check1",
+                "interval, check2",
+            ]:
+                print(session.abstract["fname"])
+                res = session.RManualLapAnalyzer.determine_intervals()
+                print(res)
+                k += 1
+    #
+    # training-session-2015-01-25-263888810-887b73d8-5599-4534-833c-521322b8c28b.json
+    # training-session-2015-03-11-263884640-0e71a9a2-88f6-4a50-a478-4401c7e9128c.json
+
+    file = "training-session-2015-01-07-263888486-2d791dc2-1ee2-4964-bb44-558579c19c6f.json"
+    session = Trainses_json(file)
+    res = session.RManualLapAnalyzer.determine_intervals()
+    print(res)
+
+    file = "training-session-2014-03-16-263911274-403459ca-e3b5-447d-b45b-e622e723e967.json"
+    session = Trainses_json(file)
+    res = session.RManualLapAnalyzer.determine_intervals()
+    print(res)
+
+    "training-session-2015-10-02-263860694-a0cc566f-63e0-4a22-ae42-e2b50b649e81.json"
+    file = "training-session-2014-03-16-263911274-403459ca-e3b5-447d-b45b-e622e723e967.json"
+
     file = "training-session-2015-04-18-263883440-3be46e75-6a93-4746-a320-96c9660f809c.json"
     session = Trainses_json(file)
+
     laps = session.return_laps()
     lapses = session.RAutoLapAnalyzer
     x = lapses.return_paraslist("speed")
@@ -29,6 +87,11 @@ def ex_polar_lapanalyzer():
 
 
 def ex_lapanalyzer_identify():
+    file = "training-session-2017-03-15-1202520256-b65156be-3420-4164-a6c9-6e34d0caafbd.json"
+    session = Trainses_json(file)
+    lapses = session.RManualLapAnalyzer
+    lapses.identify_interval()
+
     files = glob.glob(os.path.join(path, "training-session-2021-*.json"))
     for fi in random.choices(files, k=5):
         filename = fi.split("\\")[-1]
@@ -37,6 +100,7 @@ def ex_lapanalyzer_identify():
 
         if session.laps is not None:
             lapses = session.RManualLapAnalyzer
+
             print(lapses.compare_hr_sp())
             result = lapses.identify_interval()
             pprint.pprint(result)
@@ -67,6 +131,7 @@ def ex_polar_sampleanalyzer():
     ]
     for file in files:
         session = Trainses_json(file)
+
         samses = session.SamAnalRunning
 
         dtroute = samses.return_s_timeroute()
@@ -144,8 +209,8 @@ def ex_garminfit_analyzer():
 
 if __name__ == "__main__":
     ex_polar_lapanalyzer()
-    ex_polar_sampleanalyzer()
     ex_lapanalyzer_identify()
+    ex_polar_sampleanalyzer()
     ex_sampleanalyzer_wind()
     ex_garminfit_analyzer()
     ex_forerunner_analyzer()

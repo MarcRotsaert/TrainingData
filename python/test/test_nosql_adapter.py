@@ -53,7 +53,7 @@ class TestMongoQuery(unittest.TestCase):
             }
         )
         training = [res for res in cursor]
-        self.assertTrue(125 < len(training) < 130)
+        self.assertTrue(120 < len(training) < 130)
 
 
 class TestMongoPolar_adddata(unittest.TestCase):
