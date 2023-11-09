@@ -304,7 +304,7 @@ class RManualLapAnalyzer(RLapAnalyzerBasic):
         )
 
         if regis_recovery[0] != "undetermined" and regis_interval[0] != "undetermined":
-            if len(regis_interval) - len(regis_recovery) == 1:
+            if len(regis_interval[1]) - len(regis_recovery[1]) == 1:
                 regis_laps = self._prepare_convertorl2str(
                     regis_interval, regis_recovery
                 )

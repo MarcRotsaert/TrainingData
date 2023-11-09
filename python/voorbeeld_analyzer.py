@@ -208,9 +208,9 @@ def ex_garminfit_analyzer():
 
 
 if __name__ == "__main__":
+    ex_garminfit_analyzer()
+    ex_forerunner_analyzer()
     ex_polar_lapanalyzer()
     ex_lapanalyzer_identify()
     ex_polar_sampleanalyzer()
     ex_sampleanalyzer_wind()
-    ex_garminfit_analyzer()
-    ex_forerunner_analyzer()
