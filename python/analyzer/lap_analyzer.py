@@ -336,15 +336,32 @@ class RManualLapAnalyzer(RLapAnalyzerBasic):
         """ """
         trainingstr = ""
         for r_lap in regis_laps:
-            if r_lap[1] == "time":
-                trainingstr += self._convertor_lapduration2str(r_lap[0]) + ","
-            elif r_lap[1] == "distance":
-                trainingstr += self._convertor_lapdistance2str(r_lap[0]) + ","
-            elif r_lap[1] == "Ptime":
-                trainingstr += "P" + self._convertor_lapduration2str(r_lap[0]) + ","
-            elif r_lap[1] == "Pdistance":
-                trainingstr += "P" + self._convertor_lapdistance2str(r_lap[0]) + ","
+            if r_lap[1] == "time" or r_lap[1]=="distance":
+                if r_lap[1] == "time":
+                    temp = self._convertor_lapduration2str(r_lap[0]) + ","
+                elif r_lap[1] == "distance":
+                    temp =self._convertor_lapdistance2str(r_lap[0]) + ","
+                
+                temp = temp.ljust(7)
+                trainingstr += temp
+        trainingstr += '\n' 
+        
+        x = True
+        for r_lap in regis_laps:
+            if r_lap[1] == "Ptime" or r_lap[1]=="Pdistance" :
+                if r_lap[1] == "Ptime":
+                    temp =  "P"+ self._convertor_lapduration2str(r_lap[0]) + ","
+                    # trainingstr += self._convertor_lapduration2str(r_lap[0]) + ","
+                elif r_lap[1] == "Pdistance":
+                    temp = "P" + self._convertor_lapdistance2str(r_lap[0]) + ","
+                    # trainingstr += "P" + self._convertor_lapdistance2str(r_lap[0]) + ","
 
+                if  x:
+                    temp = temp.rjust(10)
+                    x = False
+                else: 
+                    temp = temp.rjust(7)
+                trainingstr += temp
         return trainingstr
 
     @staticmethod
