@@ -12,9 +12,28 @@ function updateDemo() {
     demoElement.innerHTML = "Hello, World! (from a function)";
 }
 
+function updatePlaatje() {
+    // image = document.getElementsByClassName("grafiek")[0]
+    image = document.getElementById("grafje")
+
+    // console.log('change pictures')
+    var val = selectText2()
+    switch (val) {
+        case "easy":
+            image.src = "C:/Users/marcr/MakeAIWork3/opdrachten/practica/week15/guess_who/data/pics/alfred.jpg"
+            break;
+        case "interval":
+            image.src = "C:/Users/marcr/OneDrive/Documenten/cursus_ALT4/workshop_3/Koen_a.jpg"
+            break;
+        case "road race":
+            image.src = "C:/Users/marcr/OneDrive/Documenten/cursus_ALT4/workshop_3/loopanalyse_koen/Dia1.JPG"
+    }
+}
+
 function selectText2() {
     var testElement = document.getElementById("trainingtype")
     console.log(testElement.value)
+    return testElement.value
 }
 
 
