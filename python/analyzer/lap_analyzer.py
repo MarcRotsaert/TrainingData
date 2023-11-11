@@ -49,17 +49,29 @@ class LapAnalyzer:
                 duration.append(self.laps_an["duration"][i])
         return duration
 
-    def return_paraslist(self, par: str, *arg: str) -> list[float]:
+    def return_paraslist(
+        self, par: str, ext_par: str = None, ind: Union[None, list] = None
+    ) -> list[float]:
         temp = self.laps_an[par]
         values = []
-        if len(arg) == 0:
-            values = temp
+        # if len(arg) == 0:
+        # values = temp
+        # else:
+        if ind is None:
+            lapsel = range(len(temp))
         else:
-            for la in temp:
+            lapsel = ind
+
+        # for la in temp:
+        for la in lapsel:
+            if ext_par is not None:
                 try:
-                    values.append(la[arg[0]])
+                    val = temp[la][ext_par]
                 except KeyError:
-                    values.append(-999)
+                    val = -999
+            else:
+                val = temp[la]
+            values.append(val)
 
         return values
 
@@ -344,7 +356,7 @@ class RManualLapAnalyzer(RLapAnalyzerBasic):
 
                 temp = temp.ljust(7)
                 trainingstr += temp
-        trainingstr += '\n'
+        trainingstr += "\n"
 
         x = True
         for r_lap in regis_laps:
@@ -354,10 +366,10 @@ class RManualLapAnalyzer(RLapAnalyzerBasic):
                 else:
                     temp = "P" + self._convertor_lapdistance2str(r_lap[0]) + ","
 
-                if  x:
+                if x:
                     temp = temp.rjust(10)
                     x = False
-                else: 
+                else:
                     temp = temp.rjust(7)
                 trainingstr += temp
         return trainingstr
