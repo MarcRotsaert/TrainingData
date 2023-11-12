@@ -124,15 +124,21 @@ class TestRMLapAnalyzer(unittest.TestCase):
     def test_classify_timedistance(self):
         speedlist = self.lap_an.return_paraslist("speed", "avg")
         classif = self.lap_an._classifylap_speedupspeeddown(speedlist)
-        distance_recovery, duration_recovery = self.lap_an._group_intervalorrecovery(
-            classif, "recovery"
-        )
+        (
+            distance_recovery,
+            duration_recovery,
+            speed_recovery,
+        ) = self.lap_an._group_intervalorrecovery(classif, "recovery")
         result = self.lap_an._classify_timedistance(
             distance_recovery, duration_recovery
         )
         self.assertEqual(result[0], "time")
 
-        distance_interval, duration_interval = self.lap_an._group_intervalorrecovery(
+        (
+            distance_interval,
+            duration_interval,
+            speed_interval,
+        ) = self.lap_an._group_intervalorrecovery(
             classif,
             "interval",
         )

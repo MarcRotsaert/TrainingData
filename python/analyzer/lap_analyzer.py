@@ -290,7 +290,14 @@ class RManualLapAnalyzer(RLapAnalyzerBasic):
 
         idx = np.where(classif == cl_index)[0]
         distance_values = self.return_distance(idx)
-        return distance_values, duration_values
+
+        speed_values = self.return_paraslist("speed", "avg", ind=idx)
+        return (distance_values, duration_values, speed_values)
+
+    def _return_corrected_speed(regis_speed, regis_dist, correct_dist) -> np.array:
+        return regis_speed * correct_dist / regis_dist
+
+    # def return_intervalstring(self):
 
     def determine_intervals(self) -> str:
         """determine lapinterval size in distance or time"""
@@ -301,12 +308,16 @@ class RManualLapAnalyzer(RLapAnalyzerBasic):
         for i in idx_su + idx_ru:
             classif[i] = 0
 
-        distance_interval, duration_interval = self._group_intervalorrecovery(
-            classif, "interval"
-        )
-        distance_recovery, duration_recovery = self._group_intervalorrecovery(
-            classif, "recovery"
-        )
+        (
+            distance_interval,
+            duration_interval,
+            speed_interval,
+        ) = self._group_intervalorrecovery(classif, "interval")
+        (
+            distance_recovery,
+            duration_recovery,
+            speed_recovery,
+        ) = self._group_intervalorrecovery(classif, "recovery")
 
         regis_interval = self._classify_timedistance(
             distance_interval, duration_interval
@@ -314,6 +325,15 @@ class RManualLapAnalyzer(RLapAnalyzerBasic):
         regis_recovery = self._classify_timedistance(
             distance_recovery, duration_recovery
         )
+
+        # TODO: Here I have to do something!!!
+        if regis_interval[0] == "distance":
+            # speed_interval_corr = speed_interval * regis_interval[1] / distance_interval
+            speed_interval_corr = self._return_corrected_speed(
+                speed_interval,
+                distance_interval,
+                regis_interval[1],
+            )
 
         if regis_recovery[0] != "undetermined" and regis_interval[0] != "undetermined":
             if len(regis_interval[1]) - len(regis_recovery[1]) == 1:

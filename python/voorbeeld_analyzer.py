@@ -25,7 +25,6 @@ def ex_polar_lapanalyzer():
     res = session.RManualLapAnalyzer.determine_intervals()
     print(res)
 
-
     file = "training-session-2015-01-25-263888810-887b73d8-5599-4534-833c-521322b8c28b.json"
     session = Trainses_json(file)
     res = session.RManualLapAnalyzer.determine_intervals()
