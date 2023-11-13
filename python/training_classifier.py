@@ -239,9 +239,6 @@ class MongoIntervalTraining(MongoRunningClassifier):
                 corr_speed = training.RManualLapAnalyzer.determine_corrspeed_int()
 
                 for nr, ind in enumerate(idx_int):
-                    print(corr_speed[nr])
-                    print(training.laps[ind]["speed"]["avg"])
-
                     self.mongo.updateOne(
                         objid,
                         {"laps." + str(ind) + ".speed.avg_corr": corr_speed[nr]},

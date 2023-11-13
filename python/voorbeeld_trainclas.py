@@ -40,10 +40,8 @@ for rr in road_races:
     print(rr["fname"])
 
 
-classif.set_traindescription()
-
 classif = MongoIntervalTraining(dbase, collection)
-# classif.set_intervaldescription()
+classif.set_intervaldescription()
 classif.set_corrected_speed()
 
 
