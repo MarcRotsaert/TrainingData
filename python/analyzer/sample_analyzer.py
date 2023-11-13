@@ -103,7 +103,7 @@ class SampleAnalyzerBasic:
                 diststart = pointloc.distance(pnts[0])
                 distend = pointloc.distance(pnts[-1])
                 maxdist = coord[1]
-                if diststart < maxdist or distend < maxdist:
+                if diststart < maxdist[0] or distend < maxdist[0]:
                     location = loc
         return location
 

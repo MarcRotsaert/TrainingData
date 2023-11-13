@@ -1,11 +1,12 @@
 import unittest
 import tomli
+import numpy as np
 
 import analyzer.polar_analyzer as pol_an
 import analyzer.lap_analyzer as lap_an
 
 
-class TestRMLapAnalyzer(unittest.TestCase):
+class TestRMLapAnalyzer_timeint(unittest.TestCase):
     @classmethod
     def setUp(cls) -> None:
         config = tomli.load(open("config.toml", "rb"))
@@ -16,7 +17,7 @@ class TestRMLapAnalyzer(unittest.TestCase):
         cls.laps = session.return_laps()
         cls.lap_an = lap_an.RManualLapAnalyzer(cls.laps)
 
-    def test_return(self):
+    def test_return_param(self):
         with self.subTest():
             distance = self.lap_an.return_distance()
             self.assertEqual(len(distance), 37)
@@ -50,47 +51,10 @@ class TestRMLapAnalyzer(unittest.TestCase):
         self.assertEqual(idx_ru, [36])
 
     def test_speedupspeeddown(self):
-        testresult = [
-            -1.0,
-            1.0,
-            -1.0,
-            1.0,
-            -1.0,
-            1.0,
-            -1.0,
-            1.0,
-            -1.0,
-            1.0,
-            -1.0,
-            1.0,
-            -1.0,
-            1.0,
-            -1.0,
-            1.0,
-            -1.0,
-            1.0,
-            -1.0,
-            1.0,
-            -1.0,
-            1.0,
-            -1.0,
-            1.0,
-            -1.0,
-            1.0,
-            -1.0,
-            1.0,
-            -1.0,
-            1.0,
-            -1.0,
-            1.0,
-            -1.0,
-            1.0,
-            -1.0,
-            1.0,
-            -1.0,
-        ]
+        testresult = 18 * [-1.0, 1.0] + [-1.0]
+
         speedlist = self.lap_an.return_paraslist("speed", "avg")
-        speedup_speeddown = self.lap_an._classifylap_speedupspeeddown(speedlist)
+        speedup_speeddown = self.lap_an._classify_speedupdown(speedlist)
         self.assertListEqual(testresult, speedup_speeddown.tolist())
 
     def test_convertdur2str(self):
@@ -122,27 +86,52 @@ class TestRMLapAnalyzer(unittest.TestCase):
         self.assertFalse(self.lap_an._check_allempty_data("speed"))
 
     def test_classify_timedistance(self):
-        speedlist = self.lap_an.return_paraslist("speed", "avg")
-        classif = self.lap_an._classifylap_speedupspeeddown(speedlist)
-        (
-            distance_recovery,
-            duration_recovery,
-            speed_recovery,
-        ) = self.lap_an._group_intervalorrecovery(classif, "recovery")
+        idx_int, idx_rec = self.lap_an.return_idx_intrec()
+
+        distance_recovery = self.lap_an.return_distance(idx_rec)
+        duration_recovery = self.lap_an.return_duration(idx_rec)
+
         result = self.lap_an._classify_timedistance(
             distance_recovery, duration_recovery
         )
         self.assertEqual(result[0], "time")
 
-        (
-            distance_interval,
-            duration_interval,
-            speed_interval,
-        ) = self.lap_an._group_intervalorrecovery(
-            classif,
-            "interval",
-        )
+        distance_interval = self.lap_an.return_distance(idx_int)
+        duration_interval = self.lap_an.return_duration(idx_int)
+
         result = self.lap_an._classify_timedistance(
             distance_interval, duration_interval
         )
         self.assertEqual(result[0], "time")
+
+    def test_determine_corrspeed_int(self):
+        res = self.lap_an.determine_corrspeed_int()
+        self.assertEqual(res, None)
+
+
+class TestRMLapAnalyzer_distint(unittest.TestCase):
+    @classmethod
+    def setUp(cls) -> None:
+        config = tomli.load(open("config.toml", "rb"))
+        cls.path = config["polar_json"]["datapath"]
+        session = pol_an.Trainses_json(
+            "training-session-2014-06-27-263907116-7cb098dc-3364-47b5-9d68-94ec381b08f7.json"
+        )
+        cls.laps = session.return_laps()
+        cls.lap_an = lap_an.RManualLapAnalyzer(cls.laps)
+
+    def test_determine_corrspeed_int(self):
+        res = self.lap_an.determine_corrspeed_int()
+        self.assertIsInstance(res, np.ndarray)
+        self.assertListEqual(res.tolist(), [18.3, 18.1, 15.7])
+
+    def test_determine_intervals(self):
+        res = self.lap_an.determine_intervals()
+        with self.subTest():
+            self.assertEqual(res[0], "distance")
+        with self.subTest():
+            self.assertEqual(res[1], "time")
+        with self.subTest():
+            self.assertListEqual(res[2].tolist(), [1000, 1000, 1000])
+        with self.subTest():
+            self.assertListEqual(res[3].tolist(), [360, 330])
