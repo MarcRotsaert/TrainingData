@@ -215,7 +215,7 @@ class RManualLapAnalyzer(RLapAnalyzerBasic):
                 laps[k].pop(i_la)
         return laps
 
-    def _classifylap_speedupspeeddown(self, speedlist: list) -> np.array:
+    def _classify_speedupdown(self, speedlist: list) -> np.array:
         """
         element in de
         -1 = recovery
@@ -257,7 +257,6 @@ class RManualLapAnalyzer(RLapAnalyzerBasic):
         self, distance: list, duration: list
     ) -> list[str, Union[float, None]]:
         """determine if lapinterval is based upon distance or time"""
-        # criteria for classification
         dif_dur_mean = 4  # sec
         dif_dis_std = 15  # m
 
@@ -278,46 +277,55 @@ class RManualLapAnalyzer(RLapAnalyzerBasic):
 
         return classification
 
-    def _group_intervalorrecovery(
-        self, classif, intervalrecovery
-    ) -> [np.array, np.array]:
-        if intervalrecovery == "interval":
-            cl_index = 1
-        elif intervalrecovery == "recovery":
-            cl_index = -1
-        idx = np.where(classif == cl_index)[0]
-        duration_values = self.return_duration(idx)
-
-        idx = np.where(classif == cl_index)[0]
-        distance_values = self.return_distance(idx)
-
-        speed_values = self.return_paraslist("speed", "avg", ind=idx)
-        return (distance_values, duration_values, speed_values)
-
-    def _return_corrected_speed(regis_speed, regis_dist, correct_dist) -> np.array:
-        return regis_speed * correct_dist / regis_dist
-
-    # def return_intervalstring(self):
-
-    def determine_intervals(self) -> str:
-        """determine lapinterval size in distance or time"""
+    def _return_idx_intrec(self) -> [np.array, np.array]:
+        """determine index of intervals and recovery in manual laps"""
         idx_su, idx_ru = self.determine_startuprunoutlaps()
 
         speedlist = self.return_paraslist("speed", "avg")
-        classif = self._classifylap_speedupspeeddown(speedlist)
+        speed_updown = self._classify_speedupdown(speedlist)
         for i in idx_su + idx_ru:
-            classif[i] = 0
+            speed_updown[i] = 0
 
-        (
-            distance_interval,
-            duration_interval,
-            speed_interval,
-        ) = self._group_intervalorrecovery(classif, "interval")
-        (
-            distance_recovery,
-            duration_recovery,
-            speed_recovery,
-        ) = self._group_intervalorrecovery(classif, "recovery")
+        idx_int = np.where(speed_updown == 1)[0]
+        idx_rec = np.where(speed_updown == -1)[0]
+        return idx_int, idx_rec
+
+    @staticmethod
+    def _return_corrected_speed(
+        m_speed: np.array, m_dist: np.array, c_dist: np.array
+    ) -> np.array:
+        """
+        Calculate corrected speed
+        m_speed: measured speed,
+        m_dist: measured distance
+        c_dist: corrected distance
+        """
+        return np.round(m_speed * c_dist / m_dist, 1)
+
+    def determine_corrspeed_int(self):
+        """Determine corrected speed after correction distance of a lap"""
+        int_strtype, _, corr_int, _ = self.determine_intervals()
+        if int_strtype == "distance":
+            idx_int, _ = self._return_idx_intrec()
+            int_dist_meas = self.return_distance(idx_int)
+            int_speed_meas = self.return_paraslist("speed", "avg", idx_int)
+
+            corr_speed = self._return_corrected_speed(
+                int_speed_meas, int_dist_meas, corr_int
+            )
+            return corr_speed
+
+        else:
+            return None
+
+    def determine_intervals(self) -> [str, str, list, list]:
+        """determine lapinterval size in distance or time"""
+        idx_int, idx_rec = self._return_idx_intrec()
+
+        distance_interval = self.return_distance(idx_int)
+        duration_interval = self.return_duration(idx_int)
+        distance_recovery = self.return_distance(idx_rec)
+        duration_recovery = self.return_duration(idx_rec)
 
         regis_interval = self._classify_timedistance(
             distance_interval, duration_interval
@@ -325,20 +333,19 @@ class RManualLapAnalyzer(RLapAnalyzerBasic):
         regis_recovery = self._classify_timedistance(
             distance_recovery, duration_recovery
         )
+        int_strtype = regis_interval[0]
+        corr_int = regis_interval[1]
+        rec_strtype = regis_recovery[0]
+        corr_rec = regis_recovery[1]
+        return int_strtype, rec_strtype, corr_int, corr_rec
 
-        # TODO: Here I have to do something!!!
-        if regis_interval[0] == "distance":
-            # speed_interval_corr = speed_interval * regis_interval[1] / distance_interval
-            speed_interval_corr = self._return_corrected_speed(
-                speed_interval,
-                distance_interval,
-                regis_interval[1],
-            )
+    def return_intervalstring(self) -> str:
+        int_strtype, rec_strtype, corr_int, corr_rec = self.determine_intervals()
 
-        if regis_recovery[0] != "undetermined" and regis_interval[0] != "undetermined":
-            if len(regis_interval[1]) - len(regis_recovery[1]) == 1:
+        if rec_strtype != "undetermined" and int_strtype != "undetermined":
+            if len(corr_int) - len(corr_rec) == 1:
                 regis_laps = self._prepare_convertorl2str(
-                    regis_interval, regis_recovery
+                    int_strtype, rec_strtype, corr_int, corr_rec
                 )
                 trainingstr = self.convertor_length2str(regis_laps)
             else:
@@ -349,19 +356,15 @@ class RManualLapAnalyzer(RLapAnalyzerBasic):
 
         return trainingstr
 
-    def _prepare_convertorl2str(self, regis_interval, regis_recovery):
-        # Special preparation for interval training 2 string, combine interval and recover
-        interval_strtype = regis_interval[0]
-        intervals = regis_interval[1]
-        recovery_strtype = regis_recovery[0]
-        recoveries = regis_recovery[1]
-
+    def _prepare_convertorl2str(
+        self, int_strtype: str, rec_strtype: str, corr_int: list, corr_rec: list
+    ) -> list:
         convertlist = []
-        for i in range(len(recoveries)):
-            convertlist.append([intervals[i], interval_strtype])
-            convertlist.append([recoveries[i], "P" + recovery_strtype])
+        for i in range(len(corr_rec)):
+            convertlist.append([corr_int[i], int_strtype])
+            convertlist.append([corr_rec[i], "P" + rec_strtype])
 
-        convertlist.append([intervals[i + 1], interval_strtype])
+        convertlist.append([corr_int[i + 1], int_strtype])
         return convertlist
 
     def convertor_length2str(self, regis_laps: list) -> str:
@@ -432,7 +435,7 @@ class RManualLapAnalyzer(RLapAnalyzerBasic):
             # Training is sprint or easy_run
             return "no interval, crit. 2"
         speedlist = self.return_paraslist("speed", "avg")
-        recovspeed = self._classifylap_speedupspeeddown(speedlist)
+        recovspeed = self._classify_speedupdown(speedlist)
 
         if np.count_nonzero(recovspeed == 0) / len(recovspeed) > 0.25:
             return "no interval, crit. 3, under investigation."

@@ -186,7 +186,7 @@ class MongoRunningClassifier(MongoClassifier):
                 "interval, check1",
                 "interval, check2",
             ]:
-                description = training.RManualLapAnalyzer.determine_intervals()
+                description = training.RManualLapAnalyzer.return_intervalstring()
                 # print(description)
                 result = self.mongo.simplequery("fname", training.abstract["fname"])
                 for res in result:
