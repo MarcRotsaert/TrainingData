@@ -1,6 +1,7 @@
 import unittest
 import tomli
 from training_classifier import MongoRunningClassifier as mrc
+from training_classifier import MongoIntervalTraining as mit
 import nosql_adapter as mongodb
 
 
@@ -35,6 +36,7 @@ class TestRunningClassifierPolar(unittest.TestCase):
 
     def test_return_interval(self):
         trainingen = self.session.return_interval()
+
         self.assertIsInstance(trainingen, dict)
         self.assertEqual(
             trainingen[
@@ -45,6 +47,7 @@ class TestRunningClassifierPolar(unittest.TestCase):
 
     def test_set_easyrun(self):
         self.session.set_easyrun()
+
         curs = self.adapter.simplequery("trainingtype.easyrun", True)
         res = list(curs)
         self.assertEqual(len(res), 1)
@@ -55,6 +58,7 @@ class TestRunningClassifierPolar(unittest.TestCase):
 
     def test_set_interval(self):
         self.session.set_interval()
+
         curs = self.adapter.simplequery("trainingtype.interval", "interval")
         res = list(curs)
         self.assertEqual(len(res), 1)
@@ -110,3 +114,41 @@ class TestRunningClassifierGarmin(unittest.TestCase):
     @classmethod
     def tearDown(cls):
         cls.adapter.deleteCollection()
+
+
+class TestRunningClassifierInterval(unittest.TestCase):
+    @classmethod
+    def setUp(cls):
+        config = tomli.load(open("config.toml", "rb"))
+        cls.testyear = "polartest"
+        cls.dbase = "unittest"
+
+        cls.adapter = mongodb.MongoPolar(cls.dbase, cls.testyear)
+        config = tomli.load(open("config.toml", "rb"))
+        path = config["polar_json"]["datapath"]
+        filename_easyrun = "training-session-2014-01-09-263914844-2b6b0088-52f9-4eb0-8434-f8837be097f4.json"
+        cls.adapter.put_jsonresume(filename_easyrun)
+        filename_interval = "training-session-2014-01-15-263914982-9576f971-b7fd-41f2-a257-436ffaa5aa3c.json"
+        cls.adapter.put_jsonresume(filename_interval)
+        cls.session = mrc(cls.dbase, cls.testyear)
+        cls.session_i = mit(cls.dbase, cls.testyear)
+
+    def test_set_intervaldescription(self):
+        self.session.set_interval()
+        self.session_i.set_intervaldescription()
+
+        curs = self.adapter.simplequery(
+            "trainingdescription.type",
+            "interval",
+        )
+        res = list(curs)
+        descrstring = res[0]["trainingdescription"]["description"]
+        reslist = descrstring.replace(" ", "").strip(",").split(",")
+        self.assertEqual(len(reslist), 27)
+        self.assertEqual(reslist[1], "500m")
+        self.assertEqual(reslist[-1], "P300m")
+
+        # self.assertEqual(
+        #     res[0]["fname"],
+        #     "training-session-2014-01-15-263914982-9576f971-b7fd-41f2-a257-436ffaa5aa3c.json",
+        # )

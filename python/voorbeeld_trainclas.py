@@ -1,7 +1,9 @@
-from training_classifier import MongoRunningClassifier
+from training_classifier import MongoRunningClassifier, MongoIntervalTraining
 
-classif = MongoRunningClassifier("polartest4", "polar2017")
+dbase = "polartest4"
+collection = "polar2017"
 
+classif = MongoRunningClassifier(dbase, collection)
 classif.set_easyrun()
 easyrun, no_easyrun = classif.return_easyrun()
 road_races = classif.mongo.simplequery("trainingtype.easyrun", True)
@@ -37,6 +39,12 @@ for rr in road_races:
     print("___________________________________________________")
     print(rr["fname"])
 
-print("Finish___________________________________________________")
 
 classif.set_traindescription()
+
+classif = MongoIntervalTraining(dbase, collection)
+# classif.set_intervaldescription()
+classif.set_corrected_speed()
+
+
+print("Finish___________________________________________________")

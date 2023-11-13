@@ -277,7 +277,7 @@ class RManualLapAnalyzer(RLapAnalyzerBasic):
 
         return classification
 
-    def _return_idx_intrec(self) -> [np.array, np.array]:
+    def return_idx_intrec(self) -> [np.array, np.array]:
         """determine index of intervals and recovery in manual laps"""
         idx_su, idx_ru = self.determine_startuprunoutlaps()
 
@@ -302,11 +302,11 @@ class RManualLapAnalyzer(RLapAnalyzerBasic):
         """
         return np.round(m_speed * c_dist / m_dist, 1)
 
-    def determine_corrspeed_int(self):
+    def determine_corrspeed_int(self) -> np.array:
         """Determine corrected speed after correction distance of a lap"""
         int_strtype, _, corr_int, _ = self.determine_intervals()
         if int_strtype == "distance":
-            idx_int, _ = self._return_idx_intrec()
+            idx_int, _ = self.return_idx_intrec()
             int_dist_meas = self.return_distance(idx_int)
             int_speed_meas = self.return_paraslist("speed", "avg", idx_int)
 
@@ -320,7 +320,7 @@ class RManualLapAnalyzer(RLapAnalyzerBasic):
 
     def determine_intervals(self) -> [str, str, list, list]:
         """determine lapinterval size in distance or time"""
-        idx_int, idx_rec = self._return_idx_intrec()
+        idx_int, idx_rec = self.return_idx_intrec()
 
         distance_interval = self.return_distance(idx_int)
         duration_interval = self.return_duration(idx_int)

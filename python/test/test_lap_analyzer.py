@@ -86,7 +86,7 @@ class TestRMLapAnalyzer_timeint(unittest.TestCase):
         self.assertFalse(self.lap_an._check_allempty_data("speed"))
 
     def test_classify_timedistance(self):
-        idx_int, idx_rec = self.lap_an._return_idx_intrec()
+        idx_int, idx_rec = self.lap_an.return_idx_intrec()
 
         distance_recovery = self.lap_an.return_distance(idx_rec)
         duration_recovery = self.lap_an.return_duration(idx_rec)
@@ -135,10 +135,3 @@ class TestRMLapAnalyzer_distint(unittest.TestCase):
             self.assertListEqual(res[2].tolist(), [1000, 1000, 1000])
         with self.subTest():
             self.assertListEqual(res[3].tolist(), [360, 330])
-
-        # self.assertListEqual(
-        #     res,
-        #     ["distance", "time", np.array([1000, 1000, 1000]), np.array([360, 330])],
-        # )
-        # res = self.lap_an.determine_corrspeed_int()
-        # self.assertListEqual(res, np.array([18.3, 18.1, 15.7]))
