@@ -257,7 +257,7 @@ class RManualLapAnalyzer(RLapAnalyzerBasic):
         self, distance: list, duration: list
     ) -> list[str, Union[float, None]]:
         """determine if lapinterval is based upon distance or time"""
-        dif_dur_mean = 4  # sec
+        dif_dur_mean = 2  # sec
         dif_dis_std = 15  # m
 
         rounding_time = 30  # sec
@@ -267,11 +267,12 @@ class RManualLapAnalyzer(RLapAnalyzerBasic):
             distance, rounding_distance
         )
         dif_dur, rounded_duration = self._difference2rounded(duration, rounding_time)
-        
-        if dif_dur.mean() < dif_dur_mean:
-            classification = ["time", rounded_duration]
-        elif dif_dis.std() < dif_dis_std and dif_dur.mean() >= dif_dur_mean:
+        dif_dur.sort()
+
+        if dif_dis.std() < dif_dis_std:
             classification = ["distance", rounded_distance]
+        elif dif_dur[0:-1].mean() < dif_dur_mean:
+            classification = ["time", rounded_duration]
         else:
             classification = ["undetermined", None]
 
