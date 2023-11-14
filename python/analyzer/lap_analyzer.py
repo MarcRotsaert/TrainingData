@@ -267,7 +267,7 @@ class RManualLapAnalyzer(RLapAnalyzerBasic):
             distance, rounding_distance
         )
         dif_dur, rounded_duration = self._difference2rounded(duration, rounding_time)
-
+        
         if dif_dur.mean() < dif_dur_mean:
             classification = ["time", rounded_duration]
         elif dif_dis.std() < dif_dis_std and dif_dur.mean() >= dif_dur_mean:

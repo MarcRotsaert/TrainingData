@@ -15,8 +15,10 @@ path = config["polar_json"]["datapath"]
 
 
 def ex_polar_lapanalyzer():
-    file = "training-session-2014-06-27-263907116-7cb098dc-3364-47b5-9d68-94ec381b08f7.json"
+    file = "training-session-2017-12-27-2038992394-59b467c5-4fa5-4e7a-be9e-d7b4fa023035.json"
     session = Trainses_json(file)
+
+    
     res = session.RManualLapAnalyzer.return_intervalstring()
     print(res)
     print(session.RManualLapAnalyzer.determine_corrspeed_int())
