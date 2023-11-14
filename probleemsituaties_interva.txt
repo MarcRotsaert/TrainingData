@@ -20,6 +20,7 @@ training-session-2015-03-31-263885042-731d4c77-41a0-49f7-b44a-cc041609faea.json
 training-session-2015-05-26-263881424-622c9ae7-136e-4eb9-a901-87dd3a0728ee.json
 training-session-2015-06-23-263879654-ab252be1-dced-4c76-8263-14489b7135ad.json
 
+
 training-session-2017-05-03-1347831169-a6b9ff50-2ba7-456a-a1a3-21474ab51ef5.json
 training-session-2017-10-18-1852531570-f6d37baf-2b3d-4514-852c-d4eef4b025c3.json
 training-session-2017-11-08-1921335148-ffcf00ed-05cf-454a-a665-bf553ff9bdcd.json
@@ -27,4 +28,13 @@ training-session-2017-12-06-1990656442-fffa734d-af95-44af-b180-e6714ae7e29a.json
 training-session-2017-12-27-2038992394-59b467c5-4fa5-4e7a-be9e-d7b4fa023035.json
 
 # equal interval-recovery
-training-session-2015-06-30-263879798-755767d7-3532-4d7e-a1ca-c5f570a978f0.json
+training-session-2017-09-19-1766006836-9a8fc9de-f5a2-4e5a-97d4-7822d0f1c6cf.json
+
+# outlier in distance
+"training-session-2015-06-23-263879654-ab252be1-dced-4c76-8263-14489b7135ad.json",
+"training-session-2015-02-17-263886464-81c22d89-24ce-41b2-b130-98f85cec4dbe.json",
+"training-session-2014-12-23-263896826-f8792c32-eb18-4d89-b154-c6d963f84af1.json"
+
+# different interval
+"training-session-2015-03-31-263885042-731d4c77-41a0-49f7-b44a-cc041609faea.json",
+

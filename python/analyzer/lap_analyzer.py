@@ -261,12 +261,12 @@ class RManualLapAnalyzer(RLapAnalyzerBasic):
         force: distance or duration
         """
         dif_dur_mean_1 = 0.5  # sec
-        dif_dur_mean_2 = 2  # sec
+        dif_dur_mean_2 = 1.5  # sec
         dif_dis_std = 12  # m
         rel_dif_dis = 10  # %
 
         rounding_time = 15  # sec
-        rounding_distance = 200  # m
+        rounding_distance = 100  # m
 
         dif_dis, rounded_distance = self._difference2rounded(
             distance, rounding_distance
@@ -301,6 +301,19 @@ class RManualLapAnalyzer(RLapAnalyzerBasic):
         speed_updown = self._classify_speedupdown(speedlist)
         for i in idx_su + idx_ru:
             speed_updown[i] = 0
+        
+        #change -1 after last interval to zero (add it to running out)
+        i = len(speed_updown)-1
+        while speed_updown[i] != 1:
+             speed_updown[i] = 0
+             i -= 1
+
+        #change -1 before first interval to zero (add it to startup)
+        i = 0
+        while speed_updown[i] != 1:
+             speed_updown[i] = 0
+             i += 1
+
 
         idx_int = np.where(speed_updown == 1)[0]
         idx_rec = np.where(speed_updown == -1)[0]

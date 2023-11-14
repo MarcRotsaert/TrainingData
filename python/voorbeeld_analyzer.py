@@ -15,14 +15,35 @@ path = config["polar_json"]["datapath"]
 
 
 def ex_polar_lapanalyzer():
-    file = "training-session-2017-12-27-2038992394-59b467c5-4fa5-4e7a-be9e-d7b4fa023035.json"
-    session = Trainses_json(file)
+    files = [
+# "training-session-2014-03-04-263911052-aa284d51-d372-4939-b83f-b9c732d3eb3a.json",
+# "training-session-2014-08-12-263904236-745120a4-29ce-4447-9405-db67f292622d.json",
+# "training-session-2014-11-04-263898290-253ad8c7-76cd-45b6-bc86-c49074870ecd.json",
+# "training-session-2014-11-18-263898758-b1261b4c-6f72-4469-9b0c-68aa92e3df24.json",
 
+# "training-session-2015-02-17-263886464-81c22d89-24ce-41b2-b130-98f85cec4dbe.json",
+
+# "training-session-2015-05-26-263881424-622c9ae7-136e-4eb9-a901-87dd3a0728ee.json",
+
+
+# "training-session-2017-05-03-1347831169-a6b9ff50-2ba7-456a-a1a3-21474ab51ef5.json",
+# "training-session-2017-10-18-1852531570-f6d37baf-2b3d-4514-852c-d4eef4b025c3.json",
+# "training-session-2017-11-08-1921335148-ffcf00ed-05cf-454a-a665-bf553ff9bdcd.json",
+# "training-session-2017-12-06-1990656442-fffa734d-af95-44af-b180-e6714ae7e29a.json",
+# "training-session-2017-12-27-2038992394-59b467c5-4fa5-4e7a-be9e-d7b4fa023035.json",
+    ] 
+    files =     [ 
+        "training-session-2014-12-23-263896826-f8792c32-eb18-4d89-b154-c6d963f84af1.json"
+]
+    for file in files:  
+    # file = "training-session-2014-03-04-263911052-aa284d51-d372-4939-b83f-b9c732d3eb3a.json"
+        print(file)
+        session = Trainses_json(file)
     
-    res = session.RManualLapAnalyzer.return_intervalstring()
-    print(res)
-    print(session.RManualLapAnalyzer.determine_corrspeed_int())
-    print(session.RManualLapAnalyzer.return_paraslist("speed", "avg"))
+        res = session.RManualLapAnalyzer.return_intervalstring()
+        print(res)
+        # print(session.RManualLapAnalyzer.determine_corrspeed_int())
+        # print(session.RManualLapAnalyzer.return_paraslist("speed", "avg"))
 
     file = "training-session-2015-06-10-263879420-179087dd-448d-4a57-9d5f-caaa193b05f8.json"
     session = Trainses_json(file)
