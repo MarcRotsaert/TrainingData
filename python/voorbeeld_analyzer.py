@@ -33,7 +33,14 @@ def ex_polar_lapanalyzer():
 # "training-session-2017-12-27-2038992394-59b467c5-4fa5-4e7a-be9e-d7b4fa023035.json",
     ] 
     files =     [ 
-        "training-session-2014-12-23-263896826-f8792c32-eb18-4d89-b154-c6d963f84af1.json"
+# "training-session-2015-02-04-263886074-f1452aa8-9734-47c9-bb3c-61ed2c457084.json",
+# "training-session-2015-02-17-263886464-81c22d89-24ce-41b2-b130-98f85cec4dbe.json",
+# "training-session-2015-06-03-263879174-463f62f9-4e7f-455a-9d42-fda0b0f237cc.json",
+# "training-session-2015-06-09-263879396-b9438e81-065a-43c5-8c36-2b4853abffda.json",
+"training-session-2015-07-12-263877212-0d71763a-94dc-44d6-8848-cd2b0a2e92d0.json",
+# "training-session-2015-10-06-263860766-8f9f123e-a2b9-4497-b9fa-36d5df196706.json",
+# "training-session-2015-10-14-263860874-8761fac4-2fb2-4d97-9081-2214bcc9208e.json",
+# "training-session-2015-11-04-272100918-99d6f253-e2ea-4e37-a483-ba1971a8f462.json",
 ]
     for file in files:  
     # file = "training-session-2014-03-04-263911052-aa284d51-d372-4939-b83f-b9c732d3eb3a.json"

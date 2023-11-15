@@ -253,6 +253,27 @@ class RManualLapAnalyzer(RLapAnalyzerBasic):
         dif = np.abs(values - rounded_values)
         return dif, rounded_values
 
+
+    def _dif2round_distance(self, distance: np.array) -> [np.array, np.array]:
+        rounding_distance_100 = 100  # m
+        rounding_distance_200 = 200  # m
+
+        dif_dis_100, rounded_distance_100 = self._difference2rounded(
+            distance, rounding_distance_100
+        )
+
+        y = dif_dis_100 < 45
+        if  not y.all():
+            dif_dis_200, rounded_distance_200 = self._difference2rounded(
+                distance, rounding_distance_200
+            )
+            dif_dis_100[dif_dis_100 > 45] = dif_dis_200[dif_dis_100 > 45]
+            rounded_distance_100[dif_dis_100 > 45] = rounded_distance_200[dif_dis_100 > 45] 
+        dif_dis = dif_dis_100
+        rounded_distance = rounded_distance_100
+
+        return dif_dis, rounded_distance
+
     def _classify_timedistance(
         self, distance: list, duration: list, force=None
     ) -> list[str, Union[float, None]]:
@@ -263,14 +284,12 @@ class RManualLapAnalyzer(RLapAnalyzerBasic):
         dif_dur_mean_1 = 0.5  # sec
         dif_dur_mean_2 = 1.5  # sec
         dif_dis_std = 12  # m
-        rel_dif_dis = 10  # %
+        rel_dif_dis = 5  # %
 
         rounding_time = 15  # sec
-        rounding_distance = 100  # m
 
-        dif_dis, rounded_distance = self._difference2rounded(
-            distance, rounding_distance
-        )
+        dif_dis, rounded_distance = self._dif2round_distance(distance)
+
         rel_dis = dif_dis/rounded_distance
         dif_dur, rounded_duration = self._difference2rounded(
             duration, rounding_time)
@@ -283,7 +302,7 @@ class RManualLapAnalyzer(RLapAnalyzerBasic):
         else:
             if dif_dur[0:-1].mean() < dif_dur_mean_1:
                 classification = ["time", rounded_duration]
-            elif dif_dis.std() < dif_dis_std and rel_dis.mean() < rel_dif_dis/100:
+            elif dif_dis.std() < dif_dis_std or rel_dis.mean() < rel_dif_dis/100:
                 classification = ["distance", rounded_distance]
             
             elif dif_dur[0:-1].mean() < dif_dur_mean_2:
