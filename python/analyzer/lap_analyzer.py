@@ -215,14 +215,13 @@ class RManualLapAnalyzer(RLapAnalyzerBasic):
                 laps[k].pop(i_la)
         return laps
 
-    def _classify_speedupdown(self, speedlist: list) -> np.array:
+    def _classify_speedupdown(self, speedlist: list, dspeed_int: list) -> np.array:
         """
         element in de
         -1 = recovery
         1 = interval
 
         """
-        dspeed_int = self.paces["dspeedinterval"]
 
         speed = np.array(speedlist)
         dspeed = speed[1:] - speed[0:-1]
@@ -282,7 +281,9 @@ class RManualLapAnalyzer(RLapAnalyzerBasic):
         idx_su, idx_ru = self.determine_startuprunoutlaps()
 
         speedlist = self.return_paraslist("speed", "avg")
-        speed_updown = self._classify_speedupdown(speedlist)
+        dspeed_int = self.paces["dspeedinterval"]
+
+        speed_updown = self._classify_speedupdown(speedlist, dspeed_int)
         for i in idx_su + idx_ru:
             speed_updown[i] = 0
 
@@ -427,15 +428,18 @@ class RManualLapAnalyzer(RLapAnalyzerBasic):
         speed = np.array([sp["avg"] for sp in laps["speed"]])
         sprint = self.identify_sprints()
         easyrun = self.identify_easyrun()
+        roadrace = self.identify_roadrace()
 
         if speed.shape[0] < 5:
             # Not enough laps
             return "no interval, crit. 1"
-        elif sprint or easyrun:
+        elif sprint or easyrun or roadrace:
             # Training is sprint or easy_run
             return "no interval, crit. 2"
         speedlist = self.return_paraslist("speed", "avg")
-        recovspeed = self._classify_speedupdown(speedlist)
+
+        dspeed_int = self.paces["dspeedinterval"]
+        recovspeed = self._classify_speedupdown(speedlist, dspeed_int)
 
         if np.count_nonzero(recovspeed == 0) / len(recovspeed) > 0.25:
             return "no interval, crit. 3, under investigation."
@@ -450,9 +454,8 @@ class RManualLapAnalyzer(RLapAnalyzerBasic):
         ):
             # Almost certain
             return "interval, check1"
-
-        if len(speed) == 5 and len(recovspeed[recovspeed == -1]) == 2:
-            return "interval, check2"
+            # if len(speed) == 5 and len(recovspeed[recovspeed == -1]) == 2:
+            #     return "interval, check2"
         else:
             return "no interval, crit. 4, under investigation"
 
@@ -460,8 +463,8 @@ class RManualLapAnalyzer(RLapAnalyzerBasic):
         sprints = []
         for lnr in range(len(self.laps_an["duration"])):
             lapdur = self.laps_an["duration"][lnr]
-            if isinstance(lapdur, str):
-                lapdur = float(lapdur.lstrip("PT").rstrip("S"))
+            # if isinstance(lapdur, str):
+            #     lapdur = float(lapdur.lstrip("PT").rstrip("S"))
             if lapdur < max_time:
                 sprints.append(lnr)
         result = len(sprints) > 3
