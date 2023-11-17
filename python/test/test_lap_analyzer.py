@@ -16,6 +16,7 @@ class TestRMLapAnalyzer_timeint(unittest.TestCase):
         )
         cls.laps = session.return_laps()
         cls.lap_an = lap_an.RManualLapAnalyzer(cls.laps)
+        cls.paces = config["running"]["lap_paces"]
 
     def test_return_param(self):
         with self.subTest():
@@ -52,9 +53,7 @@ class TestRMLapAnalyzer_timeint(unittest.TestCase):
 
     def test_speedupspeeddown(self):
         testresult = 18 * [-1.0, 1.0] + [-1.0]
-
         speedlist = self.lap_an.return_paraslist("speed", "avg")
-
         dspeed_int = self.paces["dspeedinterval"]
         speedup_speeddown = self.lap_an._classify_speedupdown(speedlist, dspeed_int)
         self.assertListEqual(testresult, speedup_speeddown.tolist())
