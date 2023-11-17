@@ -29,27 +29,6 @@ def ex_polar_lapanalyzer():
     print(session.RManualLapAnalyzer.determine_corrspeed_int())
     print(session.RManualLapAnalyzer.return_paraslist("speed", "avg"))
 
-    file = "training-session-2015-01-25-263888810-887b73d8-5599-4534-833c-521322b8c28b.json"
-    session = Trainses_json(file)
-    res = session.RManualLapAnalyzer.return_intervalstring()
-    print(res)
-    print(session.RManualLapAnalyzer.determine_corrspeed_int())
-    print(session.RManualLapAnalyzer.return_paraslist("speed", "avg"))
-
-    file = "training-session-2015-02-17-263886464-81c22d89-24ce-41b2-b130-98f85cec4dbe.json"
-    session = Trainses_json(file)
-    res = session.RManualLapAnalyzer.return_intervalstring()
-    print(res)
-    print(session.RManualLapAnalyzer.determine_corrspeed_int())
-    print(session.RManualLapAnalyzer.return_paraslist("speed", "avg"))
-
-    file = "training-session-2015-03-11-263884640-0e71a9a2-88f6-4a50-a478-4401c7e9128c.json"
-    session = Trainses_json(file)
-    res = session.RManualLapAnalyzer.return_intervalstring()
-    print(res)
-    print(session.RManualLapAnalyzer.determine_corrspeed_int())
-    print(session.RManualLapAnalyzer.return_paraslist("speed", "avg"))
-
     files = glob.glob(os.path.join(path, "training-session-2015-*.json"))
     k = 0
     while k < 10:
@@ -97,6 +76,22 @@ def ex_polar_lapanalyzer():
 
 
 def ex_lapanalyzer_identify():
+    # crit 3, but location baanbras.
+    files = [
+        # "training-session-2014-09-23-263902976-9b0479b8-d510-4ad0-9qf26-906666161153.json",
+        # "training-session-2014-09-30-263903114-b27ef81e-c085-4b88-9d35-61091d7de3dc.json",
+        # "training-session-2017-03-08-1181389126-47ee7d62-fddd-4428-8642-69a1818591f9.json",
+        "training-session-2017-03-15-1202520256-b65156be-3420-4164-a6c9-6e34d0caafbd.json",
+        "training-session-2017-03-29-1249402670-1d7264df-df18-4076-a426-970db7a7b94e.json",
+    ]
+    files = [
+        "training-session-2017-02-22-1144054899-ad01617e-6217-4aa9-9d24-501af712b65b.json"
+    ]
+    for file in files:
+        session = Trainses_json(file)
+        lapses = session.RManualLapAnalyzer
+        lapses.identify_interval()
+
     file = "training-session-2017-03-15-1202520256-b65156be-3420-4164-a6c9-6e34d0caafbd.json"
     session = Trainses_json(file)
     lapses = session.RManualLapAnalyzer
@@ -218,9 +213,9 @@ def ex_garminfit_analyzer():
 
 
 if __name__ == "__main__":
+    ex_lapanalyzer_identify()
     ex_polar_lapanalyzer()
     ex_garminfit_analyzer()
     ex_forerunner_analyzer()
-    ex_lapanalyzer_identify()
     ex_polar_sampleanalyzer()
     ex_sampleanalyzer_wind()

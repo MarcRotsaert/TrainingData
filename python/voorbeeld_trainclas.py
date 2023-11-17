@@ -1,7 +1,7 @@
 from training_classifier import MongoRunningClassifier, MongoIntervalTraining
 
-dbase = "polartest4"
-collection = "polar2017"
+dbase = "garminbarrie"
+collection = "garminfit"
 
 classif = MongoRunningClassifier(dbase, collection)
 classif.set_easyrun()

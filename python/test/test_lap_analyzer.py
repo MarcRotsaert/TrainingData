@@ -54,7 +54,9 @@ class TestRMLapAnalyzer_timeint(unittest.TestCase):
         testresult = 18 * [-1.0, 1.0] + [-1.0]
 
         speedlist = self.lap_an.return_paraslist("speed", "avg")
-        speedup_speeddown = self.lap_an._classify_speedupdown(speedlist)
+
+        dspeed_int = self.paces["dspeedinterval"]
+        speedup_speeddown = self.lap_an._classify_speedupdown(speedlist, dspeed_int)
         self.assertListEqual(testresult, speedup_speeddown.tolist())
 
     def test_convertdur2str(self):
