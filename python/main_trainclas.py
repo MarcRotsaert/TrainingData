@@ -1,9 +1,16 @@
 from training_classifier import MongoRunningClassifier, MongoIntervalTraining
 
-dbase = "garminbarrie"
+dbase = "polartest4"
 collection = "garminfit"
 
+
 classif = MongoRunningClassifier(dbase, collection)
+
+curs = classif.mongo.returnDocs()
+for training in curs:
+    classif.mongo.deleteField(training["_id"], "trainingtype")
+    classif.mongo.deleteField(training["_id"], "trainingdescription")
+
 classif.set_easyrun()
 easyrun, no_easyrun = classif.return_easyrun()
 road_races = classif.mongo.simplequery("trainingtype.easyrun", True)
