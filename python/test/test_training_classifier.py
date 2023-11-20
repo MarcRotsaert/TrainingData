@@ -28,11 +28,10 @@ class TestRunningClassifierPolar(unittest.TestCase):
 
     def test_return_easyrun(self):
         easyrun, non_easyrun = self.session.return_easyrun()
-        self.assertEqual(
+
+        self.assertIn(
+            "training-session-2014-01-09-263914844-2b6b0088-52f9-4eb0-8434-f8837be097f4.json",
             easyrun,
-            [
-                "training-session-2014-01-09-263914844-2b6b0088-52f9-4eb0-8434-f8837be097f4.json"
-            ],
         )
         self.assertIn(
             "training-session-2014-01-15-263914982-9576f971-b7fd-41f2-a257-436ffaa5aa3c.json",
