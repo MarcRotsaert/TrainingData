@@ -120,13 +120,17 @@ class RLapAnalyzerBasic(LapAnalyzer):
     ) -> bool:
         if min_speed is None:
             min_speed = self.paces["minroadrace"]
-
         speedarr = np.array(self.return_paraslist("speed", "avg"))
         speedarr = np.delete(speedarr, ignorelaps)
         if len(speedarr) == 0:
             result = False
         else:
-            result = all(speedarr > min_speed)
+            distarr = np.array(self.return_distance())
+            distarr = np.delete(distarr, ignorelaps)
+            if sum(distarr) < 4000:
+                result = False
+            else:
+                result = all(speedarr > min_speed)
         return result
 
     def identify_easyrun(self, max_speed: float or None = None) -> bool:
