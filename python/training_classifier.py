@@ -38,7 +38,7 @@ class MongoRunningClassifier(MongoClassifier):
                 objid = res["_id"]
                 self.mongo.updateOne(objid, {"trainingtype.roadrace": True})
 
-    def return_roadrace(self) -> list[str]:
+    def return_roadrace(self) -> set:
         traingen = self._generator_training()
         race_laps = []
         race_alaps = []
