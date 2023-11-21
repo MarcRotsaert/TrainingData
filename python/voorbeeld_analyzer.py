@@ -15,12 +15,42 @@ path = config["polar_json"]["datapath"]
 
 
 def ex_polar_lapanalyzer():
-    file = "training-session-2014-06-27-263907116-7cb098dc-3364-47b5-9d68-94ec381b08f7.json"
-    session = Trainses_json(file)
-    res = session.RManualLapAnalyzer.return_intervalstring()
-    print(res)
-    print(session.RManualLapAnalyzer.determine_corrspeed_int())
-    print(session.RManualLapAnalyzer.return_paraslist("speed", "avg"))
+    files = [
+# "training-session-2014-03-04-263911052-aa284d51-d372-4939-b83f-b9c732d3eb3a.json",
+# "training-session-2014-08-12-263904236-745120a4-29ce-4447-9405-db67f292622d.json",
+# "training-session-2014-11-04-263898290-253ad8c7-76cd-45b6-bc86-c49074870ecd.json",
+# "training-session-2014-11-18-263898758-b1261b4c-6f72-4469-9b0c-68aa92e3df24.json",
+
+# "training-session-2015-02-17-263886464-81c22d89-24ce-41b2-b130-98f85cec4dbe.json",
+
+# "training-session-2015-05-26-263881424-622c9ae7-136e-4eb9-a901-87dd3a0728ee.json",
+
+
+# "training-session-2017-05-03-1347831169-a6b9ff50-2ba7-456a-a1a3-21474ab51ef5.json",
+# "training-session-2017-10-18-1852531570-f6d37baf-2b3d-4514-852c-d4eef4b025c3.json",
+# "training-session-2017-11-08-1921335148-ffcf00ed-05cf-454a-a665-bf553ff9bdcd.json",
+# "training-session-2017-12-06-1990656442-fffa734d-af95-44af-b180-e6714ae7e29a.json",
+# "training-session-2017-12-27-2038992394-59b467c5-4fa5-4e7a-be9e-d7b4fa023035.json",
+    ] 
+    files =     [ 
+# "training-session-2015-02-04-263886074-f1452aa8-9734-47c9-bb3c-61ed2c457084.json",
+# "training-session-2015-02-17-263886464-81c22d89-24ce-41b2-b130-98f85cec4dbe.json",
+# "training-session-2015-06-03-263879174-463f62f9-4e7f-455a-9d42-fda0b0f237cc.json",
+# "training-session-2015-06-09-263879396-b9438e81-065a-43c5-8c36-2b4853abffda.json",
+"training-session-2015-07-12-263877212-0d71763a-94dc-44d6-8848-cd2b0a2e92d0.json",
+# "training-session-2015-10-06-263860766-8f9f123e-a2b9-4497-b9fa-36d5df196706.json",
+# "training-session-2015-10-14-263860874-8761fac4-2fb2-4d97-9081-2214bcc9208e.json",
+# "training-session-2015-11-04-272100918-99d6f253-e2ea-4e37-a483-ba1971a8f462.json",
+]
+    for file in files:  
+    # file = "training-session-2014-03-04-263911052-aa284d51-d372-4939-b83f-b9c732d3eb3a.json"
+        print(file)
+        session = Trainses_json(file)
+    
+        res = session.RManualLapAnalyzer.return_intervalstring()
+        print(res)
+        # print(session.RManualLapAnalyzer.determine_corrspeed_int())
+        # print(session.RManualLapAnalyzer.return_paraslist("speed", "avg"))
 
     file = "training-session-2015-06-10-263879420-179087dd-448d-4a57-9d5f-caaa193b05f8.json"
     session = Trainses_json(file)

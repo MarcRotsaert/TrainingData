@@ -278,28 +278,62 @@ class RManualLapAnalyzer(RLapAnalyzerBasic):
         dif = np.abs(values - rounded_values)
         return dif, rounded_values
 
-    def _classify_timedistance(
-        self, distance: list, duration: list
-    ) -> list[str, Union[float, None]]:
-        """determine if lapinterval is based upon distance or time"""
+    def _dif2round_distance(self, distance: np.array) -> [np.array, np.array]:
+        rounding_distance_100 = 100  # m
+        rounding_distance_200 = 200  # m
 
-        dif_dur_mean = 4  # sec
-        dif_dis_std = 15  # m
+        dif_dis_100, rounded_distance_100 = self._difference2rounded(
+            distance, rounding_distance_100
+        )
+
+        y = dif_dis_100 < 45
+        if not y.all():
+            dif_dis_200, rounded_distance_200 = self._difference2rounded(
+                distance, rounding_distance_200
+            )
+            dif_dis_100[dif_dis_100 > 45] = dif_dis_200[dif_dis_100 > 45]
+            rounded_distance_100[dif_dis_100 > 45] = rounded_distance_200[
+                dif_dis_100 > 45
+            ]
+        dif_dis = dif_dis_100
+        rounded_distance = rounded_distance_100
+
+        return dif_dis, rounded_distance
+
+    def _classify_timedistance(
+        self, distance: list, duration: list, force=None
+    ) -> list[str, Union[float, None]]:
+        """determine if lapinterval is based upon distance or time
+
+        force: distance or duration
+        """
+        dif_dur_mean_1 = 1.5  # sec
+        dif_dur_mean_2 = 3.0  # sec
+        dif_dis_std = 16  # m
+        # rel_dif_dis = 10  # %
 
         rounding_time = 30  # sec
-        rounding_distance = 100  # m
 
-        dif_dis, rounded_distance = self._difference2rounded(
-            distance, rounding_distance
-        )
+        dif_dis, rounded_distance = self._dif2round_distance(distance)
+
+        # rel_dis = dif_dis / 100
         dif_dur, rounded_duration = self._difference2rounded(duration, rounding_time)
+        dif_dur.sort()
 
-        if dif_dur.mean() < dif_dur_mean:
+        if force == "time":
             classification = ["time", rounded_duration]
-        elif dif_dis.std() < dif_dis_std and dif_dur.mean() >= dif_dur_mean:
+        elif force == "distance":
             classification = ["distance", rounded_distance]
         else:
-            classification = ["undetermined", None]
+            if dif_dur[0:-1].mean() < dif_dur_mean_1:
+                classification = ["time", rounded_duration]
+            elif dif_dis.std() < dif_dis_std:
+                classification = ["distance", rounded_distance]
+
+            elif dif_dur[0:-1].mean() < dif_dur_mean_2:
+                classification = ["time", rounded_duration]
+            else:
+                classification = ["undetermined", None]
 
         return classification
 
@@ -313,6 +347,18 @@ class RManualLapAnalyzer(RLapAnalyzerBasic):
 
         for i in idx_su + idx_ru:
             speed_updown[i] = 0
+
+        # change -1 after last interval to zero (add it to running out)
+        i = len(speed_updown) - 1
+        while speed_updown[i] != 1:
+            speed_updown[i] = 0
+            i -= 1
+
+        # change -1 before first interval to zero (add it to startup)
+        i = 0
+        while speed_updown[i] != 1:
+            speed_updown[i] = 0
+            i += 1
 
         idx_int = np.where(speed_updown == 1)[0]
         idx_rec = np.where(speed_updown == -1)[0]
@@ -359,7 +405,7 @@ class RManualLapAnalyzer(RLapAnalyzerBasic):
             distance_interval, duration_interval
         )
         regis_recovery = self._classify_timedistance(
-            distance_recovery, duration_recovery
+            distance_recovery, duration_recovery, "time"
         )
         int_strtype = regis_interval[0]
         corr_int = regis_interval[1]
