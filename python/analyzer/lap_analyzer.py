@@ -371,14 +371,18 @@ class RManualLapAnalyzer(RLapAnalyzerBasic):
         int_strtype, rec_strtype, corr_int, corr_rec = self.determine_intervals()
 
         if rec_strtype != "undetermined" and int_strtype != "undetermined":
-            if len(corr_int) - len(corr_rec) == 1:
+            try:
                 regis_laps = self._prepare_convertorl2str(
                     int_strtype, rec_strtype, corr_int, corr_rec
                 )
                 trainingstr = self.convertor_length2str(regis_laps)
-            else:
-                trainingstr = "error: nr. interval laps equals nr recovery laps"
+            except IndexError:
+                trainingstr = (
+                    "number of laps recovery not fitted to number laps intervals"
+                )
 
+            if len(corr_int) == len(corr_rec):
+                trainingstr = trainingstr + " nr. interval laps equals nr recovery laps"
         else:
             trainingstr = "undetermined"
 
@@ -391,8 +395,8 @@ class RManualLapAnalyzer(RLapAnalyzerBasic):
         for i in range(len(corr_rec)):
             convertlist.append([corr_int[i], int_strtype])
             convertlist.append([corr_rec[i], "P" + rec_strtype])
-
-        convertlist.append([corr_int[i + 1], int_strtype])
+        if len(corr_rec) + 1 == len(corr_int):
+            convertlist.append([corr_int[i + 1], int_strtype])
         return convertlist
 
     def convertor_length2str(self, regis_laps: list) -> str:
