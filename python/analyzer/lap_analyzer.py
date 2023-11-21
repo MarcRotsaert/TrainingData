@@ -21,7 +21,10 @@ class LapAnalyzer:
             result.update(temp)
         return result
 
-    def _check_allempty_data(self, param: str):
+    def _check_param_none(self, param: str) -> bool:
+        return self.laps_an[param] == None
+
+    def _check_allempty_data(self, param: str) -> bool:
         empty = []
         for i, data in enumerate(self.laps_an[param]):
             if len(data) == 0:
@@ -30,6 +33,14 @@ class LapAnalyzer:
             return True
         else:
             return False
+
+    def check_paramvalidity(self, param: str) -> bool:
+        if self._check_param_none(param):
+            return False
+        if self._check_allempty_data(param):
+            return False
+        else:
+            return True
 
     def return_distance(self, lapidx: list[int] = []) -> list[float]:
         distance = []
@@ -134,8 +145,12 @@ class RLapAnalyzerBasic(LapAnalyzer):
         return result
 
     def identify_easyrun(self, max_speed: float or None = None) -> bool:
-        if self._check_allempty_data("speed"):
+        if not self.check_paramvalidity("speed"):
             return False
+        # if self._check_param_none("speed"):
+        #     return False
+        # if self._check_allempty_data("speed"):
+        #     return False
 
         if max_speed is None:
             max_speed = self.paces["maxeasy"]
@@ -165,9 +180,14 @@ class RManualLapAnalyzer(RLapAnalyzerBasic):
     def determine_startuprunoutlaps(
         self, su_speed=None
     ) -> (Union[List[int], None], Union[List[int], None]):
-        nodata = self._check_allempty_data("speed")
-        if nodata:
+        # nospeed = self._check_param_none("speed")
+        # nodata = self._check_allempty_data("speed")
+        # if nodata:
+        #     return None, None
+        valid = self.check_paramvalidity("speed")
+        if not valid:
             return None, None
+
         if su_speed is None:
             su_speed = self.paces["maxruninout"]
         idx_su = []
@@ -421,8 +441,12 @@ class RManualLapAnalyzer(RLapAnalyzerBasic):
         return distance_str
 
     def identify_interval(self) -> str:
-        if self._check_allempty_data("speed"):
+        if not self.check_paramvalidity("speed"):
             return "undetermined"
+        # if self._check_param_none("speed"):
+        #     return "undetermined"
+        # if self._check_allempty_data("speed"):
+        #     return "undetermined"
 
         laps = self.determine_lapswithoutsu()
 

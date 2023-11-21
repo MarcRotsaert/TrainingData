@@ -81,6 +81,16 @@ class TestRMLapAnalyzer_timeint(unittest.TestCase):
             d_str = self.lap_an._convertor_lapdistance2str(d[0])
             self.assertEqual(d_str, d[1])
 
+    def test_check_paramvalidity(self):
+        # TODO: select appropriate data for this test
+        self.assertTrue(self.lap_an.check_paramvalidity("heartRate"))
+        self.assertTrue(self.lap_an.check_paramvalidity("speed"))
+
+    def test_check_paramnone(self):
+        # TODO: select appropriate data for this test
+        self.assertFalse(self.lap_an._check_param_none("heartRate"))
+        self.assertFalse(self.lap_an._check_param_none("speed"))
+
     def test_check_allemptydata(self):
         # TODO: select appropriate data for this test
         self.assertFalse(self.lap_an._check_allempty_data("heartRate"))

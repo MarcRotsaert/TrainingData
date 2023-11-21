@@ -1,7 +1,7 @@
 from training_classifier import MongoRunningClassifier, MongoIntervalTraining
 
 dbase = "polartest4"
-collection = "garminfit"
+collection = "polar2014"
 
 
 classif = MongoRunningClassifier(dbase, collection)
