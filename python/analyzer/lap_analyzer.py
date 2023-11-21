@@ -239,13 +239,15 @@ class RManualLapAnalyzer(RLapAnalyzerBasic):
                 laps[k].pop(i_la)
         return laps
 
-    def _classify_speedupdown(self, speedlist: list, dspeed_int: list) -> np.array:
+    def _classify_speedupdown(self, dspeed_int: float) -> np.array:
         """
+        dspeed_int = minimal speed difference to classify as speed up/down.
         element in de
         -1 = recovery
         1 = interval
-
+        0 = no difference
         """
+        speedlist = self.return_paraslist("speed", "avg")
 
         speed = np.array(speedlist)
         dspeed = speed[1:] - speed[0:-1]
@@ -280,6 +282,7 @@ class RManualLapAnalyzer(RLapAnalyzerBasic):
         self, distance: list, duration: list
     ) -> list[str, Union[float, None]]:
         """determine if lapinterval is based upon distance or time"""
+
         dif_dur_mean = 4  # sec
         dif_dis_std = 15  # m
 
@@ -302,12 +305,12 @@ class RManualLapAnalyzer(RLapAnalyzerBasic):
 
     def return_idx_intrec(self) -> [np.array, np.array]:
         """determine index of intervals and recovery in manual laps"""
+
         idx_su, idx_ru = self.determine_startuprunoutlaps()
 
-        speedlist = self.return_paraslist("speed", "avg")
         dspeed_int = self.paces["dspeedinterval"]
+        speed_updown = self._classify_speedupdown(dspeed_int)
 
-        speed_updown = self._classify_speedupdown(speedlist, dspeed_int)
         for i in idx_su + idx_ru:
             speed_updown[i] = 0
 
@@ -464,10 +467,9 @@ class RManualLapAnalyzer(RLapAnalyzerBasic):
         elif sprint or easyrun or roadrace:
             # Training is sprint or easy_run
             return "no interval, crit. 2"
-        speedlist = self.return_paraslist("speed", "avg")
 
         dspeed_int = self.paces["dspeedinterval"]
-        recovspeed = self._classify_speedupdown(speedlist, dspeed_int)
+        recovspeed = self._classify_speedupdown(dspeed_int)
 
         if np.count_nonzero(recovspeed == 0) / len(recovspeed) > 0.25:
             return "no interval, crit. 3, under investigation."
