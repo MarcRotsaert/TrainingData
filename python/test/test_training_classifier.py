@@ -224,7 +224,7 @@ class TestRunningClassifierInterval(unittest.TestCase):
         reslist = descrstring.replace(" ", "").strip(",").split(",")
         self.assertEqual(len(reslist), 27)
         self.assertEqual(reslist[1], "500m")
-        self.assertEqual(reslist[-1], "P300m")
+        self.assertEqual(reslist[-1], "P2:00")
 
         # self.assertEqual(
         #     res[0]["fname"],

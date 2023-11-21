@@ -307,16 +307,16 @@ class RManualLapAnalyzer(RLapAnalyzerBasic):
 
         force: distance or duration
         """
-        dif_dur_mean_1 = 0.5  # sec
-        dif_dur_mean_2 = 1.5  # sec
-        dif_dis_std = 12  # m
-        rel_dif_dis = 5  # %
+        dif_dur_mean_1 = 1.5  # sec
+        dif_dur_mean_2 = 3.0  # sec
+        dif_dis_std = 16  # m
+        # rel_dif_dis = 10  # %
 
-        rounding_time = 15  # sec
+        rounding_time = 30  # sec
 
         dif_dis, rounded_distance = self._dif2round_distance(distance)
 
-        rel_dis = dif_dis / rounded_distance
+        # rel_dis = dif_dis / 100
         dif_dur, rounded_duration = self._difference2rounded(duration, rounding_time)
         dif_dur.sort()
 
@@ -327,7 +327,7 @@ class RManualLapAnalyzer(RLapAnalyzerBasic):
         else:
             if dif_dur[0:-1].mean() < dif_dur_mean_1:
                 classification = ["time", rounded_duration]
-            elif dif_dis.std() < dif_dis_std or rel_dis.mean() < rel_dif_dis / 100:
+            elif dif_dis.std() < dif_dis_std:
                 classification = ["distance", rounded_distance]
 
             elif dif_dur[0:-1].mean() < dif_dur_mean_2:
