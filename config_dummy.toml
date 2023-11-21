@@ -60,10 +60,10 @@ overall_param = ["distance", "speed", "heartRate",
 
 lap_param = ["distance", "duration", "cadence", "heartRate", "speed", "ascent", "descent"]
 
-lap_paces.maxeasy = 14
+lap_paces.maxeasy = 13.8
 lap_paces.minroadrace = 15.3
 lap_paces.maxruninout = 13.8
-lap_paces.dspeedinterval = 3
+lap_paces.dspeedinterval = 2.5
 
 sample_param = ["altitude", "heartRate", "speed", "distance", "recordedRoute"]
 

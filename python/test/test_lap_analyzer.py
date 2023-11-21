@@ -16,6 +16,7 @@ class TestRMLapAnalyzer_timeint(unittest.TestCase):
         )
         cls.laps = session.return_laps()
         cls.lap_an = lap_an.RManualLapAnalyzer(cls.laps)
+        cls.paces = config["running"]["lap_paces"]
 
     def test_return_param(self):
         with self.subTest():
@@ -52,9 +53,9 @@ class TestRMLapAnalyzer_timeint(unittest.TestCase):
 
     def test_speedupspeeddown(self):
         testresult = 18 * [-1.0, 1.0] + [-1.0]
-
         speedlist = self.lap_an.return_paraslist("speed", "avg")
-        speedup_speeddown = self.lap_an._classify_speedupdown(speedlist)
+        dspeed_int = self.paces["dspeedinterval"]
+        speedup_speeddown = self.lap_an._classify_speedupdown(dspeed_int)
         self.assertListEqual(testresult, speedup_speeddown.tolist())
 
     def test_convertdur2str(self):
@@ -79,6 +80,16 @@ class TestRMLapAnalyzer_timeint(unittest.TestCase):
         for d in d_list:
             d_str = self.lap_an._convertor_lapdistance2str(d[0])
             self.assertEqual(d_str, d[1])
+
+    def test_check_paramvalidity(self):
+        # TODO: select appropriate data for this test
+        self.assertTrue(self.lap_an.check_paramvalidity("heartRate"))
+        self.assertTrue(self.lap_an.check_paramvalidity("speed"))
+
+    def test_check_paramnone(self):
+        # TODO: select appropriate data for this test
+        self.assertFalse(self.lap_an._check_param_none("heartRate"))
+        self.assertFalse(self.lap_an._check_param_none("speed"))
 
     def test_check_allemptydata(self):
         # TODO: select appropriate data for this test
