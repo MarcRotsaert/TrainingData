@@ -139,16 +139,17 @@ class Garminfit_parser:
         ]
 
         session, _, _, _ = self._fit_parser()
-        frame = session[0]
+        if len(session)>0: 
+            frame = session[0]
 
-        abstract = {}
-        paramconv = self.config["garmin_fit"]["paramnameconversion"]
-        for pn in paramnames:
-            value = frame.get_value(paramconv[pn])
-            if pn == "sport":
-                value = value.upper()
-            abstract.update({pn: value})
-        return abstract
+            abstract = {}
+            paramconv = self.config["garmin_fit"]["paramnameconversion"]
+            for pn in paramnames:
+                value = frame.get_value(paramconv[pn])
+                if pn == "sport":
+                    value = value.upper()
+                abstract.update({pn: value})
+            return abstract
         # framename = 'device'
         # fnames = ['serial_number']
 
