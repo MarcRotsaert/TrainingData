@@ -143,3 +143,6 @@ docker/makeaiwork3_files
 
 # javascript
 node_modules
+
+# node/js
+node_modules

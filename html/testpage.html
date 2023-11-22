@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+
+<head>
+    <meta charset="utf-8">
+    <title>testpage</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+
+</head>
+
+<body>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"
+        integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+"
+        crossorigin="anonymous"></script>
+    <!-- Content here -->
+    <h1>Testpage, try to put an image</h1>
+    <div class="container">
+        <div class="row">
+            <div class="col-4">
+                <input type=" text" id="text-box" size="20" value="Hello world!" />
+                <button onclick="selectText1()">Select text</button>
+            </div>
+        </div>
+        <p></p>
+        <div class="row">
+            <div class="col-4">
+                <div class="col-4">
+                    <label for="trainingtype">Choose trainingtype:</label>
+                </div>
+                <select id="trainingtype" name="ttypes" size="3">
+                    <option value="easy">Easy</option>
+                    <option value="interval">Interval</option>
+                    <option value="road race">Road Race</option>
+                </select>
+            </div>
+            <div class="col-6">
+                <p></p>
+            </div>
+            <div class="col-6">
+                <button id="button" onclick="updatePlaatje()">Select text</button>
+            </div>
+            <div>
+                <p></p>
+            </div>
+            <div class="col">
+                <img src="C:\Users\marcr\MakeAIWork3\opdrachten\practica\week15\guess_who\data\pics\alex.jpg" id=grafje
+                    class="grafiek" width="500" height="350">
+            </div>
+            <!-- <button id="button">Select text</button> -->
+            <script src="../js/read_toml2.js"></script>
+        </div>
+    </div>
+    </div>
+</body>
