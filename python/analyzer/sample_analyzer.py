@@ -102,8 +102,8 @@ class SampleAnalyzerBasic:
                 pointloc = shp.Point(coord[0][0], coord[0][1])
                 diststart = pointloc.distance(pnts[0])
                 distend = pointloc.distance(pnts[-1])
-                maxdist = coord[1][0]
-                if diststart < maxdist or distend < maxdist:
+                maxdist = coord[1]
+                if diststart < maxdist[0] or distend < maxdist[0]:
                     location = loc
         return location
 

@@ -49,7 +49,7 @@ class MongoAdapter:
     def deleteField(self, objid: str, fieldToDelete: str) -> None:
         collection = self.getCollection()
         temp = collection.update_one({"_id": objid}, {"$unset": {fieldToDelete: ""}})
-        print(temp.raw_result)
+        # print(temp.raw_result)
 
     def deleteCollection(self) -> None:
         collection = self.getCollection()

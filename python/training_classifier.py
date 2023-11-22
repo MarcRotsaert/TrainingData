@@ -38,7 +38,7 @@ class MongoRunningClassifier(MongoClassifier):
                 objid = res["_id"]
                 self.mongo.updateOne(objid, {"trainingtype.roadrace": True})
 
-    def return_roadrace(self) -> list[str]:
+    def return_roadrace(self) -> set:
         traingen = self._generator_training()
         race_laps = []
         race_alaps = []
@@ -186,9 +186,60 @@ class MongoRunningClassifier(MongoClassifier):
                 "interval, check1",
                 "interval, check2",
             ]:
-                description = training.RManualLapAnalyzer.determine_intervals()
+                description = training.RManualLapAnalyzer.return_intervalstring()
                 # print(description)
                 result = self.mongo.simplequery("fname", training.abstract["fname"])
                 for res in result:
                     objid = res["_id"]
                     self.mongo.updateOne(objid, {"trainingdescription": description})
+
+
+class MongoIntervalTraining(MongoRunningClassifier):
+    def _return_session(self, mongorecord) -> Trainsession_mongo:
+        return Trainsession_mongo(mongorecord)
+
+    def _generator_training(self) -> Generator:
+        # yield all trainingen, from self.sport
+        query = {
+            "$and": [
+                {"sport": "RUNNING"},
+                {
+                    "$or": [
+                        {"trainingtype.interval": "interval"},
+                        {"trainingtype.interval": "interval, check1"},
+                        {"trainingtype.interval": "interval, check2"},
+                    ]
+                },
+            ]
+        }
+        trainingen = self.mongo.morecomplexquery(query)
+        for training in trainingen:
+            yield self._return_session(training)
+
+    def set_intervaldescription(self):
+        train_gen = self._generator_training()
+
+        # print(len(list(train_gen)))
+        for training in train_gen:
+            print(training)
+            descr = training.RManualLapAnalyzer.return_intervalstring()
+            objid = training.abstract["_id"]
+            self.mongo.updateOne(
+                objid,
+                {"trainingdescription": {"type": "interval", "description": descr}},
+            )
+
+    def set_corrected_speed(self):
+        train_gen = self._generator_training()
+        for training in train_gen:
+            int_strtype, _, _, _ = training.RManualLapAnalyzer.determine_intervals()
+            if int_strtype == "distance":
+                objid = training.abstract["_id"]
+                idx_int, _ = training.RManualLapAnalyzer.return_idx_intrec()
+                corr_speed = training.RManualLapAnalyzer.determine_corrspeed_int()
+
+                for nr, ind in enumerate(idx_int):
+                    self.mongo.updateOne(
+                        objid,
+                        {"laps." + str(ind) + ".speed.avg_corr": corr_speed[nr]},
+                    )
