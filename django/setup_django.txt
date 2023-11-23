@@ -7,7 +7,6 @@ python manage.py startapp test_training
     "- Add template dir. " 
     "- Add static dir " 
 
-
 # 3)set urls
     "- Add urls.py to app"
     "- Add include to project urls.py"
@@ -15,3 +14,11 @@ python manage.py startapp test_training
 # 4) Adapt templates
     "- set html-page in templates"
     "- adapt html page."
+
+# 5) Make model
+    "- adapt models.py"
+    "- register model in admin.py"
+    " - migrate database"
+        python manage.py migrate 
+        python manage.py makemigrations
+python manage.py runserver

@@ -18,7 +18,7 @@
     <h1>Testpage, try to put an image</h1>
     
     {% comment %} <img src="{% static "images/Dia1.JPG" %}" id="grafje",width="500" height="350", alt="Oh nooo!"> {% endcomment %}
-    <img src="/static/images/knmirotterdam_220719_15.png"  id="grafje",width="500" height="350", alt="Oh nooo!">
+    <img src="/static/images/knmirotterdam_220719_1.png"  id="grafje",width="500" height="350", alt="Oh nooo!">
 
     
     <div class="container">
@@ -35,9 +35,15 @@
                     <label for="trainingtype">Choose trainingtype:</label>
                 </div>
                 <select id="trainingtype" name="ttypes" size="3">
-                    <option value="easy">Easy</option>
-                    <option value="interval">Interval</option>
-                    <option value="road race">Road Race</option>
+                    {% if  trainingtypes %}
+                        {% for t in trainingtypes %}
+                            <option value={{ t.type_name }}>{{ t.image }}</option>
+                            {% comment %} <option value="interval">Interval</option>
+                            <option value="road race">Road Race</option> {% endcomment %}
+                        {% endfor %}
+                        {% else %}
+                            <option value="No Choice">No Choice</option>
+                    {% endif %}
                 </select>
             </div>
             <div class="col-6">

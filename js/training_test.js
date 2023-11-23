@@ -21,12 +21,16 @@ function updatePlaatje() {
     switch (val) {
         case "easy":
             image.src = "/static/images/knmirotterdam_220616_11.png"
+            console.log(1);
             break;
         case "interval":
             image.src = "/static/images/knmirotterdam_220719_15.png"
+            console.log(2);
             break;
-        case "road race":
+        case "road":
             image.src = "/static/images/knmirotterdam_220814_07.png"
+            console.log(3);
+
     }
 }
 
