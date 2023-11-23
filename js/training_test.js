@@ -20,15 +20,17 @@ function updatePlaatje() {
     var val = selectText2()
     switch (val) {
         case "easy":
-            image.src = "C:/Users/marcr/MakeAIWork3/opdrachten/practica/week15/guess_who/data/pics/alfred.jpg"
+            image.src = "/static/images/knmirotterdam_220616_11.png"
             break;
         case "interval":
-            image.src = "C:/Users/marcr/OneDrive/Documenten/cursus_ALT4/workshop_3/Koen_a.jpg"
+            image.src = "/static/images/knmirotterdam_220719_15.png"
             break;
         case "road race":
-            image.src = "C:/Users/marcr/OneDrive/Documenten/cursus_ALT4/workshop_3/loopanalyse_koen/Dia1.JPG"
+            image.src = "/static/images/knmirotterdam_220814_07.png"
     }
 }
+
+
 
 function selectText2() {
     var testElement = document.getElementById("trainingtype")

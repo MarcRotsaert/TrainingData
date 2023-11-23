@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+{% load static %}
 
 <head>
     <meta charset="utf-8">
@@ -15,11 +16,16 @@
         crossorigin="anonymous"></script>
     <!-- Content here -->
     <h1>Testpage, try to put an image</h1>
+    
+    {% comment %} <img src="{% static "images/Dia1.JPG" %}" id="grafje",width="500" height="350", alt="Oh nooo!"> {% endcomment %}
+    <img src="/static/images/knmirotterdam_220719_15.png"  id="grafje",width="500" height="350", alt="Oh nooo!">
+
+    
     <div class="container">
         <div class="row">
             <div class="col-4">
                 <input type=" text" id="text-box" size="20" value="Hello world!" />
-                <button onclick="selectText1()">Select text</button>
+                <button onclick="selectText2()">Select text above</button>
             </div>
         </div>
         <p></p>
@@ -43,12 +49,7 @@
             <div>
                 <p></p>
             </div>
-            <div class="col">
-                <img src="C:\Users\marcr\MakeAIWork3\opdrachten\practica\week15\guess_who\data\pics\alex.jpg" id=grafje
-                    class="grafiek" width="500" height="350">
-            </div>
-            <!-- <button id="button">Select text</button> -->
-            <script src="../js/read_toml2.js"></script>
+             <script src="{% static "training_test.js" %}"></script>
         </div>
     </div>
     </div>

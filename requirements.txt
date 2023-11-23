@@ -6,3 +6,4 @@ matplotlib
 shapely
 tomli
 fitdecode
+Django
