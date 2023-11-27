@@ -60,6 +60,7 @@ coverage.xml
 local_settings.py
 db.sqlite3
 db.sqlite3-journal
+migrations/
 
 # Flask stuff:
 instance/
@@ -140,9 +141,6 @@ config_barrie.toml
 config_marc.toml
 docker/makeaiwork3_files
 
-
-# javascript
-node_modules
 
 # node/js
 node_modules

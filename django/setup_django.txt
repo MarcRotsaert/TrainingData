@@ -1,5 +1,5 @@
 # SETUP DJANGO
-# 1) INITIATE PROJECT 
+# 1) INITIATE PROJECT & APP
 django-admin startproject test_project
 python manage.py startapp test_training
 
@@ -21,4 +21,16 @@ python manage.py startapp test_training
     " - migrate database"
         python manage.py migrate 
         python manage.py makemigrations
+
+6) Define views
+MAke definition, 
+Define interactivity backend-frontend
+
+7) define forms
+    Make forms.py
+    adapt  template - html to incoorporate forms.  
+
+8) add views to the urls.py
+
+x) start server
 python manage.py runserver

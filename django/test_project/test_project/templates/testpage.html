@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 {% load static %}
 
+<html lang="en">
 <head>
     <meta charset="utf-8">
     <title>testpage</title>
@@ -18,14 +19,17 @@
     <h1>Testpage, try to put an image</h1>
     
     {% comment %} <img src="{% static "images/Dia1.JPG" %}" id="grafje",width="500" height="350", alt="Oh nooo!"> {% endcomment %}
-    <img src="/static/images/knmirotterdam_220719_1.png"  id="grafje",width="500" height="350", alt="Oh nooo!">
+    <img src="{% static "images/knmirotterdam_220911_20.png" %}"  id="grafje", width="500" height="600", alt="Oh nooo!">
 
     
     <div class="container">
         <div class="row">
-            <div class="col-4">
-                <input type=" text" id="text-box" size="20" value="Hello world!" />
-                <button onclick="selectText2()">Select text above</button>
+            <div class="col-6">
+
+                <label for="to_addtt">To add trainingtype</label>
+                <a href="../add_ttype">
+                    <input type="submit" id="to_addtt" value="to next page"> </input>
+                </a>             
             </div>
         </div>
         <p></p>
@@ -50,7 +54,7 @@
                 <p></p>
             </div>
             <div class="col-6">
-                <button id="button" onclick="updatePlaatje()">Select text</button>
+                <button id="button" onclick="updatePlaatje()">Select graph</button>
             </div>
             <div>
                 <p></p>
@@ -60,3 +64,4 @@
     </div>
     </div>
 </body>
+</html>

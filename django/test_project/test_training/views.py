@@ -1,12 +1,53 @@
-from django.shortcuts import render
-from django.http import HttpResponse
+# Create your views here.
+from django.shortcuts import render, redirect
+from django.http import HttpResponse, HttpRequest
+from .forms import TrainingForm, TrainingModelForm
 
-from test_training.models import Trainingtype
+from test_training.models import Trainingtype, Testpage
 
-def test(request):
+def select_ttype(request: HttpRequest):
+    if request.method == "GET":
+        print(request.body)
     training = Trainingtype.objects.all()
-    trainingtypes = {"trainingtypes":training}
-    # return HttpResponse("<em> My second X-app!</em>")
+    trainingtypes = {"trainingtypes": training}
+    # # return HttpResponse("<em> My second X-app!</em>")
     return render(request, "testpage.html", context=trainingtypes)
 
-# Create your views here.
+
+def _get_typenames():
+    trainings = Trainingtype.objects.all()
+    type_names = [t.type_name for t in trainings ]
+    print(type_names)
+    return  type_names
+
+
+def select_ttype2(request: HttpRequest):
+    if request.method == "GET":
+        type_names = _get_typenames()
+        return render(request,"get_ttype.html",  context={"trainingtypes": type_names})
+
+    elif request.method == "POST":
+        # print(request.POST)
+        trainingtypes = _get_typenames()
+        print(request.POST["type_name"])
+        trainsel = Trainingtype.objects.filter(type_name=request.POST["type_name"])
+        print(trainsel[0])
+        return render(request, "get_ttype.html", context={"datapath": trainsel[0].datapath, "trainingtypes": trainingtypes})
+
+    else:
+        print("xx")
+        return render(request, "get_ttype.html")
+
+def add_ttype(request):
+    form  = TrainingModelForm()
+    # print(dir(form))
+    if request.method == "POST":
+        print(request.POST)
+        form = TrainingModelForm(request.POST,  request.FILES)
+        if form.is_valid():
+            print(form.cleaned_data)
+            form.save(commit=True)
+        return redirect(select_ttype)
+            
+    return render(request, "add_ttype.html", {"form": form})
+
