@@ -34,11 +34,17 @@ function updatePlaatje() {
     }
 }
 
-
+function updateText2() {
+    console.log("grrr")
+    var textvalue = selectText2()
+    elem = document.getElementById("textblok")
+    elem.innerHTML = textvalue
+}
 
 function selectText2() {
     var testElement = document.getElementById("trainingtype")
     console.log(testElement.value)
+    console.log('BlaBla')
     return testElement.value
 }
 
