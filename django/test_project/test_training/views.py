@@ -1,11 +1,12 @@
+from typing import Union
 # Create your views here.
 from django.shortcuts import render, redirect
-from django.http import HttpResponse, HttpRequest
+from django.http import HttpResponse, HttpRequest,HttpResponseRedirect
 from .forms import TrainingForm, TrainingModelForm
 
 from test_training.models import Trainingtype, Testpage
 
-def select_ttype(request: HttpRequest):
+def select_ttype(request: HttpRequest) -> HttpRequest:
     if request.method == "GET":
         print(request.body)
     training = Trainingtype.objects.all()
@@ -14,14 +15,14 @@ def select_ttype(request: HttpRequest):
     return render(request, "testpage.html", context=trainingtypes)
 
 
-def _get_typenames():
+def _get_typenames() -> list:
     trainings = Trainingtype.objects.all()
     type_names = [t.type_name for t in trainings ]
     print(type_names)
     return  type_names
 
 
-def select_ttype2(request: HttpRequest):
+def select_ttype2(request: HttpRequest) -> HttpResponse:
     if request.method == "GET":
         type_names = _get_typenames()
         return render(request,"get_ttype.html",  context={"trainingtypes": type_names})
@@ -38,7 +39,7 @@ def select_ttype2(request: HttpRequest):
         print("xx")
         return render(request, "get_ttype.html")
 
-def add_ttype(request):
+def add_ttype(request) -> Union[HttpResponse, HttpResponseRedirect]:
     form  = TrainingModelForm()
     # print(dir(form))
     if request.method == "POST":
