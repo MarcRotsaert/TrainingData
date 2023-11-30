@@ -17,7 +17,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 TEMP_DIR = Path(__file__).resolve().parent.joinpath('templates')
 STATIC_DIR = Path(__file__).parent.joinpath('static')
-JS_DIR = BASE_DIR.parent.parent.joinpath('js')
+# JS_DIR = BASE_DIR.parent.parent.joinpath('js')
 
 
 # Quick-start development settings - unsuitable for production
@@ -81,9 +81,20 @@ WSGI_APPLICATION = 'test_project.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3'},
+    # "mongodb": {
+    #     'ENGINE': "djongo",
+    #     "ENFORCE_SCHEMA": False,
+    #     "CLIENT": {"host": "mongodb://student:miw3@127.0.0.1:27017/djongo?authMechanism=DEFAULT&authSource=admin"},
+        # "HOST": "127.0.0.1",
+        # "PORT": "27017",
+        # "NAME": "djongo",
+        # "USER": "student",
+        # "PASSWORD": "miw3",
+        # "SERVER_PROTOCOL":"x",
+        # },
     }
-}
+
 
 
 # Password validation
@@ -127,4 +138,5 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-STATICFILES_DIRS = [STATIC_DIR, JS_DIR]
+# STATICFILES_DIRS = [STATIC_DIR, JS_DIR]
+STATICFILES_DIRS = [STATIC_DIR]

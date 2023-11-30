@@ -4,7 +4,15 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpRequest,HttpResponseRedirect
 from .forms import TrainingForm, TrainingModelForm
 
-from test_training.models import Trainingtype, Testpage
+from test_training.models import Trainingtype #, Testpage, PolarModel
+
+
+# def show_polar(request: HttpRequest) -> HttpRequest:
+#     if request.method == "GET":
+#         print(request.body)
+#     training = PolarModel.objects.all()
+#     print(training)
+#     return render(request, "polar.html")
 
 def select_ttype(request: HttpRequest) -> HttpRequest:
     if request.method == "GET":
