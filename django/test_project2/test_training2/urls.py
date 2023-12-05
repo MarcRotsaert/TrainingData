@@ -1,7 +1,7 @@
 from django.urls import path, re_path
-from test_training import views
+from test_training2 import views
 
-app_name = "test_training"
+app_name = "test_training2"
 
 urlpatterns = [
     path('training/', views.select_ttype, name="testpage"),

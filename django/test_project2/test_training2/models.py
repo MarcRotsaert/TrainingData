@@ -3,14 +3,19 @@ from djongo import models as mongomod
 
 # Create your models here.
 
-# class PolarModel(mongomod.Model):
-#     # garminfit = mongomod.JSONField()
-#     sport = mongomod.CharField(max_length=256, default="RUNNING")
-#     class Meta:
-#         db_table = "testdatabase"
-#         app_label= "test_training"
-        # managed = False
-        # using = "mongodb"
+class PolarModel(mongomod.Model):
+    # garminfit = mongomod.JSONField()
+    # sport = mongomod.CharField(max_length=256, default="RUNNING")
+    sport = mongomod.CharField(max_length=256, default="RUNNING")
+    latitude = mongomod.DecimalField(decimal_places=6, max_digits=8)
+    class Meta:
+        db_table = "polar2014"
+        app_label= "test_polar"
+        managed = False
+
+    @classmethod
+    def using_mongo(cls):
+        return cls.objects.using("default")
 
 
 class Trainingtype(models.Model):
@@ -18,7 +23,9 @@ class Trainingtype(models.Model):
     # image = models.FileField(max_length=256)
     datapath = models.FilePathField(max_length=256, path="C:/TEMP")
 
-
+    @classmethod
+    def using_sqlite(cls):
+        return cls.objects.using('sqlite')
 # class Trainingtype2(models.Model):
 #     type_name = models.CharField(max_length=50, unique=True, primary_key=True)
 #     image = models.FileField(max_length=256)

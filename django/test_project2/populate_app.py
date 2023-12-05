@@ -3,7 +3,7 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "test_project.settings")
 import django
 django.setup()
 
-from test_training.models import Trainingtype
+from test_training2.models import PolarModel
 
 def populate(training: dict):
     for descr,fi in training.items():

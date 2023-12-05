@@ -36,7 +36,7 @@
             <div class="col-6">
 
                 <label for="to_addtt">To add trainingtype</label>
-                <a href={% url 'test_training:addttype' %}>
+                <a href={% url 'test_training2:addttype' %}>
                     <input type="submit" id="to_addtt" value="to next page"> </input>
                 </a>             
             </div>
@@ -56,7 +56,8 @@
                             {% comment %} <option value={{ t.type_name}}>{{ t.image|cut:"knmirotterdam_" }}</option> {% endcomment %}
                             {% comment %} <option value={{ t.type_name}}>{{ t.datapath|length }}_{{ t.image|cut:"knmirotterdam_" }}</option> {% endcomment %}
                             {% comment %} <option value={{ t.type_name}}>{{ t.image|cut:"knmirotterdam_"|cut:".png"}}</option> {% endcomment %}
-                            <option value={{ t.type_name}}>{{ t.image|cut:"knmirotterdam_"|slice:6}}</option>
+                            <option value={{ t.type_name}}>{{ t.datapath|cut:"C:/TEMP\knmirotterdam_"|slice:6}}</option>
+                            {% comment %} <option value={{ t.type_name}}>{{ t.datapath }}</option> {% endcomment %}
                         {% endfor %}
                         {% else %}
                             <option value="No Choice">No Choice</option>
