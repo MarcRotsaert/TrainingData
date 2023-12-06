@@ -1,23 +1,39 @@
 from typing import Union
+
 # Create your views here.
 from django.shortcuts import render, redirect
-from django.http import HttpResponse, HttpRequest,HttpResponseRedirect
+from django.http import HttpResponse, HttpRequest, HttpResponseRedirect
+
 # from .forms import TrainingForm, TrainingModelForm
 
-from test_polar.models import PolarModel#, Testpage
+from test_polar.models import PolarModel  # , Testpage
 
 
 def show_polar(request: HttpRequest) -> HttpRequest:
     if request.method == "GET":
-        print(request.body)
-    training = PolarModel.objects.using("default")
-    print(training.all()[0])
-    print(dir(training.all()[0]))
-    print(training.all()[200].sport)
-    print(training.all()[200].get_constraints())
-    print(training.all()[200].latitude)
+        print("to get!")
+    connection = PolarModel.objects.using("default")
+    # dir(connection.first())
+    # print(dir(connection))
+    # print(connection.filter(sport="RUNNING"))
+    training = connection.filter(sport="RUNNING")
+
+    # print(training.values()[0]["speed"]["avg"])
+    # print(training.values()[0]["alaps"][0])
+    for t in training.values():
+        try:
+            print(t["laps"][0]["distance"])
+        except TypeError:
+            print("probably None laps")
+    # xxx
+    for t in training.values():
+        try:
+            print(t["alaps"][0]["distance"])
+        except TypeError:
+            print("probably None alaps")
 
     return render(request, "polar.html")
+
 
 # def select_ttype(request: HttpRequest) -> HttpRequest:
 #     if request.method == "GET":
@@ -48,9 +64,9 @@ def show_polar(request: HttpRequest) -> HttpRequest:
 #         print(trainsel[0])
 #         return render(request, "get_ttype.html", context={"datapath": trainsel[0].datapath, "trainingtypes": trainingtypes})
 
-    # else:
-    #     print("xx")
-    #     return render(request, "get_ttype.html")
+# else:
+#     print("xx")
+#     return render(request, "get_ttype.html")
 
 # def add_ttype(request) -> Union[HttpResponse, HttpResponseRedirect]:
 #     form  = TrainingModelForm()
@@ -62,6 +78,5 @@ def show_polar(request: HttpRequest) -> HttpRequest:
 #             print(form.cleaned_data)
 #             form.save(commit=True)
 #         return redirect("select_ttype")
-            
-#     return render(request, "add_ttype.html", {"form": form})
 
+#     return render(request, "add_ttype.html", {"form": form})
