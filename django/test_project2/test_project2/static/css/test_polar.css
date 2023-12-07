@@ -1,0 +1,18 @@
+/* table, */
+th,
+td {
+    border: 1px solid;
+    padding: 1cqb;
+    border-collapse: collapse;
+    text-align: center;
+}
+
+table {
+    position: relative;
+    left: 15px
+}
+
+p {
+    font-size: 200%;
+    font-style: italic;
+}

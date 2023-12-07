@@ -8,20 +8,11 @@ from .forms import TrainingForm, TrainingModelForm
 from test_training2.models import Trainingtype  # , PolarModel#, Testpage, PolarModel
 
 
-# def show_polar(request: HttpRequest) -> HttpRequest:
-#     if request.method == "GET":
-#         print(request.body)
-#     training = PolarModel.using_mongo().all()
-#     # print(len(training))
-#     return render(request, "polar.html")
-
-
 def select_ttype(request: HttpRequest) -> HttpRequest:
     if request.method == "GET":
         print(request.body)
     training = Trainingtype.using_sqlite().all()
     trainingtypes = {"trainingtypes": training}
-    # # return HttpResponse("<em> My second X-app!</em>")
     return render(request, "testpage.html", context=trainingtypes)
 
 
