@@ -81,7 +81,7 @@ class PolarModel(mongomod.Model):
 
     sport = mongomod.CharField(max_length=256, default="RUNNING")
     fname = mongomod.CharField(max_length=80)
-    locations = mongomod.CharField(max_length=30)
+    location = mongomod.CharField(max_length=30)
     distance = mongomod.IntegerField()
     duration = mongomod.DecimalField(decimal_places=1, max_digits=5)
     startTime = mongomod.CharField(max_length=20)
