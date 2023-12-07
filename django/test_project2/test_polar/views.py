@@ -12,27 +12,27 @@ from test_polar.models import PolarModel  # , Testpage
 def show_polar(request: HttpRequest) -> HttpRequest:
     if request.method == "GET":
         print("to get!")
-    connection = PolarModel.objects.using("default")
-    # dir(connection.first())
-    # print(dir(connection))
-    # print(connection.filter(sport="RUNNING"))
-    training = connection.filter(sport="RUNNING")
+        connection = PolarModel.objects.using("default")
+        # dir(connection.first())
+        # print(dir(connection))
+        # print(connection.filter(sport="RUNNING"))
+        training = connection.filter(sport="RUNNING")
+        print(len(training))
+        lenrunning = str(len(training))
+        
+        trainingen = [t for t in training.values()]
+        print(trainingen[0].keys())
 
-    # print(training.values()[0]["speed"]["avg"])
-    # print(training.values()[0]["alaps"][0])
-    for t in training.values():
-        try:
-            print(t["laps"][0]["distance"])
-        except TypeError:
-            print("probably None laps")
-    # xxx
-    for t in training.values():
-        try:
-            print(t["alaps"][0]["distance"])
-        except TypeError:
-            print("probably None alaps")
+        # print(training.values()[0]["speed"]["avg"])
+        # print(training.values()[0]["alaps"][0])
+        for t in training.values():
+            try:
+                print(t["laps"][0]["distance"])
+            except TypeError:
+                print("probably None laps")
 
-    return render(request, "polar.html")
+
+    return render(request, "polar.html", context={"trainingen": trainingen, "lenrunning": lenrunning})
 
 
 # def select_ttype(request: HttpRequest) -> HttpRequest:

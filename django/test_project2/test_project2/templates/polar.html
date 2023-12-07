@@ -11,7 +11,28 @@
         integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
 
     </head>
-{% block body_block %}
-<body>
 
+    {% block body_block %}
+    <body>
+    <p> This is just a test </p>
+    <p> number of run training in 2014: {{ lenrunning }} </p>
+    
+    <table>
+        <tr><th>Date</th><th>location</th><th>Distance(m)</th></tr>
+    <p>{% for training in trainingen|dictsort:"fname" %} 
+        <tr><td>{{training.startTime|slice:":10"}}</td> 
+            
+            {% if training.location != None %}
+            <td>{{training.location|upper}}</td>
+            {% else %}
+            <td>not defined</td>
+            {% endif %}
+            <td>{{training.distance}}</td>
+        </tr>
+        {% endfor %}
+    </p>
+    <br><br>
+
+
+</body>
 {% endblock %}
