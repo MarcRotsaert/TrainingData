@@ -5,7 +5,7 @@ from djongo import models as mongomod
 class AbstractSpeedModel(mongomod.Model):
     avg = mongomod.DecimalField(max_digits=5, decimal_places=2)
     max = mongomod.DecimalField(max_digits=5, decimal_places=2)
-
+    avg_corr = mongomod.IntegerField()
     class Meta:
         abstract = True
 
@@ -17,16 +17,17 @@ class SpeedModel(AbstractSpeedModel):
         abstract = False
 
 
-class AbstractHearrateModel(mongomod.Model):
+class AbstractHeartrateModel(mongomod.Model):
     avg = mongomod.IntegerField()
     max = mongomod.IntegerField()
     min = mongomod.IntegerField()
+
 
     class Meta:
         abstract = True
 
 
-class HeartrateModel(AbstractHearrateModel):
+class HeartrateModel(AbstractHeartrateModel):
     _id = mongomod.ObjectIdField(primary_key=True)
 
 
