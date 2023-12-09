@@ -1,25 +1,104 @@
 from typing import Union
+import tomli
 
 # Create your views here.
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpRequest, HttpResponseRedirect
 
 # from .forms import TrainingForm, TrainingModelForm
+import sys
 
-from test_polar.models import PolarModel  # , Testpage
+sys.path.append(r"C:\Users\marcr\Polar\Polar\python")
+sys.path.append(r"C:\Users\marcr\Polar\Polar\python\analyzer")
+
+from nosql_adapter import MongoPolar
+
+from test_polar.models import PolarModel, PolarModel_test  # , Testpage
 
 
 def show_polar(request: HttpRequest) -> HttpRequest:
+    # config = tomli.load(open("../../config.toml", "rb"))
+    # import os
+
+    # curdir = os.getcwd()
+    # os.chdir("../..")
+    # curs = MongoPolar("polartest4", "polar2014").simplequery(
+    #     "trainingtype.easyrun", True
+    # )
+    # os.chdir(curdir)
+
     if request.method == "GET":
         print("to get!")
         connection = PolarModel.objects.using("default")
+        training = connection.filter(trainingtype={"roadrace": True})
+        for val in training.values():
+            try:
+                print(val["trainingtype"])
+            except TypeError:
+                print("no")
+
+        # xx
+        # connection = PolarModel.objects.using("default")
         # dir(connection.first())
         # print(dir(connection))
         # print(connection.filter(sport="RUNNING"))
+
+        # training = connection.filter(speed={"avg": 13.8})
+
+        # training = connection.filter(
+        #     trainingtype__contains={
+        #         "interval": "no interval, crit. 3, under investigation."
+        #     }
+        # )
+        # for val in training.values():
+        #     print(val["speed"]["avg"])
+        #     try:
+        #         print(val["trainingtype"])
+        #     except:
+        #         print("no")
+        # pass
+        # xx
+        # print(len(training))
+        lenrunning = str(len(training))
+
+        trainingen = [t for t in training.values()]
+        # print(trainingen[0].keys())
+
+        # print(training.values()[0]["speed"]["avg"])
+        # print(training.values()[0]["alaps"][0])
+        # for t in training.values():
+        #     try:
+        #         print(t["laps"][0]["distance"])
+        #     except TypeError:
+        #         print("probably None laps")
+
+        ttypes = return_ttype()
+        # print(ttypes)
+        return render(
+            request,
+            "polar.html",
+            context={
+                "trainingen": trainingen,
+                "lenrunning": lenrunning,
+                "ttypes": ttypes,
+            },
+        )
+
+
+def return_ttype() -> HttpRequest:
+    config = tomli.load(open("../../config.toml", "rb"))
+
+    return config["running"]["trainingtypes"]
+
+
+# as a test
+def return_easy(ttype: str) -> HttpRequest:
+    if request.method == "GET":
+        connection = PolarModel.objects.using("default")
         training = connection.filter(sport="RUNNING")
         print(len(training))
         lenrunning = str(len(training))
-        
+
         trainingen = [t for t in training.values()]
         print(trainingen[0].keys())
 
@@ -31,52 +110,17 @@ def show_polar(request: HttpRequest) -> HttpRequest:
             except TypeError:
                 print("probably None laps")
 
-
-    return render(request, "polar.html", context={"trainingen": trainingen, "lenrunning": lenrunning})
-
-
-# def select_ttype(request: HttpRequest) -> HttpRequest:
-#     if request.method == "GET":
-#         print(request.body)
-#     training = Trainingtype.using_sqlite().all()
-#     trainingtypes = {"trainingtypes": training}
-#     # # return HttpResponse("<em> My second X-app!</em>")
-#     return render(request, "testpage.html", context=trainingtypes)
-
-
-# def _get_typenames() -> list:
-#     trainings = Trainingtype.using_sqlite().all()
-#     type_names = [t.type_name for t in trainings ]
-#     print(type_names)
-#     return  type_names
+        ttypes = return_ttype()
+        print(ttypes)
+        return render(
+            request,
+            "polar.html",
+            context={
+                "trainingen": trainingen,
+                "lenrunning": lenrunning,
+                "ttypes": ttypes,
+            },
+        )
 
 
-# def select_ttype2(request: HttpRequest) -> HttpResponse:
-#     if request.method == "GET":
-#         type_names = _get_typenames()
-#         return render(request,"get_ttype.html",  context={"trainingtypes": type_names})
-
-#     elif request.method == "POST":
-#         # print(request.POST)
-#         trainingtypes = _get_typenames()
-#         print(request.POST["type_name"])
-#         trainsel = Trainingtype.using_sqlite().filter(type_name=request.POST["type_name"])
-#         print(trainsel[0])
-#         return render(request, "get_ttype.html", context={"datapath": trainsel[0].datapath, "trainingtypes": trainingtypes})
-
-# else:
-#     print("xx")
-#     return render(request, "get_ttype.html")
-
-# def add_ttype(request) -> Union[HttpResponse, HttpResponseRedirect]:
-#     form  = TrainingModelForm()
-#     # print(dir(form))
-#     if request.method == "POST":
-#         print(request.POST)
-#         form = TrainingModelForm(request.POST,  request.FILES)
-#         if form.is_valid():
-#             print(form.cleaned_data)
-#             form.save(commit=True)
-#         return redirect("select_ttype")
-
-#     return render(request, "add_ttype.html", {"form": form})
+# {% url 'test_training2:addttype' %}

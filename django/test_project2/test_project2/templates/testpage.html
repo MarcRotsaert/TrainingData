@@ -47,17 +47,11 @@
                 <div class="col-4">
                     <label for="trainingtype">Choose trainingtype:</label>
                 </div>
-                <p>{{ trainingtypes|unordered_list }}</p>
+                <p>{{ ttypes}}</p>
                 <select id="trainingtype" name="ttypes" size="3" onclick="updateText2()">
-                    {% if  trainingtypes %}
-                        {% for t in trainingtypes %}
-                        {% comment %} <option value="road race">Road Race</option> {% endcomment %}
-                            {% comment %} <option value={{ t.type_name}}>{{ t.image|cut:"knmirotterdam_" }}</option> {% endcomment %}
-                            {% comment %} <option value={{ t.type_name}}>{{ t.image|cut:"knmirotterdam_" }}</option> {% endcomment %}
-                            {% comment %} <option value={{ t.type_name}}>{{ t.datapath|length }}_{{ t.image|cut:"knmirotterdam_" }}</option> {% endcomment %}
-                            {% comment %} <option value={{ t.type_name}}>{{ t.image|cut:"knmirotterdam_"|cut:".png"}}</option> {% endcomment %}
+                    {% if  ttypes %}
+                        {% for t in ttypes %}
                             <option value={{ t.type_name}}>{{ t.datapath|cut:"C:/TEMP\knmirotterdam_"|slice:6}}</option>
-                            {% comment %} <option value={{ t.type_name}}>{{ t.datapath }}</option> {% endcomment %}
                         {% endfor %}
                         {% else %}
                             <option value="No Choice">No Choice</option>

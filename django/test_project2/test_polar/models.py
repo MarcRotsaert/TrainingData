@@ -3,9 +3,11 @@ from djongo import models as mongomod
 
 # Create your models here.
 class AbstractSpeedModel(mongomod.Model):
+    _id = mongomod.ObjectIdField(primary_key=True)
     avg = mongomod.DecimalField(max_digits=5, decimal_places=2)
     max = mongomod.DecimalField(max_digits=5, decimal_places=2)
-    avg_corr = mongomod.IntegerField()
+    avg_corr = mongomod.DecimalField(max_digits=5, decimal_places=2)
+
     class Meta:
         abstract = True
 
@@ -22,13 +24,15 @@ class AbstractHeartrateModel(mongomod.Model):
     max = mongomod.IntegerField()
     min = mongomod.IntegerField()
 
-
     class Meta:
         abstract = True
 
 
 class HeartrateModel(AbstractHeartrateModel):
     _id = mongomod.ObjectIdField(primary_key=True)
+
+    class Meta:
+        abstract = False
 
 
 class AbstractLapArray(mongomod.Model):
@@ -46,7 +50,6 @@ class AbstractLapArray(mongomod.Model):
 
 
 class AbstractLaps(AbstractLapArray):
-    # mongomod.EmbeddedField(model_container=AbstractLapArray)
     class Meta:
         abstract = True
 
@@ -58,17 +61,19 @@ class Laps(AbstractLaps):
         abstract = False
 
 
-class AbstractTrainingtype:
-    easyrun = mongomod.BooleanField()
+class AbstractTrainingtype(mongomod.Model):
+    easyrun = mongomod.BooleanField(null=True)
     interval = mongomod.CharField(max_length=50)
-    roadrace = mongomod.BooleanField()
+    roadrace = mongomod.BooleanField(null=True)
+    sprint = mongomod.BooleanField(null=True)
+    # other = mongomod.CharField(max_length=50)
 
     class Meta:
-        abstract = False
+        abstract = True
 
 
 class TrainingtypeModel(AbstractTrainingtype):
-    _id = mongomod.ObjectIdField(primary_key=True)
+    _id = mongomod.ObjectIdField()
 
     class Meta:
         abstract = False
@@ -76,9 +81,6 @@ class TrainingtypeModel(AbstractTrainingtype):
 
 class PolarModel(mongomod.Model):
     _id = mongomod.ObjectIdField(primary_key=True)
-    # garminfit = mongomod.JSONField()
-    # sport = mongomod.CharField(max_length=256, default="RUNNING")
-
     sport = mongomod.CharField(max_length=256, default="RUNNING")
     fname = mongomod.CharField(max_length=80)
     location = mongomod.CharField(max_length=30)
@@ -90,15 +92,35 @@ class PolarModel(mongomod.Model):
     latitude = mongomod.DecimalField(decimal_places=6, max_digits=8)
     longitude = mongomod.DecimalField(decimal_places=6, max_digits=8)
     speed = mongomod.EmbeddedField(model_container=SpeedModel)
+    heartRate = mongomod.EmbeddedField(model_container=HeartrateModel)
     alaps = mongomod.ArrayField(model_container=Laps)
     laps = mongomod.ArrayField(model_container=Laps)
-    # trainingtype = mongomod.EmbeddedField(model_containe=TrainingtypeModel)
+    trainingtype = mongomod.EmbeddedField(model_container=TrainingtypeModel)
     objects = mongomod.DjongoManager()
 
     class Meta:
         db_table = "polar2014"
         app_label = "test_training2"
         managed = False
+
+    @classmethod
+    def using_mongo(cls):
+        return cls.objects.using("default")
+
+
+class PolarModel_test(mongomod.Model):
+    _id = mongomod.ObjectIdField(primary_key=True)
+    sport = mongomod.CharField(max_length=256, default="RUNNING")
+    speed = mongomod.EmbeddedField(model_container=SpeedModel)
+    heartRate = mongomod.EmbeddedField(model_container=HeartrateModel)
+    trainingtype = mongomod.EmbeddedField(model_container=TrainingtypeModel)
+    objects = mongomod.DjongoManager()
+
+    class Meta:
+        db_table = "polar2014"
+        app_label = "test_training2"
+        managed = False
+        abstract = False
 
     @classmethod
     def using_mongo(cls):

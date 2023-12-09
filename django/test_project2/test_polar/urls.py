@@ -9,4 +9,4 @@ urlpatterns = [
     # re_path(r"^add_ttype/$", views.add_ttype, name="addttype")
     # path("add_ttype/", views.add_ttype, name="addttype"),
     path("polar/", views.show_polar, name="showpolar"),
-    ]
+]

@@ -17,8 +17,23 @@
     <body>
         <br>lalalalala</br>
     <p> This is just a test </p>
-    <p> number of run training in 2014: {{ lenrunning }} </p>
+    <p> number of run training in 2014: {{ trainingen|length }} </p>
     
+        
+    <p>{{ ttypes }}</p>
+    {% comment %} <select id="trainingtype" name="ttypes" size="4" onclick="updateText2()"> {% endcomment %}
+    <select id="trainingtype" name="ttypes" size="4" ">
+        {% if  ttypes %}
+            {% for type_name in ttypes %}
+                <option value={{ type_name}}>{{type_name}}</option>
+            {% endfor %}
+            {% else %}
+                <option value="No Choice">No Choice</option>
+        {% endif %}
+    </select>
+
+
+
     <table>
         <tr><th>Date</th><th>location</th><th>Distance(m)</th></tr>
     <p>{% for training in trainingen|dictsort:"fname" %} 
