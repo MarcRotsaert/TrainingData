@@ -8,6 +8,8 @@ from django.http import HttpResponse, HttpRequest, HttpResponseRedirect
 # from .forms import TrainingForm, TrainingModelForm
 import sys
 
+from test_polar.forms import formType
+
 sys.path.append(r"C:\Users\marcr\Polar\Polar\python")
 sys.path.append(r"C:\Users\marcr\Polar\Polar\python\analyzer")
 
@@ -28,58 +30,40 @@ def show_polar(request: HttpRequest) -> HttpRequest:
     # os.chdir(curdir)
 
     if request.method == "GET":
-        print("to get!")
         connection = PolarModel.objects.using("default")
-        training = connection.filter(trainingtype={"roadrace": True})
-        for val in training.values():
-            try:
-                print(val["trainingtype"])
-            except TypeError:
-                print("no")
+        # print(request.POST) # print(request.body)
+        if "ttypes" not in request.GET:
+            training = connection.filter(sport="RUNNING")
+        else:
+            ttype = request.GET["ttypes"]
+            print(len(ttype))
+            if ttype == "easy":
+                ttype = "easyrun"
+                comp = True
+                # xx
+            elif ttype == "road":
+                ttype = "roadrace"
+                comp = True
+            elif ttype == "interval":
+                comp = "interval"
+            else:
+                print(ttype)
 
-        # xx
-        # connection = PolarModel.objects.using("default")
-        # dir(connection.first())
-        # print(dir(connection))
-        # print(connection.filter(sport="RUNNING"))
-
-        # training = connection.filter(speed={"avg": 13.8})
-
-        # training = connection.filter(
-        #     trainingtype__contains={
-        #         "interval": "no interval, crit. 3, under investigation."
-        #     }
-        # )
-        # for val in training.values():
-        #     print(val["speed"]["avg"])
-        #     try:
-        #         print(val["trainingtype"])
-        #     except:
-        #         print("no")
-        # pass
-        # xx
-        # print(len(training))
-        lenrunning = str(len(training))
+            training = connection.filter(trainingtype={ttype: comp})
+            for val in training.values():
+                try:
+                    print(val["trainingtype"])
+                except TypeError:
+                    print("no")
 
         trainingen = [t for t in training.values()]
-        # print(trainingen[0].keys())
-
-        # print(training.values()[0]["speed"]["avg"])
-        # print(training.values()[0]["alaps"][0])
-        # for t in training.values():
-        #     try:
-        #         print(t["laps"][0]["distance"])
-        #     except TypeError:
-        #         print("probably None laps")
 
         ttypes = return_ttype()
-        # print(ttypes)
         return render(
             request,
             "polar.html",
             context={
                 "trainingen": trainingen,
-                "lenrunning": lenrunning,
                 "ttypes": ttypes,
             },
         )
@@ -102,8 +86,6 @@ def return_easy(ttype: str) -> HttpRequest:
         trainingen = [t for t in training.values()]
         print(trainingen[0].keys())
 
-        # print(training.values()[0]["speed"]["avg"])
-        # print(training.values()[0]["alaps"][0])
         for t in training.values():
             try:
                 print(t["laps"][0]["distance"])
@@ -121,6 +103,3 @@ def return_easy(ttype: str) -> HttpRequest:
                 "ttypes": ttypes,
             },
         )
-
-
-# {% url 'test_training2:addttype' %}
