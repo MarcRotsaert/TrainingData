@@ -1,3 +1,11 @@
+p {
+    margin: ;
+    font-size: 85%;
+    font-style: italic;
+    text-align: center;
+
+}
+
 /* table, */
 th,
 td {
@@ -5,14 +13,10 @@ td {
     padding: 1cqb;
     border-collapse: collapse;
     text-align: center;
+    white-space: pre-wrap;
 }
 
 table {
     position: relative;
     left: 15px
-}
-
-p {
-    font-size: 200%;
-    font-style: italic;
 }

@@ -15,8 +15,10 @@
     </head>
 
     <body>
+        {% comment %} <img src={% static "images/knmirotterdam_220814_07.png" %} {% endcomment %}
         <br>lalalalala</br>
     <p> This is just a test </p>
+    <br></br>
     <p> number of run training in 2014: {{ trainingen|length }} </p>
     
         
@@ -46,7 +48,14 @@
 
 
     <table>
-        <tr><th>Date</th><th>location</th><th>Distance(m)</th></tr>
+        <tr>
+            <th>Date</th>
+            <th>location</th>
+            <th>Distance(m)</th>
+            <th>vel avg(km/u)</th>
+            <th>Hsl avg(bpm)</th>
+            <th>training description</th>
+        </tr>
     <p>{% for training in trainingen|dictsort:"fname" %} 
         <tr><td>{{training.startTime|slice:":10"}}</td> 
             
@@ -56,6 +65,10 @@
             <td>not defined</td>
             {% endif %}
             <td>{{training.distance}}</td>
+            <td>{{training.speed.avg}}</td>
+            <td>{{training.heartRate.avg}} / {{training.heartRate.max}}
+            </td>
+            <td>{{training.trainingdescription.description|linebreaks}}</td>
         </tr>
         {% endfor %}
     </p>

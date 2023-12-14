@@ -79,6 +79,18 @@ class TrainingtypeModel(AbstractTrainingtype):
         abstract = False
 
 
+class AbstractTrainingDescr(mongomod.Model):
+    description = mongomod.TextField(max_length=256)
+    type = mongomod.CharField(max_length=20)
+
+    class Meta:
+        abstract = True
+
+
+class TrainingDescription(AbstractTrainingDescr):
+    _id = mongomod.ObjectIdField()
+
+
 class PolarModel(mongomod.Model):
     _id = mongomod.ObjectIdField(primary_key=True)
     sport = mongomod.CharField(max_length=256, default="RUNNING")
@@ -96,6 +108,7 @@ class PolarModel(mongomod.Model):
     alaps = mongomod.ArrayField(model_container=Laps)
     laps = mongomod.ArrayField(model_container=Laps)
     trainingtype = mongomod.EmbeddedField(model_container=TrainingtypeModel)
+    trainingdescription = mongomod.EmbeddedField(model_container=TrainingDescription)
     objects = mongomod.DjongoManager()
 
     class Meta:
