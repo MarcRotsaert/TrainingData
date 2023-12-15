@@ -1,9 +1,11 @@
 from typing import Union
 import tomli
 
+import json
+
 # Create your views here.
 from django.shortcuts import render, redirect
-from django.http import HttpResponse, HttpRequest, HttpResponseRedirect
+from django.http import HttpResponse, HttpRequest, HttpResponseRedirect, JsonResponse
 
 # from .forms import TrainingForm, TrainingModelForm
 import sys
@@ -67,6 +69,36 @@ def show_polar(request: HttpRequest) -> HttpRequest:
                 "ttypes": ttypes,
             },
         )
+
+
+def return_lapdata(request) -> HttpResponse:
+    connection = PolarModel.objects.using("default")
+    if request.method == "POST":
+        try:
+            print(dir(request))
+            print(request.body)
+            data = json.loads(request.body.decode("utf-8"))
+            received_data = data.get("lapdata", "")
+            trainingen = connection.filter(fname=received_data)
+            print(trainingen.values()[0]["laps"])
+            lapdata = trainingen.values()[0]["laps"]
+            # Process the received_data as needed
+            training = connection.filter(sport="RUNNING")
+            trainingen = [t for t in training.values()]
+            ttypes = return_ttype()
+
+            return render(
+                request,
+                "polar.html",
+                context={
+                    "lapdata": lapdata,
+                    "trainingen": trainingen,
+                    "ttypes": ttypes,
+                },
+            )
+        except json.JSONDecodeError:
+            return JsonResponse({"status": "error", "message": "Invalid JSON"})
+    return JsonResponse({"status": "error", "message": "Invalid request method"})
 
 
 def return_ttype() -> HttpRequest:

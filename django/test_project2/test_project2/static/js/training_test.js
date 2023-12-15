@@ -48,46 +48,54 @@ function selectText2() {
     return testElement.value
 }
 
+function showLapdata(cell) {
+    // console.log(cell.innerText)
+    // console.log(cell.id)
+    // console.log(cell.parentNode.id)
+    // console.log(cell.parentNode.getAttribute("value"))
+    var fname = cell.parentNode.getAttribute("value")
+    var url = cell.parentNode.getAttribute("data-url")
+    var csrftoken = getCookie('csrftoken');
+    console.log(url)
+    // console.log(fname)
+    // Use AJAX to send the data to the Django view
+    var xhr = new XMLHttpRequest(value = fname);
+    xhr.open("POST", url, true);
+    xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+    xhr.setRequestHeader("X-CSRFToken", csrftoken);
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+            // Handle the response from the server if needed
+            console.log(xhr.responseText);
+            var newHTML = xhr.responseText;
+            document.open();
+            document.write(newHTML);
+            document.close();
+
+        }
+    };
+
+    var jsonData = JSON.stringify({ "lapdata": fname });
+    xhr.send(jsonData);
+
+    // return fname
+}
+
+// Function to get CSRF token from cookies
+function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
 
 // Add an event listener to call the function when the button is clicked
-document.getElementById("button").addEventListener("click", selectText2);
-
-
-function read_toml() {
-
-    // Specify the path to your TOML file
-    const tomlFilePath = "config_dummy.toml";
-
-    // Create a read stream for the TOML file
-    const readStream = fs.createReadStream(tomlFilePath, 'utf8');
-
-    let data = '';
-
-    readStream.on('data', (chunk) => {
-        data += chunk;
-    });
-
-    readStream.on('end', () => {
-        // Now, the `data` variable contains the entire contents of the TOML file as a string
-        console.log(data);
-
-        // You can parse it as TOML if needed
-        const toml = require('toml');
-
-        try {
-            parsedData = toml.parse(data);
-        } catch (e) {
-            console.error("Parsing error on line " + e.line + ", column " + e.column +
-                ": " + e.message);
-        }
-
-        // Now you can work with the parsed TOML data
-        console.log(parsedData["garmin_fit"]["paramnameconversion"]);
-
-    });
-
-    readStream.on('error', (err) => {
-        console.error(`Error reading TOML file: ${err}`);
-    });
-    return data
-}
+// document.getElementById("button").addEventListener("click", selectText2);

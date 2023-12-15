@@ -14,11 +14,26 @@
     
     </head>
 
+        
     <body>
+        {% comment %} <script src={% static  "/js/training_test.js" %}></script> {% endcomment %}
+        <script src={% static  "js/training_test.js" %}></script>
+
+
         {% comment %} <img src={% static "images/knmirotterdam_220814_07.png" %} {% endcomment %}
         <br>lalalalala</br>
     <p> This is just a test </p>
     <br></br>
+
+    <div id="lapdata"> {% if lapdata %}
+        {% comment %} <h3><LAPDATA</h3> {% endcomment %}
+        <table>
+        {% for lap in lapdata %}
+            <tr><td>{{lap.distance}}</td> <td>{{lap.speed.avg }}</td> <td>{{lap.heartRate.avg }}</td> </tr>
+        {% endfor %}
+            {% endif %}
+        </table>
+        </div>
     <p> number of run training in 2014: {{ trainingen|length }} </p>
     
         
@@ -44,10 +59,11 @@
         var selectedValue = document.getElementById('trainingtype').value;
         // Attach the selected value to a input field in the form
         this.action = '/polar/?selected_type=' + encodeURIComponent(selectedValue);});
-</script>
+    </script>
 
 
-    <table>
+
+    <table name="traindata">
         <tr>
             <th>Date</th>
             <th>location</th>
@@ -57,7 +73,11 @@
             <th>training description</th>
         </tr>
     <p>{% for training in trainingen|dictsort:"fname" %} 
-        <tr><td>{{training.startTime|slice:":10"}}</td> 
+        <tr value={{training.fname}}  
+        name="traindata" 
+        id="traindata"
+        data-url="{% url 'test_polar:return_lapdata' %}">
+            <td>{{training.startTime|slice:":10"}}</td> 
             
             {% if training.location != None %}
             <td>{{training.location|upper}}</td>
@@ -68,7 +88,9 @@
             <td>{{training.speed.avg}}</td>
             <td>{{training.heartRate.avg}} / {{training.heartRate.max}}
             </td>
-            <td>{{training.trainingdescription.description|linebreaks}}</td>
+            <td id="tdescr" 
+             
+            onclick="showLapdata(this)">{{training.trainingdescription.description|linebreaks}}</td>
         </tr>
         {% endfor %}
     </p>

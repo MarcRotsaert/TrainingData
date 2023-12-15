@@ -8,5 +8,6 @@ urlpatterns = [
     # path('select_ttype/', views.select_ttype2, name="selectttype"),
     # re_path(r"^add_ttype/$", views.add_ttype, name="addttype")
     # path("add_ttype/", views.add_ttype, name="addttype"),
+    path("polar/return_lapdata/", views.return_lapdata, name="return_lapdata"),
     path("polar/", views.show_polar, name="showpolar"),
 ]
