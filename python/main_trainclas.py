@@ -1,9 +1,9 @@
 from training_classifier import MongoRunningClassifier, MongoIntervalTraining
 
-dbase = "polartest4"
-# collections = "polar2015"
+dbase = "garminbarrie2"
+collections = []
 years = [2013, 2014, 2015, 2017, 2018, 2019, 2020, 2021, 2022]
-collections = ["polar" + str(y) for y in years]
+# collections = ["polar" + str(y) for y in years]
 collections.append("garminfit")
 
 for collection in collections:

@@ -61,6 +61,7 @@ overall_param = ["distance", "speed", "heartRate",
                  "sport" ]
 lap_param = ["distance", "duration", "cadence", "heartRate", "speed", "ascent", "descent"]
 
+trainingtypes = ["easy", "interval", "road race"]
 lap_paces.maxeasy = 13.8
 lap_paces.minroadrace = 15.3
 lap_paces.maxruninout = 13.8

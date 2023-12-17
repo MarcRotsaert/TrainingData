@@ -133,6 +133,7 @@ class RLapAnalyzerBasic(LapAnalyzer):
             min_speed = self.paces["minroadrace"]
         speedarr = np.array(self.return_paraslist("speed", "avg"))
         speedarr = np.delete(speedarr, ignorelaps)
+        speedarr[speedarr == None] = 0
         if len(speedarr) == 0:
             result = False
         else:
@@ -160,7 +161,7 @@ class RLapAnalyzerBasic(LapAnalyzer):
             if len(sp) != 0:
                 speed.append(sp["avg"])
         speed = np.array(speed)
-
+        speed[speed == None] = 0
         result = all(speed <= max_speed)
 
         return result
@@ -199,19 +200,38 @@ class RManualLapAnalyzer(RLapAnalyzerBasic):
                 idx_su.append(i1)
                 i1 += 1
             else:
-                if speed["avg"] > su_speed:
+                if speed["avg"] == None:
+                    idx_su.append(i1)
+                    i1 += 1
+                elif speed["avg"] > su_speed:
                     break
                 else:
                     idx_su.append(i1)
                     i1 += 1
+
         if len(idx_su) == 0:
             idx_su = []
 
         idx_ro = []
         i2 = len(self.laps_an["speed"]) - 1
-        while self.laps_an["speed"][i2]["avg"] < su_speed and i2 > i1:
-            idx_ro.append(i2)
-            i2 -= 1
+
+        test1 = True
+        test2 = True
+        # while self.laps_an["speed"][i2]["avg"] < su_speed and i2 > i1:
+        while test1 and test2:
+            if self.laps_an["speed"][i2]["avg"] == None:
+                test1 = True
+            elif self.laps_an["speed"][i2]["avg"] < su_speed:
+                test1 = True
+            else:
+                test1 = False
+
+            test2 = i2 > i1
+
+            if test1 and test2:
+                idx_ro.append(i2)
+                i2 -= 1
+
         if len(idx_ro) == len(self.laps_an["speed"]) + 1:
             idx_ro = []
         elif len(idx_ro) == 0:
