@@ -6,6 +6,7 @@ import json
 # Create your views here.
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpRequest, HttpResponseRedirect, JsonResponse
+from django.core.exceptions import ValidationError
 
 # from .forms import TrainingForm, TrainingModelForm
 import sys
@@ -33,6 +34,7 @@ def show_polar(request: HttpRequest) -> HttpRequest:
 
     if request.method == "GET":
         connection = PolarModel.objects.using("default")
+
         # print(request.POST) # print(request.body)
         if "ttypes" not in request.GET:
             training = connection.filter(sport="RUNNING")
@@ -57,9 +59,29 @@ def show_polar(request: HttpRequest) -> HttpRequest:
                     print(val["trainingtype"])
                 except TypeError:
                     print("no")
-
-        trainingen = [t for t in training.values()]
-
+        # training = training.order_by("startTime")
+        # print(type(training))
+        # xx
+        # training.values()
+        x = training.values()
+        # trainingen = [t for t in training.values()]
+        trainingen = []
+        # print(training.value())
+        # xx
+        x = training.values()
+        for i in range(200):
+            # print(i)
+            try:
+                trainingen.append(x[i])
+                print(x[i]["fname"])
+            except ValidationError:
+                print("error")
+        print(x[i])
+        # for t in x:
+        #     print(t)
+        # xx
+        # for t in x:
+        # xx
         ttypes = return_ttype()
         return render(
             request,
@@ -81,10 +103,16 @@ def return_lapdata(request) -> HttpResponse:
             received_data = data.get("lapdata", "")
             trainingen = connection.filter(fname=received_data)
             print(trainingen.values()[0]["laps"])
+            x = trainingen.values()[0]["laps"]
+            print(trainingen.values()[0]["alaps"])
+            # x = trainingen.values()[0]["alaps"]
             lapdata = trainingen.values()[0]["laps"]
             # Process the received_data as needed
             training = connection.filter(sport="RUNNING")
+            training = training.order_by("startTime")
+            # trainingen = {"laps": x}
             trainingen = [t for t in training.values()]
+            # trainingen = [training.values()[0]]
             ttypes = return_ttype()
 
             return render(

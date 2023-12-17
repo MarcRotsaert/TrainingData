@@ -29,7 +29,11 @@
         {% comment %} <h3><LAPDATA</h3> {% endcomment %}
         <table>
         {% for lap in lapdata %}
-            <tr><td>{{lap.distance}}</td> <td>{{lap.speed.avg }}</td> <td>{{lap.heartRate.avg }}</td> </tr>
+            <tr><td>{{lap.distance}}</td> 
+                <td>{{lap.speed.avg }}</td> 
+                <td>{{lap.speed.avg_corr }}</td> 
+                <td>{{lap.heartRate.avg }}</td> 
+                <td>{{lap.heartRate.max }}</td> </tr>
         {% endfor %}
             {% endif %}
         </table>

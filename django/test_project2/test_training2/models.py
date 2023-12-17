@@ -10,7 +10,7 @@ class PolarModel(mongomod.Model):
     longitude = mongomod.DecimalField(decimal_places=6, max_digits=8)
 
     class Meta:
-        db_table = "polar2014"
+        db_table = "garminfit"
         app_label = "test_polar"
         managed = False
 
