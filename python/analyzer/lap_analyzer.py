@@ -139,7 +139,8 @@ class RLapAnalyzerBasic(LapAnalyzer):
         else:
             distarr = np.array(self.return_distance())
             distarr = np.delete(distarr, ignorelaps)
-            if sum(distarr) < 4000:
+            distarr[distarr == None] = 0
+            if np.sum(distarr) < 4000:
                 result = False
             else:
                 result = all(speedarr > min_speed)
