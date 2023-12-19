@@ -16,9 +16,9 @@ from test_polar.forms import formType
 sys.path.append(r"C:\Users\marcr\Polar\Polar\python")
 sys.path.append(r"C:\Users\marcr\Polar\Polar\python\analyzer")
 
-from nosql_adapter import MongoPolar
+# from nosql_adapter import MongoPolar
 
-from test_polar.models import PolarModel, PolarModel_test  # , Testpage
+from test_polar.models import PolarModel  # , PolarModel_test  # , Testpage
 
 
 def show_polar(request: HttpRequest) -> HttpRequest:
@@ -60,7 +60,16 @@ def show_polar(request: HttpRequest) -> HttpRequest:
                 except TypeError:
                     print("no")
         # training = training.order_by("startTime")
-
+        # FOR DEBUG PURPOSES
+        # trainingen = []
+        # for t in range(200):
+        #     try:
+        #         print(training[t]["fname"])
+        #         trainingen.append(training[t])
+        #     except:
+        #         print("no")
+        # print(trainingen)
+        # xx
         trainingen = [t for t in training.values()]
         ttypes = return_ttype()
         return render(
