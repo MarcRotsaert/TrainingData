@@ -76,7 +76,7 @@
             <th>Hsl avg(bpm)</th>
             <th>training description</th>
         </tr>
-    <p>{% for training in trainingen|dictsort:"fname" %} 
+    <p>{% for training in trainingen|dictsort:"startTime" %} 
         <tr value={{training.fname}}  
         name="traindata" 
         id="traindata"

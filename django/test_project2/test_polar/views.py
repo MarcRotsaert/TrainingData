@@ -60,28 +60,8 @@ def show_polar(request: HttpRequest) -> HttpRequest:
                 except TypeError:
                     print("no")
         # training = training.order_by("startTime")
-        # print(type(training))
-        # xx
-        # training.values()
-        x = training.values()
-        # trainingen = [t for t in training.values()]
-        trainingen = []
-        # print(training.value())
-        # xx
-        x = training.values()
-        for i in range(200):
-            # print(i)
-            try:
-                trainingen.append(x[i])
-                print(x[i]["fname"])
-            except ValidationError:
-                print("error")
-        print(x[i])
-        # for t in x:
-        #     print(t)
-        # xx
-        # for t in x:
-        # xx
+
+        trainingen = [t for t in training.values()]
         ttypes = return_ttype()
         return render(
             request,
@@ -109,10 +89,7 @@ def return_lapdata(request) -> HttpResponse:
             lapdata = trainingen.values()[0]["laps"]
             # Process the received_data as needed
             training = connection.filter(sport="RUNNING")
-            training = training.order_by("startTime")
-            # trainingen = {"laps": x}
             trainingen = [t for t in training.values()]
-            # trainingen = [training.values()[0]]
             ttypes = return_ttype()
 
             return render(
