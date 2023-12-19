@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Union, Optional
 import tomli
 
 import json
@@ -7,7 +7,7 @@ import json
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpRequest, HttpResponseRedirect, JsonResponse
 from django.core.exceptions import ValidationError
-
+from django.db.models.query import QuerySet
 # from .forms import TrainingForm, TrainingModelForm
 import sys
 
@@ -21,57 +21,78 @@ sys.path.append(r"C:\Users\marcr\Polar\Polar\python\analyzer")
 from test_polar.models import PolarModel  # , PolarModel_test  # , Testpage
 
 
-def show_polar(request: HttpRequest) -> HttpRequest:
-    # config = tomli.load(open("../../config.toml", "rb"))
-    # import os
+def return_configttype() -> list[str]:
+    config = tomli.load(open("../../config.toml", "rb"))
+    return config["running"]["trainingtypes"]
 
-    # curdir = os.getcwd()
-    # os.chdir("../..")
-    # curs = MongoPolar("polartest4", "polar2014").simplequery(
-    #     "trainingtype.easyrun", True
-    # )
-    # os.chdir(curdir)
 
+def _return_trainttype(connection: QuerySet, ttype: str) -> list[Optional[dict]]:
+    if ttype == "easy":
+        ttype = "easyrun"
+        comp = True
+    elif ttype == "road":
+        ttype = "roadrace"
+        comp = True
+    elif ttype == "interval":
+        comp = "interval"
+    else:
+        print(ttype)
+        return []
+    
+    training = connection.filter(trainingtype={ttype: comp})
+    # FOR DEBUGGING
+    # for val in training.values():
+    #     try:
+    #         print(val["trainingtype"])
+    #     except TypeError:
+    #         print("no")
+    trainingen = [t for t in training.values()]
+    return trainingen
+
+
+def _return_trainrunning(connection: QuerySet) -> list[Optional[dict]]:
+    training = connection.filter(sport="RUNNING")
+    if len(training) > 0:
+        return [t for t in training.values()]
+    else:
+        return []
+
+
+def _return_lapdata(connection: QuerySet, fname: str) -> list[Optional[dict]]:
+    trainingen = connection.filter(fname=fname)
+    # print(trainingen.values()[0]["laps"])
+    if len(trainingen.values()[0]["laps"]) > 0:
+        return trainingen.values()[0]["laps"]
+    else:
+        return []
+
+
+def show_polar(request: HttpRequest) -> HttpResponse:
     if request.method == "GET":
         connection = PolarModel.objects.using("default")
 
         # print(request.POST) # print(request.body)
         if "ttypes" not in request.GET:
-            training = connection.filter(sport="RUNNING")
+            trainingen = _return_trainrunning(connection)
+            # training = connection.filter(sport="RUNNING")
         else:
             ttype = request.GET["ttypes"]
             print(len(ttype))
-            if ttype == "easy":
-                ttype = "easyrun"
-                comp = True
-                # xx
-            elif ttype == "road":
-                ttype = "roadrace"
-                comp = True
-            elif ttype == "interval":
-                comp = "interval"
-            else:
-                print(ttype)
 
-            training = connection.filter(trainingtype={ttype: comp})
-            for val in training.values():
-                try:
-                    print(val["trainingtype"])
-                except TypeError:
-                    print("no")
-        # training = training.order_by("startTime")
-        # FOR DEBUG PURPOSES
-        # trainingen = []
-        # for t in range(200):
-        #     try:
-        #         print(training[t]["fname"])
-        #         trainingen.append(training[t])
-        #     except:
-        #         print("no")
-        # print(trainingen)
-        # xx
-        trainingen = [t for t in training.values()]
-        ttypes = return_ttype()
+            trainingen = _return_trainttype(connection, ttype)
+            # FOR DEBUG PURPOSES
+            # trainingen = []
+            # for t in range(200):
+            #     try:
+            #         print(training[t]["fname"])
+            #         trainingen.append(training[t])
+            #     except ValidationError:
+            #         print("no")
+            # xx
+            # trainingen = [t for t in training.values()]
+        
+        ttypes = return_configttype()
+
         return render(
             request,
             "polar.html",
@@ -82,24 +103,19 @@ def show_polar(request: HttpRequest) -> HttpRequest:
         )
 
 
-def return_lapdata(request) -> HttpResponse:
+
+
+def show_lapdata(request: HttpRequest) -> Union[HttpResponse, JsonResponse] :
     connection = PolarModel.objects.using("default")
     if request.method == "POST":
         try:
-            print(dir(request))
             print(request.body)
             data = json.loads(request.body.decode("utf-8"))
             received_data = data.get("lapdata", "")
-            trainingen = connection.filter(fname=received_data)
-            print(trainingen.values()[0]["laps"])
-            x = trainingen.values()[0]["laps"]
-            print(trainingen.values()[0]["alaps"])
-            # x = trainingen.values()[0]["alaps"]
-            lapdata = trainingen.values()[0]["laps"]
-            # Process the received_data as needed
-            training = connection.filter(sport="RUNNING")
-            trainingen = [t for t in training.values()]
-            ttypes = return_ttype()
+            lapdata = _return_lapdata(connection, received_data)
+
+            trainingen = _return_trainrunning(connection)
+            ttypes = return_configttype()
 
             return render(
                 request,
@@ -115,37 +131,4 @@ def return_lapdata(request) -> HttpResponse:
     return JsonResponse({"status": "error", "message": "Invalid request method"})
 
 
-def return_ttype() -> HttpRequest:
-    config = tomli.load(open("../../config.toml", "rb"))
 
-    return config["running"]["trainingtypes"]
-
-
-# as a test
-def return_easy(ttype: str) -> HttpRequest:
-    if request.method == "GET":
-        connection = PolarModel.objects.using("default")
-        training = connection.filter(sport="RUNNING")
-        print(len(training))
-        lenrunning = str(len(training))
-
-        trainingen = [t for t in training.values()]
-        print(trainingen[0].keys())
-
-        for t in training.values():
-            try:
-                print(t["laps"][0]["distance"])
-            except TypeError:
-                print("probably None laps")
-
-        ttypes = return_ttype()
-        print(ttypes)
-        return render(
-            request,
-            "polar.html",
-            context={
-                "trainingen": trainingen,
-                "lenrunning": lenrunning,
-                "ttypes": ttypes,
-            },
-        )

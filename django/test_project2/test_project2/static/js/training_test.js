@@ -49,15 +49,13 @@ function selectText2() {
 }
 
 function showLapdata(cell) {
-    // console.log(cell.innerText)
-    // console.log(cell.id)
     // console.log(cell.parentNode.id)
-    // console.log(cell.parentNode.getAttribute("value"))
     var fname = cell.parentNode.getAttribute("value")
     var url = cell.parentNode.getAttribute("data-url")
     var csrftoken = getCookie('csrftoken');
     console.log(url)
     // console.log(fname)
+
     // Use AJAX to send the data to the Django view
     var xhr = new XMLHttpRequest(value = fname);
     xhr.open("POST", url, true);

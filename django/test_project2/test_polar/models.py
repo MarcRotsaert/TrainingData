@@ -126,6 +126,8 @@ class PolarModel(mongomod.Model):
         decimal_places=6, max_digits=8, null=True, blank=True
     )
     speed = mongomod.EmbeddedField(model_container=SpeedModel, null=True, blank=True)
+    maximumHeartRate = mongomod.IntegerField( null=True, blank=True)
+    averageHeartRate = mongomod.IntegerField( null=True, blank=True)
     heartRate = mongomod.EmbeddedField(
         model_container=HeartrateModel, null=True, blank=True
     )

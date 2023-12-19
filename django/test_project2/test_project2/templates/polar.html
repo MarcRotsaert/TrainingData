@@ -29,11 +29,11 @@
         {% comment %} <h3><LAPDATA</h3> {% endcomment %}
         <table>
         {% for lap in lapdata %}
-            <tr><td>{{lap.distance}}</td> 
-                <td>{{lap.speed.avg }}</td> 
-                <td>{{lap.speed.avg_corr }}</td> 
-                <td>{{lap.heartRate.avg }}</td> 
-                <td>{{lap.heartRate.max }}</td> </tr>
+            <tr><td>{{lap.distance|floatformat:0}}</td> 
+                <td>{{lap.speed.avg|floatformat:1 }}</td> 
+                <td>{{lap.speed.avg_corr|floatformat:1 }}</td> 
+                <td>{{lap.heartRate.avg|floatformat:0}}</td> 
+                <td>{{lap.heartRate.max|floatformat:0}}</td> </tr>
         {% endfor %}
             {% endif %}
         </table>
@@ -80,7 +80,7 @@
         <tr value={{training.fname}}  
         name="traindata" 
         id="traindata"
-        data-url="{% url 'test_polar:return_lapdata' %}">
+        data-url="{% url 'test_polar:showlapdata' %}">
             <td>{{training.startTime|slice:":10"}}</td> 
             
             {% if training.location != None %}
@@ -88,9 +88,9 @@
             {% else %}
             <td>not defined</td>
             {% endif %}
-            <td>{{training.distance}}</td>
-            <td>{{training.speed.avg}}</td>
-            <td>{{training.heartRate.avg}} / {{training.heartRate.max}}
+            <td>{{training.distance|floatformat:0}}</td>
+            <td>{{training.speed.avg|floatformat:1}}</td>
+            <td>{{training.averageHeartRate|floatformat:0}} / {{training.maximumHeartRate|floatformat:0}}
             </td>
             <td id="tdescr" 
              
