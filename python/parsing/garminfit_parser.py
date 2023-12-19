@@ -194,10 +194,16 @@ class Lapparser(Garminfit_parser):
             "max_speed",
         ]
         speed_list = self._values_from_frame(lap, par_names)
+        # try:
+        speed_arr = np.array(speed_list)
+        speed_arr[speed_arr == None] = 0
         try:
-            speed_kmu = np.array(speed_list) * 3600 / 1000  # m/s -> km/u
+            speed_kmu = speed_arr * 3600 / 1000  # m/s -> km/u
         except TypeError:
-            speed_kmu = len(speed_list) * [None]
+            print(speed_kmu)
+        speed_kmu[speed_kmu == 0] = None
+        # except TypeError:
+        # speed_kmu = len(speed_list) * [None]
         return speed_kmu
 
     def _return_heartrate(self, lap: FitDataMessage) -> list[float]:

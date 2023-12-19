@@ -9,7 +9,7 @@ import parsing.garminfit_parser as ga_pa
 import tomli
 
 config = tomli.load(open("config.toml", "rb"))
-database = "garminbarrie2"
+database = "garminbarrie"
 # database = "testdb"
 
 

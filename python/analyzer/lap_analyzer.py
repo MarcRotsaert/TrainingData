@@ -270,6 +270,7 @@ class RManualLapAnalyzer(RLapAnalyzerBasic):
         speedlist = self.return_paraslist("speed", "avg")
 
         speed = np.array(speedlist)
+        speed[speed == None] = 0  # Emergency call!!!!
         dspeed = speed[1:] - speed[0:-1]
 
         dspeed[(dspeed < dspeed_int) & (dspeed > -dspeed_int)] = 0
