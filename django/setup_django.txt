@@ -32,5 +32,18 @@ Define interactivity backend-frontend
 
 8) add views to the urls.py
 
-x) start server
-python manage.py runserver
+
+#Djongo adaptations
+9) Adapt models.py according to form of Mongo data
+    import djongo 
+    Make model according to the database setup. 
+10) Add model to admin.py
+11) set mongodb connection as default in settings
+12) make database migrations:
+    python manage makemigrations
+    python manage migrate
+
+
+12) Make templates
+13) start server
+    python manage.py runserver

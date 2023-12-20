@@ -8,6 +8,7 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpRequest, HttpResponseRedirect, JsonResponse
 from django.core.exceptions import ValidationError
 from django.db.models.query import QuerySet
+
 # from .forms import TrainingForm, TrainingModelForm
 import sys
 
@@ -38,7 +39,7 @@ def _return_trainttype(connection: QuerySet, ttype: str) -> list[Optional[dict]]
     else:
         print(ttype)
         return []
-    
+
     training = connection.filter(trainingtype={ttype: comp})
     # FOR DEBUGGING
     # for val in training.values():
@@ -90,7 +91,7 @@ def show_polar(request: HttpRequest) -> HttpResponse:
             #         print("no")
             # xx
             # trainingen = [t for t in training.values()]
-        
+
         ttypes = return_configttype()
 
         return render(
@@ -103,9 +104,7 @@ def show_polar(request: HttpRequest) -> HttpResponse:
         )
 
 
-
-
-def show_lapdata(request: HttpRequest) -> Union[HttpResponse, JsonResponse] :
+def show_lapdata(request: HttpRequest) -> Union[HttpResponse, JsonResponse]:
     connection = PolarModel.objects.using("default")
     if request.method == "POST":
         try:
@@ -129,6 +128,3 @@ def show_lapdata(request: HttpRequest) -> Union[HttpResponse, JsonResponse] :
         except json.JSONDecodeError:
             return JsonResponse({"status": "error", "message": "Invalid JSON"})
     return JsonResponse({"status": "error", "message": "Invalid request method"})
-
-
-

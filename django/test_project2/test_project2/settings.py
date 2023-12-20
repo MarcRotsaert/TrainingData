@@ -79,7 +79,7 @@ WSGI_APPLICATION = "test_project2.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "djongo",
-        "NAME": "garminbarrie",
+        "NAME": "polartest",
         "ENFORCE_SCHEMA": False,
         "CLIENT": {
             "host": "127.0.0.1",

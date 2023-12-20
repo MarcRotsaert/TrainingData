@@ -14,9 +14,10 @@ class PolarModel(mongomod.Model):
         app_label = "test_polar"
         managed = False
 
-    @classmethod
-    def using_mongo(cls):
-        return cls.objects.using("default")
+
+# @classmethod
+# def using_mongo(cls):
+#     return cls.objects.using("default")
 
 
 class Trainingtype(models.Model):
