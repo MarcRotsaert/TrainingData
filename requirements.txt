@@ -1,8 +1,10 @@
 pandas
 geopandas
 numpy
-pymongo
+pymongo==3.12.3 # compatibility with djongo
 matplotlib
 shapely
 tomli
 fitdecode
+Django
+djongo

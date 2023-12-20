@@ -99,7 +99,7 @@ class Garminfit_parser:
             field = self._find_onefield(frame, fi)
             if hasattr(field, "value"):
                 if field.value == None:
-                    field.value = np.nan
+                    field.value = None
                 values.append(field.value)
             else:
                 values.append(None)
@@ -139,7 +139,7 @@ class Garminfit_parser:
         ]
 
         session, _, _, _ = self._fit_parser()
-        if len(session)>0: 
+        if len(session) > 0:
             frame = session[0]
 
             abstract = {}
@@ -186,7 +186,7 @@ class Lapparser(Garminfit_parser):
         par_name = "total_timer_time"
         return self._values_from_frame(lap, par_name)[0]
 
-    def _return_speed(self, lap: FitDataMessage) -> list[float]:
+    def _return_speed(self, lap: FitDataMessage) -> np.array:
         par_names = [
             "enhanced_avg_speed",
             "avg_speed",
@@ -194,7 +194,17 @@ class Lapparser(Garminfit_parser):
             "max_speed",
         ]
         speed_list = self._values_from_frame(lap, par_names)
-        speed_kmu = np.array(speed_list) * 3600 / 1000  # m/s -> km/u
+        # try:
+        speed_arr = np.array(speed_list)
+        speed_arr[speed_arr == np.nan] = 0
+        speed_arr[speed_arr is None] = 0
+        try:
+            speed_kmu = speed_arr * 3600 / 1000  # m/s -> km/u
+        except TypeError:
+            print(speed_kmu)
+        # speed_kmu[speed_kmu == 0] = None
+        # except TypeError:
+        # speed_kmu = len(speed_list) * [None]
         return speed_kmu
 
     def _return_heartrate(self, lap: FitDataMessage) -> list[float]:

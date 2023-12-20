@@ -1,0 +1,22 @@
+p {
+    margin: 0;
+    font-size: 85%;
+    font-style: italic;
+    text-align: center;
+
+}
+
+/* table, */
+th,
+td {
+    border: 1px solid;
+    padding: 1cqb;
+    border-collapse: collapse;
+    text-align: center;
+    white-space: pre-wrap;
+}
+
+table {
+    position: relative;
+    left: 15px
+}

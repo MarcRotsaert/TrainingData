@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+{% extends "base.html" %}
+{% load static %}
+
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>testpage</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+
+        <style>
+            #textblok {
+              border: 1px solid #999;
+              padding: 10px;  /* Add padding for better visual appearance */
+              background-color: yellow
+            }
+          </style>
+
+    </head>
+{% block body_block %}
+<body>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"
+        integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+"
+        crossorigin="anonymous"></script>
+    <!-- Content here -->
+    <h1>Testpage, try to put an image</h1>
+    
+    {% comment %} <img src="{% static "images/Dia1.JPG" %}" id="grafje",width="500" height="350", alt="Oh nooo!"> {% endcomment %}
+    <img src="{% static "/images/knmirotterdam_220911_20.png" %}"  id="grafje", width="500" height="600", alt="Oh nooo!">
+
+    
+    <div class="container">
+        <div class="row">
+            <div class="col-6">
+
+                <label for="to_addtt">To add trainingtype</label>
+                <a href={% url 'test_training2:addttype' %}>
+                    <input type="submit" id="to_addtt" value="to next page"> </input>
+                </a>             
+            </div>
+        </div>
+        <p></p>
+        <div class="row">
+            <div class="col-4">
+                <div class="col-4">
+                    <label for="trainingtype">Choose trainingtype:</label>
+                </div>
+                <p>{{ ttypes}}</p>
+                <select id="trainingtype" name="ttypes" size="3" onclick="updateText2()">
+                    {% if  ttypes %}
+                        {% for t in ttypes %}
+                            <option value={{ t.type_name}}>{{ t.datapath|cut:"C:/TEMP\knmirotterdam_"|slice:6}}</option>
+                        {% endfor %}
+                        {% else %}
+                            <option value="No Choice">No Choice</option>
+                    {% endif %}
+                </select>
+            </div>
+            <div class="col-6">
+                {% comment %} <p>{{  }}</p> {% endcomment %}
+            </div>
+            <div class="col-6">
+                <button id="button" onclick="updatePlaatje()">Select graph</button>
+            </div>
+            
+            <p id="textblok" border="1px solid #999">sss </p>
+            <script src={% static  "/js/training_test.js" %}></script>
+            {% comment %} <script src="{% static "training_test.js" %}"></script> {% endcomment %}
+        </div>
+    </div>
+    </div>
+{% endblock %}
+
+</body>
+</html>
