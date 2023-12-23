@@ -28,11 +28,18 @@ class Lapparser(Forerunner_parser):
 
     def _return_latitude(self, lap: ET.Element) -> float:
         temp = lap.find(f"{self.Namespace}BeginPosition")
-        return float(temp.find(f"{self.Namespace}Latitude").text)
+        try:
+            lat = float(temp.find(f"{self.Namespace}Latitude").text)
+        except AttributeError:
+            return None
 
     def _return_longitude(self, lap: ET.Element) -> float:
         temp = lap.find(f"{self.Namespace}BeginPosition")
-        return float(temp.find(f"{self.Namespace}Longitude").text)
+        try:
+            lon = float(temp.find(f"{self.Namespace}Longitude").text)
+        except AttributeError:
+            return None
+        return lon
 
     def _return_distance(self, lap: ET.Element) -> float:
         length = lap.find(f"{self.Namespace}Length").text
@@ -56,20 +63,26 @@ class Lapparser(Forerunner_parser):
         return json
 
     def _xml2laps_onelap(self) -> list:
-        result = [{
-            "startTime": self._return_starttime(self.laps[0]),
-            "latitude": self._return_latitude(self.laps[0]),
-            "longitude": self._return_longitude(self.laps[0]),
-            "duration": self._return_duration(self.laps[0]),
-            "speed": {"avg": self._return_speed(self.laps[0])},
-            "distance": self._return_distance(self.laps[0]),
-        }]
+        result = [
+            {
+                "startTime": self._return_starttime(self.laps[0]),
+                "latitude": self._return_latitude(self.laps[0]),
+                "longitude": self._return_longitude(self.laps[0]),
+                "duration": self._return_duration(self.laps[0]),
+                "speed": {"avg": self._return_speed(self.laps[0])},
+                "distance": self._return_distance(self.laps[0]),
+            }
+        ]
         return result
 
     def _xml2laps_multiplelap(self) -> list:
-        laps = [{ "startTime": self._return_starttime(self.laps[0]),
-            "latitude": self._return_latitude(self.laps[0]),
-            "longitude": self._return_longitude(self.laps[0])}]
+        laps = [
+            {
+                "startTime": self._return_starttime(self.laps[0]),
+                "latitude": self._return_latitude(self.laps[0]),
+                "longitude": self._return_longitude(self.laps[0]),
+            }
+        ]
         for i, lap in enumerate(self.laps):
             duration = self._return_duration(lap)
             distance = self._return_distance(lap)
@@ -125,12 +138,11 @@ class Parser(Forerunner_parser):
     def xml2json(self):
         laps = Lapparser(self.filename).xml2laps()
         recordedroute = Sampleparser(self.filename).xml2samples()
-        
+
         abstract = laps.pop(0)
         exercise = {"samples": {"recordedRoute": recordedroute}}
         if len(laps) > 1:
-            exercise.update({"laps": laps })
+            exercise.update({"laps": laps})
         json = abstract
         json.update({"exercises": [exercise]})
         return json
-
