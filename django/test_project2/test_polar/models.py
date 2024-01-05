@@ -44,6 +44,13 @@ class CadenceModel(AbstractHeartrateModel):
         abstract = False
 
 
+class PowerModel(AbstractHeartrateModel):
+    _id = mongomod.ObjectIdField(primary_key=True)
+
+    class Meta:
+        abstract = False
+
+
 class AbstractLapArray(mongomod.Model):
     lapNumber = mongomod.IntegerField()
     duration = mongomod.CharField(max_length=50)
@@ -60,6 +67,7 @@ class AbstractLapArray(mongomod.Model):
         max_digits=10, decimal_places=2, null=True, blank=True
     )
     cadence = mongomod.EmbeddedField(CadenceModel, null=True, blank=True)
+    power = mongomod.EmbeddedField(PowerModel, null=True, blank=True)
 
     class Meta:
         abstract = True
@@ -140,7 +148,7 @@ class PolarModel(mongomod.Model):
     objects = mongomod.DjongoManager()
 
     class Meta:
-        db_table = "garminfit"
+        db_table = "polar2022"
         app_label = "test_training2"
         managed = False
 

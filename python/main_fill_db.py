@@ -13,7 +13,7 @@ database = config["mongodb"]["database"]
 # database = "testdb"
 
 
-if False:
+if True:
     path = config["polar_json"]["datapath"]
     # for year in [2014, 2015, 2017]:
     # for year in [2017]:
@@ -26,7 +26,11 @@ if False:
         for fi in files:
             # "training-session-2014-12-07-263916482-2cbe9312-6b71-4693-8519-a9a860a23cbc.json"
             filename = fi.split("\\")[-1]
-            mongad.put_jsonresume(filename)
+            curs = MongoQuery(database, "polar" + str(year)).simplequery(
+                "fname", filename
+            )
+            if len(list(curs)) == 0:
+                mongad.put_jsonresume(filename)
 
 if False:
     path = config["forerunner_xml"]["datapath"]
@@ -39,7 +43,7 @@ if False:
             mongad.put_jsonresume(filename)
 
 
-if True:
+if False:
     path = config["garmin_fit"]["datapath"]
     # for year in range(2013, 2022):
     files = glob.glob(os.path.join(path, "*.fit"))

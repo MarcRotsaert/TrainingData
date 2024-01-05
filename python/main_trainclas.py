@@ -2,7 +2,7 @@ from training_classifier import MongoRunningClassifier, MongoIntervalTraining
 
 dbase = "polartest"
 collections = []
-years = [2013, 2014, 2015, 2017, 2018, 2019, 2020, 2021, 2022]
+years = range(2013, 2023)
 collections = ["polar" + str(y) for y in years]
 collections.append("garminfit")
 
