@@ -61,11 +61,10 @@ def _return_trainrunning(connection: QuerySet) -> list[Optional[dict]]:
 
 def _return_lapdata(connection: QuerySet, fname: str) -> list[Optional[dict]]:
     trainingen = connection.filter(fname=fname)
-    # print(trainingen.values()[0]["laps"])
-    if len(trainingen.values()[0]["laps"]) > 0:
+    if trainingen.values()[0]["laps"] is not None:
         return trainingen.values()[0]["laps"]
     else:
-        return []
+        return trainingen.values()[0]["alaps"]
 
 
 def show_polar(request: HttpRequest) -> HttpResponse:
