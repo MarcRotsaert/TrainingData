@@ -55,7 +55,6 @@ function showLapdata(cell) {
     var csrftoken = getCookie('csrftoken');
     console.log(url)
     // console.log(fname)
-
     // Use AJAX to send the data to the Django view
     var xhr = new XMLHttpRequest(value = fname);
     xhr.open("POST", url, true);
@@ -75,7 +74,7 @@ function showLapdata(cell) {
 
     var jsonData = JSON.stringify({ "lapdata": fname });
     xhr.send(jsonData);
-
+    toHeadofpage()
     // return fname
 }
 
@@ -97,3 +96,8 @@ function getCookie(name) {
 
 // Add an event listener to call the function when the button is clicked
 // document.getElementById("button").addEventListener("click", selectText2);
+
+function toHeadofpage() {
+    window.scrollTo(0, 0);
+}
+
