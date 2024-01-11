@@ -9,21 +9,15 @@ from django.http import HttpResponse, HttpRequest, HttpResponseRedirect, JsonRes
 from django.core.exceptions import ValidationError
 from django.db.models.query import QuerySet
 
-# from .forms import TrainingForm, TrainingModelForm
-import sys
-
-from test_polar.forms import formType
-
-sys.path.append(r"C:\Users\marcr\Polar\Polar\python")
-sys.path.append(r"C:\Users\marcr\Polar\Polar\python\analyzer")
-
-# from nosql_adapter import MongoPolar
-
+from test_polar.forms import locationForm, formType
 from test_polar.models import PolarModel  # , PolarModel_test  # , Testpage
+
+from nosql_adapter import MongoPolar
 
 
 def return_configttype() -> list[str]:
-    config = tomli.load(open("../../config.toml", "rb"))
+    # config = tomli.load(open("../../config.toml", "rb"))
+    config = tomli.load(open("config.toml", "rb"))
     return config["running"]["trainingtypes"]
 
 
@@ -57,6 +51,15 @@ def _return_trainrunning(connection: QuerySet) -> list[Optional[dict]]:
         return [t for t in training.values()]
     else:
         return []
+
+
+def _return_trainingdata(connection: QuerySet, fname: str) -> Union[dict, None]:
+    trainingen = connection.filter(fname=fname)
+    if trainingen.values()[0]["trainingdescription"] is not None:
+        # return trainingen.values()[0]["trainingdescription"]
+        return trainingen.values()[0]
+    else:
+        return None
 
 
 def _return_lapdata(connection: QuerySet, fname: str) -> list[Optional[dict]]:
@@ -99,6 +102,87 @@ def show_polar(request: HttpRequest) -> HttpResponse:
             context={
                 "trainingen": trainingen,
                 "ttypes": ttypes,
+            },
+        )
+
+
+def _adapt_test(request: HttpRequest) -> HttpResponse:
+    connection = PolarModel.objects.using("default")
+    fname = "training-session-2022-01-12-6892575464-df5387b0-e271-48db-b0c2-4735c913b039.json"
+    training = _return_trainingdata(connection, fname)
+    if request.method == "GET":
+        description = {
+            # "trainingdescription": training.get("trainingdescription"),
+            "location": training.get("location"),
+        }
+        # print(description)
+        # xx
+        ttypeform = locationForm(
+            initial=description,
+            # initial=description["trainingdescription"],
+        )
+        if not ttypeform.is_valid():
+            print(ttypeform.errors)
+        else:
+            print("yesss")
+        # ttypeform = locationForm()
+        # ttypeform = formType(initial={"ttype": "test2"})
+        # print(ttypeform.initial)
+        # form
+        return ttypeform
+        # return render(request, "adapt.html", {"ttypeform": ttypeform})
+    if request.method == "POST":
+        obj_id = training["_id"]
+        ttypeform = locationForm(request.POST)
+        if ttypeform.is_valid():
+            new_location = request.POST["location"]
+            mongpol = MongoPolar("polartest", "polar2022")
+            mongpol.updateOne(
+                obj_id,
+                {"location": new_location},
+            )
+            # ttypeform.save(commit=True)
+            return ttypeform  # redirect("/polar")
+        else:
+            print(ttypeform.errors)
+            return None
+            # return render(request, "add_ttype.html", {"ttypeform": ttypeform})
+
+
+def show_adapt(request: HttpRequest) -> HttpResponse:
+    connection = PolarModel.objects.using("default")
+    if request.method == "GET":
+        ttypeform = _adapt_test(request)
+
+        if "ttypes" not in request.GET:
+            trainingen = _return_trainrunning(connection)
+        else:
+            ttype = request.GET["ttypes"]
+            print(len(ttype))
+
+            trainingen = _return_trainttype(connection, ttype)
+        ttypes = return_configttype()
+
+        return render(
+            request,
+            "adapt.html",
+            context={
+                "trainingen": trainingen,
+                # "ttypes": ttypes,
+                "ttypeform": ttypeform,
+            },
+        )
+    elif request.method == "POST":
+        ttypeform = _adapt_test(request)
+        trainingen = _return_trainrunning(connection)
+        ttypes = return_configttype()
+        return render(
+            request,
+            "adapt.html",
+            context={
+                "trainingen": trainingen,
+                "ttypes": ttypes,
+                "ttypeform": ttypeform,
             },
         )
 

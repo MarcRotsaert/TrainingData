@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+{% extends "polar.html" %}
+{% comment %} {% extends "base.html" %} {% endcomment %}
+{% load static %}
+<p>This page has a master page</p>
+{% block adapt_block %}
+  <p>This page has a master page</p>
+  <div class="container">
+    <div class="row">
+        <div class="col-4">
+            <form method="POST", enctype="multipart/form-data">
+                {% comment %} {{form.as_p}} {% endcomment %}
+                {{ ttypeform.as_p }}
+                {% csrf_token %}
+                <input type="submit" class="btn btn-primary", value="Commit" method="POST">
+                {% comment %} <input type=" text" id="text-box" size="20" value="Hello world!" /> {% endcomment %}
+            </form>
+        </div>
+    </div>
+  
+  {% endblock %}
+
+</html>    

@@ -11,7 +11,7 @@ from test_training2.models import Trainingtype  # , PolarModel#, Testpage, Polar
 
 
 def select_ttype(request: HttpRequest) -> HttpRequest:
-    config = tomli.load(open("../../config.toml", "rb"))
+    config = tomli.load(open("config.toml", "rb"))
 
     if request.method == "GET":
         print(request.body)
