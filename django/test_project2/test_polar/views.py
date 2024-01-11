@@ -98,7 +98,7 @@ def show_polar(request: HttpRequest) -> HttpResponse:
 
         return render(
             request,
-            "polar.html",
+            "summary.html",
             context={
                 "trainingen": trainingen,
                 "ttypes": ttypes,
@@ -111,27 +111,21 @@ def _adapt_test(request: HttpRequest) -> HttpResponse:
     fname = "training-session-2022-01-12-6892575464-df5387b0-e271-48db-b0c2-4735c913b039.json"
     training = _return_trainingdata(connection, fname)
     if request.method == "GET":
-        description = {
+        location = {
             # "trainingdescription": training.get("trainingdescription"),
             "location": training.get("location"),
         }
-        # print(description)
-        # xx
+        # print(location)
         ttypeform = locationForm(
-            initial=description,
-            # initial=description["trainingdescription"],
+            initial=location,
         )
         if not ttypeform.is_valid():
             print(ttypeform.errors)
         else:
             print("yesss")
-        # ttypeform = locationForm()
-        # ttypeform = formType(initial={"ttype": "test2"})
-        # print(ttypeform.initial)
-        # form
         return ttypeform
         # return render(request, "adapt.html", {"ttypeform": ttypeform})
-    if request.method == "POST":
+    elif request.method == "POST":
         obj_id = training["_id"]
         ttypeform = locationForm(request.POST)
         if ttypeform.is_valid():
@@ -141,7 +135,6 @@ def _adapt_test(request: HttpRequest) -> HttpResponse:
                 obj_id,
                 {"location": new_location},
             )
-            # ttypeform.save(commit=True)
             return ttypeform  # redirect("/polar")
         else:
             print(ttypeform.errors)
@@ -162,6 +155,8 @@ def show_adapt(request: HttpRequest) -> HttpResponse:
 
             trainingen = _return_trainttype(connection, ttype)
         ttypes = return_configttype()
+        print(ttypes)
+        print(ttypeform)
 
         return render(
             request,
@@ -201,7 +196,7 @@ def show_lapdata(request: HttpRequest) -> Union[HttpResponse, JsonResponse]:
 
             return render(
                 request,
-                "polar.html",
+                "summary.html",
                 context={
                     "lapdata": lapdata,
                     "trainingen": trainingen,

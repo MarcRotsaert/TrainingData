@@ -5,7 +5,7 @@ app_name = "test_polar"
 
 urlpatterns = [
     # re_path(r"^add_ttype/$", views.add_ttype, name="addttype")
-    path("polar/return_lapdata/", views.show_lapdata, name="showlapdata"),
-    path("polar/", views.show_polar, name="showpolar"),
-    path("polar/adapt", views.show_adapt, name="showadapt"),
+    path("summary/return_lapdata/", views.show_lapdata, name="showlapdata"),
+    path("summary/", views.show_polar, name="showpolar"),
+    path("adapt/", views.show_adapt, name="showadapt"),
 ]

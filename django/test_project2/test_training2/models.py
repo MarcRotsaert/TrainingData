@@ -29,12 +29,6 @@ class Trainingtype(models.Model):
         return cls.objects.using("sqlite")
 
 
-# class Trainingtype2(models.Model):
-#     type_name = models.CharField(max_length=50, unique=True, primary_key=True)
-#     image = models.FileField(max_length=256)
-#     datapath = models.FilePathField(max_length=256, path="C:TEMP")
-
-
 class Testpage(models.Model):
     name = models.CharField(max_length=20)
     email = models.EmailField()

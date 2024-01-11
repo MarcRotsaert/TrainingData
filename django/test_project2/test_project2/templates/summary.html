@@ -4,7 +4,7 @@
 
 <html lang="en">
 <head>
-    {% block polar_block %}
+    {% block summary_block %}
     <meta charset="utf-8">
     <title>testpage</title>
     {% block adapt %}
@@ -46,7 +46,7 @@
     <p>{{ ttypes }}</p>
     {% comment %} <select id="trainingtype" name="ttypes" size="4" onclick="updateText2()"> {% endcomment %}
     
-    <form id="trainingForm" action="/polar/" method="get">
+    <form id="trainingForm" action="/summary/" method="get">
         {% csrf_token %}
         <select id="trainingtype" name="ttypes" size="4" onclick="" >
         {% if  ttypes %}
@@ -60,8 +60,6 @@
     </select>
     <input type="submit" id="to_addtt" value="to next page" onclick="toHeadofpage()"> </input>
 </form>
-
-
 
     <table name="traindata">
         <tr>
@@ -101,12 +99,4 @@
 
 </body>
 
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-    alert("help")
-    document.getElementById('trainingForm').addEventListener('submit', function(event) {
-        var selectedValue = document.getElementById('trainingtype').value;
-        // Attach the selected value to a input field in the form
-        this.action = '/polar/?selected_type=' + encodeURIComponent(selectedValue);});
-    </script>
     </html>
