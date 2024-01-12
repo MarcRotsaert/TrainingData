@@ -48,6 +48,35 @@ function selectText2() {
     return testElement.value
 }
 
+function showForm(cell) {
+    var fname = cell.parentNode.getAttribute("value")
+    var url = cell.parentNode.getAttribute("data-url")
+    var csrftoken = getCookie('csrftoken');
+    console.log(url)
+    var xhr = new XMLHttpRequest(value = fname);
+    cell.fname = fname
+    xhr.open("POST", url, true);
+    xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+    xhr.setRequestHeader("X-CSRFToken", csrftoken);
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+            // Handle the response from the server if needed
+            console.log(xhr.responseText);
+            var newHTML = xhr.responseText;
+            document.open();
+            document.write(newHTML);
+            document.close();
+
+        }
+    };
+
+    var jsonData = JSON.stringify({ "fname": fname });
+    xhr.send(jsonData);
+    toHeadofpage()
+    // return fname
+
+}
+
 function showLapdata(cell) {
     // console.log(cell.parentNode.id)
     var fname = cell.parentNode.getAttribute("value")

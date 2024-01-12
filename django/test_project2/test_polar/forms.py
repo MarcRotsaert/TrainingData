@@ -11,6 +11,6 @@ class formType(forms.Form):
 class locationForm(forms.ModelForm):
     class Meta:
         model = PolarModel
-        fields = ("location",)
+        fields = ("location", "fname")
         # fields = ["laps", "alaps"]
         # fields = "__all__"

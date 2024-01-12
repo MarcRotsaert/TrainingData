@@ -41,7 +41,6 @@
         </table>
         </div>
     <p> number of run training in 2014: {{ trainingen|length }} </p>
-    
         
     <p>{{ ttypes }}</p>
     {% comment %} <select id="trainingtype" name="ttypes" size="4" onclick="updateText2()"> {% endcomment %}
@@ -60,9 +59,11 @@
     </select>
     <input type="submit" id="to_addtt" value="to next page" onclick="toHeadofpage()"> </input>
 </form>
+{% endblock %}
+{% block traintab_block %}
 
-    <table name="traindata">
-        <tr>
+<table name="traindata">
+    <tr>
             <th>Date</th>
             <th>location</th>
             <th>Distance(m)</th>
@@ -70,11 +71,11 @@
             <th>Hsl avg(bpm)</th>
             <th>training description</th>
         </tr>
-    <p>{% for training in trainingen|dictsort:"startTime" %} 
-        <tr value={{training.fname}}  
-        name="traindata" 
-        id="traindata"
-        data-url="{% url 'test_polar:showlapdata' %}">
+        <p>{% for training in trainingen|dictsort:"startTime" %} 
+            <tr value={{training.fname}}  
+            name="traindata" 
+            id="traindata"
+            data-url="{% url 'test_polar:showlapdata' %}">
             <td>{{training.startTime|slice:":10"}}</td> 
             
             {% if training.location != None %}
@@ -87,16 +88,15 @@
             <td>{{training.averageHeartRate|floatformat:0}} / {{training.maximumHeartRate|floatformat:0}}
             </td>
             <td id="tdescr" 
-             
+            
             onclick="showLapdata(this)">{{training.trainingdescription.description|linebreaks}}</td>
         </tr>
         {% endfor %}
     </p>
     <br><br>
-
-
     {% endblock %}
-
+    
+    
+    
 </body>
-
-    </html>
+</html>
