@@ -22,9 +22,7 @@
 
 
         {% comment %} <img src={% static "images/knmirotterdam_220814_07.png" %} {% endcomment %}
-        <br>lalalalala</br>
-    <p> This is just a test </p>
-    <br></br>
+    <p> This is a test </p>
 
     <div id="lapdata"> 
         {% if lapdata %}
@@ -39,9 +37,9 @@
         {% endfor %}
             {% endif %}
         </table>
+        <div class="info">
+        <br> number of run training in table: {{ trainingen|length }} </br>
         </div>
-    <p> number of run training in 2014: {{ trainingen|length }} </p>
-        
     <p>{{ ttypes }}</p>
     {% comment %} <select id="trainingtype" name="ttypes" size="4" onclick="updateText2()"> {% endcomment %}
     

@@ -8,14 +8,14 @@
   {% if locationform %}
   <div class="container">
     <div class="row">
-        <div class="col-4">
+        <div class="col">
             <form method="POST", enctype="multipart/form-data">
                 {% comment %} {{form.as_p}} {% endcomment %}
                 {{ locationform.as_p }}
                 {% csrf_token %}
                 <input type="submit" class="btn btn-primary", value="Commit" method="POST">
                 {% comment %} <input type=" text" id="text-box" size="20" value="Hello world!" /> {% endcomment %}
-            </form>
+            {% comment %} </form> {% endcomment %}
         </div>
     </div>
     </div>
@@ -48,7 +48,7 @@
             <td>{{training.speed.avg|floatformat:1}}</td>
             <td>{{training.averageHeartRate|floatformat:0}} / {{training.maximumHeartRate|floatformat:0}}
             </td>
-            <td id="tdescr" ">{{training.trainingdescription.description|linebreaks}}</td>
+            <td id="tdescr" onclick="showLapdata(this)">{{training.trainingdescription.description|linebreaks}}</td>
         </tr>
         {% endfor %}
     </p>

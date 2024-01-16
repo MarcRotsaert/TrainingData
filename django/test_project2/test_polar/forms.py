@@ -1,6 +1,6 @@
 from django import forms
 
-from test_polar.models import PolarModel
+from test_polar.models import PolarModel, TrainingDescription
 
 
 class formType(forms.Form):
@@ -8,9 +8,18 @@ class formType(forms.Form):
     ttype = forms.CharField(max_length=20)
 
 
+class TrainingDescriptionForm(forms.ModelForm):
+    class Meta:
+        model = TrainingDescription
+        fields = ("description", "type")
+
+
 class locationForm(forms.ModelForm):
+    trainingdescription = TrainingDescriptionForm()
+
     class Meta:
         model = PolarModel
-        fields = ("location", "fname")
+        fields = ("fname", "location", "trainingdescription")
+        # fields = ("location", "fname")
         # fields = ["laps", "alaps"]
         # fields = "__all__"

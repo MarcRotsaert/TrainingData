@@ -70,7 +70,7 @@ function showForm(cell) {
         }
     };
 
-    var jsonData = JSON.stringify({ "fname": fname });
+    var jsonData = JSON.stringify({ "fname": fname, "lapdata": fname });
     xhr.send(jsonData);
     toHeadofpage()
     // return fname

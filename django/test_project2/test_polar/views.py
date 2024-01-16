@@ -106,65 +106,69 @@ def show_polar(request: HttpRequest) -> HttpResponse:
         )
 
 
-def _adapt_test(
+def _set_database(request: HttpRequest, connection):
+    new_description = request.POST["trainingdescription-description"]
+    new_location = request.POST["location"]
+    print(new_description)
+    new_location = request.POST["location"]
+    new_description = request.POST["trainingdescription-description"]
+    # fname = "training-session-2022-01-12-6892575464-df5387b0-e271-48db-b0c2-4735c913b039.json"
+    fname = request.POST["fname"]
+    training = _return_trainingdata(connection, fname)
+    obj_id = training["_id"]
+    print(fname)
+    mongpol = MongoPolar("polartest", "polar2022")
+    mongpol.updateOne(
+        obj_id,
+        {
+            "location": new_location,
+            "trainingdescription": {"description": new_description},
+        },
+    )
+
+
+def _get_adapt_form(
     request: HttpRequest,
 ) -> HttpResponse:
     connection = PolarModel.objects.using("default")
     if request.method == "GET":
-        fname = "training-session-2022-01-12-6892575464-df5387b0-e271-48db-b0c2-4735c913b039.json"
-        training = _return_trainingdata(connection, fname)
-        location = {
-            # "trainingdescription": training.get("trainingdescription"),
-            "location": training.get("location"),
-        }
-        # print(location)
-        locationform = locationForm(
-            initial=location,
-        )
-        if not locationform.is_valid():
-            print(locationform.errors)
-        else:
-            print("yesss")
+        locationform = locationForm()
+        print("nonono")
         return locationform
+
     elif request.method == "POST":
         locationform = locationForm(request.POST)
-        if locationform.is_valid():
-            new_location = request.POST["location"]
-            # fname = "training-session-2022-01-12-6892575464-df5387b0-e271-48db-b0c2-4735c913b039.json"
-            print(request.POST)
-            fname = request.POST["fname"]
-            training = _return_trainingdata(connection, fname)
-            obj_id = training["_id"]
-            print(fname)
-            # xx
-            mongpol = MongoPolar("polartest", "polar2022")
-            mongpol.updateOne(
-                obj_id,
-                {"location": new_location},
-            )
-            return locationform
-        else:
-            print(locationform.errors)
-            return None
-            # return render(request, "add_ttype.html", {"ttypeform": ttypeform})
+        return locationform
+        # else:
+        #     print(locationform.errors)
+        #     return None
+        #     # return render(request, "add_ttype.html", {"ttypeform": ttypeform})
 
 
-def show_adapt(request: HttpRequest) -> HttpResponse:
+def action_adapt(request: HttpRequest) -> HttpResponse:
     connection = PolarModel.objects.using("default")
+    trainingen = _return_trainrunning(connection)
     if request.method == "GET":
-        locationform = _adapt_test(request)
-
-        if "ttypes" not in request.GET:
-            trainingen = _return_trainrunning(connection)
-        else:
+        if "ttypes" in request.GET:
             ttype = request.GET["ttypes"]
             print(len(ttype))
+        else:
+            ttypes = return_configttype()
+        # print(ttypes)
+        # print(locationform)
 
-            trainingen = _return_trainttype(connection, ttype)
-        ttypes = return_configttype()
-        print(ttypes)
-        print(locationform)
-
+        return render(
+            request,
+            "adapt.html",
+            context={
+                "trainingen": trainingen,
+                "ttypes": ttypes,
+            },
+        )
+    elif request.method == "POST":
+        locationform = _get_adapt_form(request)
+        _set_database(request, connection)
+        trainingen = _return_trainrunning(connection)
         return render(
             request,
             "adapt.html",
@@ -174,48 +178,62 @@ def show_adapt(request: HttpRequest) -> HttpResponse:
                 # "locationform": locationform,
             },
         )
-    elif request.method == "POST":
-        locationform = _adapt_test(request)
-        trainingen = _return_trainrunning(connection)
-        # ttypes = return_configttype()
-        return render(
-            request,
-            "adapt.html",
-            context={
-                "trainingen": trainingen,
-                # "ttypes": ttypes,
-                "locationform": locationform,
-            },
-        )
 
 
 def show_form(request: HttpRequest):
     connection = PolarModel.objects.using("default")
     if request.method == "POST":
+        data = json.loads(request.body.decode("utf-8"))
+        print(data)
+        fname = data.pop("fname", None)
+        if not fname:
+            fname = data.get("lapdata", None)
+        print(fname)
+        lapdata = _return_lapdata(connection, fname)
+
+        training = _return_trainingdata(connection, fname)
+        location = training["location"]
         try:
-            # print(request.body)
-            data = json.loads(request.body.decode("utf-8"))
-            print(data)
-            fname = data.get("fname", "")
-            print(fname)
-            training = _return_trainingdata(connection, fname)
-            location = training.get("location")
-            trainingen = _return_trainrunning(connection)
-            locationform = locationForm(initial={"location": location, "fname": fname})
-            print(locationform)
-            return render(
-                request,
-                "adapt.html",
-                context={
-                    "location": location,
-                    "trainingen": trainingen,
-                    # "ttypes": ttypes,
-                    "locationform": locationform,
-                },
-            )
-        except json.JSONDecodeError:
-            return JsonResponse({"status": "error", "message": "Invalid JSON"})
-    return JsonResponse({"status": "error", "message": "Invalid request method"})
+            description = training["trainingdescription"]["description"]
+        except:
+            description = "unknown"
+        print(description)
+
+        locationform = locationForm(
+            use_required_attribute=True,
+            initial={
+                "location": location,
+                "fname": fname,
+                # TODO: onderstaande werkt allemaal niet.
+                #  Waarschijnlijk op te lossen met apart model maken voor form ipv polarmodel
+                # "trainingdescription": {"description": description, "type": ""},
+                # "trainingdescription-description": "random",
+                # "trainingdescription-type": "",
+                # "dummy": "tralala",
+            },
+        )
+
+        # lf_trainingdesc = locationform["trainingdescription-description"]
+        # print(dir(lf_trainingdesc))
+        print(locationform.fields)
+        print(locationform.is_valid())
+        print(locationform.errors)
+
+        trainingen = _return_trainrunning(connection)
+        return render(
+            request,
+            "adapt.html",
+            context={
+                "lapdata": lapdata,
+                "trainingen": trainingen,
+                # "ttypes": ttypes,
+                "locationform": locationform,
+            },
+        )
+    #     except json.JSONDecodeError:
+    #         print("nooo")
+    #         return JsonResponse({"status": "error", "message": "Invalid JSON"})
+    # return JsonResponse({"status": "error", "message": "Invalid request method"})
 
 
 def show_lapdata(request: HttpRequest) -> Union[HttpResponse, JsonResponse]:

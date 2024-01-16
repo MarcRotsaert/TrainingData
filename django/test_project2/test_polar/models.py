@@ -104,8 +104,8 @@ class TrainingtypeModel(AbstractTrainingtype):
 
 
 class AbstractTrainingDescr(mongomod.Model):
-    description = mongomod.TextField(max_length=256)
-    type = mongomod.CharField(max_length=20)
+    description = mongomod.TextField(max_length=256, null=True, blank=True)
+    type = mongomod.CharField(max_length=20, null=True, blank=True)
 
     class Meta:
         abstract = True

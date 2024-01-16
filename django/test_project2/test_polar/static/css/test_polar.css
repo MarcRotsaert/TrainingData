@@ -2,9 +2,44 @@ p {
     margin: 0;
     font-size: 85%;
     font-style: italic;
-    text-align: center;
+    text-align: left;
+    /* width: 600px; */
+    /* height: 300px; */
 
 }
+
+#id_fname,
+label[for="id_fname"] {
+    display: none;
+}
+
+#id_trainingdescription-type,
+label[for="id_trainingdescription-type"],
+#id_trainingdescription-type~th,
+#id_trainingdescription-type~tr {
+    display: none;
+    visibility: hidden;
+}
+
+td input {
+    max-height: 100px;
+}
+
+td textarea {
+    border: 2px dashed red;
+    margin: 0;
+    font-size: 100%;
+    text-align: left;
+    padding: 0;
+    background-color: lightblue;
+    width: 100 px;
+    height: 300 px;
+    max-width: 500px;
+    max-height: 100px;
+    ;
+}
+
+
 
 /* table, */
 th,
@@ -12,11 +47,21 @@ td {
     border: 1px solid;
     padding: 1cqb;
     border-collapse: collapse;
-    text-align: center;
-    white-space: pre-wrap;
+    text-align: right;
+    margin: 20%
+}
+
+#tdescr {
+    text-wrap: wrap;
+
 }
 
 table {
     position: relative;
     left: 15px
+}
+
+.info {
+    /* border: 1px solid; */
+    font-size: 30px;
 }
