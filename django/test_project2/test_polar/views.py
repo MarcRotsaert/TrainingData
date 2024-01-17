@@ -125,7 +125,11 @@ def _set_database(request: HttpRequest, connection):
     training = _return_trainingdata(connection, fname)
     obj_id = training["_id"]
     print(fname)
-    mongpol = MongoPolar("polartest", "polar2022")
+    db_table = PolarModel._meta.db_table
+    config = tomli.load(open("config.toml", "rb"))
+    database = config["mongodb"]["database"]
+
+    mongpol = MongoPolar(database, db_table)
     mongpol.updateOne(
         obj_id,
         {
