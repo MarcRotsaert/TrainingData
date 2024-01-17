@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 {% extends "base.html" %}
 {% load static %}
-
+{% load cache %}
 <html lang="en">
 <head>
     {% block summary_block %}
     <meta charset="utf-8">
-    <title>testpage</title>
+    <title>summary</title>
     {% block adapt %}
     {% endblock %}
     
@@ -43,23 +43,24 @@
     <p>{{ ttypes }}</p>
     {% comment %} <select id="trainingtype" name="ttypes" size="4" onclick="updateText2()"> {% endcomment %}
     
-    <form id="trainingForm" action="/summary/" method="get">
-        {% csrf_token %}
-        <select id="trainingtype" name="ttypes" size="4" onclick="" >
+
         {% if  ttypes %}
+        <form id="trainingForm" action="/summary/" method="get">
+            {% csrf_token %}
+            <select id="trainingtype" name="ttypes" size="4" onclick="" >
             {% for type_name in ttypes %}
                 <option value={{ type_name}}>{{type_name}}</option>
             {% endfor %}
-            {% else %}
-                <option value="No Choice">No Choice</option>
+            {% comment %} {% else %} {% endcomment %}
+            {% comment %} <option value="No Choice">No Choice</option> {% endcomment %}
+            
+        </select>
+        <input type="submit" id="to_addtt" value="to next page" onclick="toHeadofpage()"> </input>
         {% endif %}
-
-    </select>
-    <input type="submit" id="to_addtt" value="to next page" onclick="toHeadofpage()"> </input>
-</form>
+        </form>
 {% endblock %}
-{% block traintab_block %}
 
+{% block traintab_block %}
 <table name="traindata">
     <tr>
             <th>Date</th>
@@ -69,7 +70,8 @@
             <th>Hsl avg(bpm)</th>
             <th>training description</th>
         </tr>
-        <p>{% for training in trainingen|dictsort:"startTime" %} 
+        <p>{% cache 360 "training_data" %}
+            {% for training in trainingen|dictsort:"startTime" %} 
             <tr value={{training.fname}}  
             name="traindata" 
             id="traindata"
@@ -90,7 +92,8 @@
             onclick="showLapdata(this)">{{training.trainingdescription.description|linebreaks}}</td>
         </tr>
         {% endfor %}
-    </p>
+        {% endcache %}
+        </p>
     <br><br>
     {% endblock %}
     

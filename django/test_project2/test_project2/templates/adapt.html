@@ -2,9 +2,9 @@
 {% extends "summary.html" %}
 {% comment %} {% extends "base.html" %} {% endcomment %}
 {% load static %}
-<p>This page has a master page</p>
+{% load cache %}
+
 {% block adapt_block %}
-  <p>This page has a master page</p>
   {% if locationform %}
   <div class="container">
     <div class="row">
@@ -22,7 +22,7 @@
     {% endif %} 
   {% endblock %}
  
-  {% block traintab_block %}
+{% block traintab_block %}
   <table name="traindata">
     <tr>
             <th>Date</th>
@@ -32,7 +32,8 @@
             <th>Hsl avg(bpm)</th>
             <th>training description</th>
         </tr>
-        <p>{% for training in trainingen|dictsort:"startTime" %} 
+        <p>{% cache 360 "training_data" %}
+          {% for training in trainingen|dictsort:"startTime" %} 
             <tr value={{training.fname}}  
             name="traindata" 
             id="traindata"
@@ -51,8 +52,9 @@
             <td id="tdescr" onclick="showLapdata(this)">{{training.trainingdescription.description|linebreaks}}</td>
         </tr>
         {% endfor %}
+        {% endcache %}
     </p>
     <br><br>
     {% endblock %}
-
+ 
 </html>    

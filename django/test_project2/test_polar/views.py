@@ -3,11 +3,15 @@ import tomli
 
 import json
 
+
+from django.core.cache.backends.memcached import PyMemcacheCache
+
 # Create your views here.
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpRequest, HttpResponseRedirect, JsonResponse
 from django.core.exceptions import ValidationError
 from django.db.models.query import QuerySet
+from django.core.cache import cache
 
 from test_polar.forms import locationForm, formType
 from test_polar.models import PolarModel  # , PolarModel_test  # , Testpage
@@ -81,8 +85,10 @@ def show_polar(request: HttpRequest) -> HttpResponse:
         else:
             ttype = request.GET["ttypes"]
             print(len(ttype))
+            print(ttype)
 
             trainingen = _return_trainttype(connection, ttype)
+            print(len(trainingen))
             # FOR DEBUG PURPOSES
             # trainingen = []
             # for t in range(200):
@@ -93,9 +99,11 @@ def show_polar(request: HttpRequest) -> HttpResponse:
             #         print("no")
             # xx
             # trainingen = [t for t in training.values()]
+        cache_key = "training_data"
+        cache.clear()
+        cache.set(cache_key, trainingen, 360)
 
         ttypes = return_configttype()
-
         return render(
             request,
             "summary.html",
@@ -148,12 +156,15 @@ def _get_adapt_form(
 def action_adapt(request: HttpRequest) -> HttpResponse:
     connection = PolarModel.objects.using("default")
     trainingen = _return_trainrunning(connection)
+    cache_key = "training_data"
+    cache.clear()
+    cache.set(cache_key, trainingen, 360)
     if request.method == "GET":
-        if "ttypes" in request.GET:
-            ttype = request.GET["ttypes"]
-            print(len(ttype))
-        else:
-            ttypes = return_configttype()
+        # if "ttypes" in request.GET:
+        #     ttype = request.GET["ttypes"]
+        #     print(len(ttype))
+        # else:
+        #     ttypes = return_configttype()
         # print(ttypes)
         # print(locationform)
 
@@ -162,7 +173,7 @@ def action_adapt(request: HttpRequest) -> HttpResponse:
             "adapt.html",
             context={
                 "trainingen": trainingen,
-                "ttypes": ttypes,
+                # "ttypes": ttypes,
             },
         )
     elif request.method == "POST":
@@ -181,6 +192,7 @@ def action_adapt(request: HttpRequest) -> HttpResponse:
 
 
 def show_form(request: HttpRequest):
+    print(__name__)
     connection = PolarModel.objects.using("default")
     if request.method == "POST":
         data = json.loads(request.body.decode("utf-8"))
@@ -219,13 +231,13 @@ def show_form(request: HttpRequest):
         print(locationform.is_valid())
         print(locationform.errors)
 
-        trainingen = _return_trainrunning(connection)
+        # trainingen = _return_trainrunning(connection)
         return render(
             request,
             "adapt.html",
             context={
                 "lapdata": lapdata,
-                "trainingen": trainingen,
+                # "trainingen": trainingen,
                 # "ttypes": ttypes,
                 "locationform": locationform,
             },
@@ -236,16 +248,25 @@ def show_form(request: HttpRequest):
     # return JsonResponse({"status": "error", "message": "Invalid request method"})
 
 
+# def _return_json(lapdata:dict = None) -> JsonResponse:
+#     ttypes = return_configttype()
+
+#     context =
+#     JsonResponse("lapdata":lapdata, "ttypes":ttypes)
+
+
 def show_lapdata(request: HttpRequest) -> Union[HttpResponse, JsonResponse]:
-    connection = PolarModel.objects.using("default")
     if request.method == "POST":
+        print(request)
+        connection = PolarModel.objects.using("default")
         try:
             print(request.body)
             data = json.loads(request.body.decode("utf-8"))
             received_data = data.get("lapdata", "")
             lapdata = _return_lapdata(connection, received_data)
 
-            trainingen = _return_trainrunning(connection)
+            # trainingen = _return_trainrunning(connection)
+            # print(trainingen)
             ttypes = return_configttype()
 
             return render(
@@ -253,7 +274,7 @@ def show_lapdata(request: HttpRequest) -> Union[HttpResponse, JsonResponse]:
                 "summary.html",
                 context={
                     "lapdata": lapdata,
-                    "trainingen": trainingen,
+                    # "trainingen": trainingen,
                     "ttypes": ttypes,
                 },
             )
