@@ -15,7 +15,7 @@ from test_polar.models import PolarModel  # , PolarModel_test  # , Testpage
 from nosql_adapter import MongoPolar
 
 
-def return_configttype() -> list[str]:
+def _return_configttype() -> list[str]:
     # config = tomli.load(open("../../config.toml", "rb"))
     config = tomli.load(open("config.toml", "rb"))
     return config["running"]["trainingtypes"]
@@ -66,36 +66,6 @@ def _set_cache_trainingdata(trainingen: list, cachetime: float):
     cache.set(cache_key, trainingen, cachetime)
 
 
-def show_polar(request: HttpRequest) -> HttpResponse:
-    if request.method == "GET":
-        connection = PolarModel.objects.using("default")
-
-        if "ttypes" not in request.GET:
-            trainingen = _return_trainrunning(connection)
-            # training = connection.filter(sport="RUNNING")
-        else:
-            ttype = request.GET["ttypes"]
-            print(len(ttype))
-            print(ttype)
-
-            trainingen = _return_trainttype(connection, ttype)
-            print(len(trainingen))
-
-        _set_cache_trainingdata(trainingen, 60)
-
-        ttypes = return_configttype()
-        return render(
-            request,
-            "summary.html",
-            context={
-                "trainingen": trainingen,
-                "ttypes": ttypes,
-            },
-        )
-    else:
-        return HttpResponse()
-
-
 def _set_database(request: HttpRequest, connection):
     new_description = request.POST["trainingdescription-description"]
     new_location = request.POST["location"]
@@ -121,35 +91,48 @@ def _set_database(request: HttpRequest, connection):
     )
 
 
-def _get_adapt_form(
-    request: HttpRequest,
-) -> HttpResponse:
-    connection = PolarModel.objects.using("default")
+def show_polar(request: HttpRequest) -> HttpResponse:
     if request.method == "GET":
-        locationform = locationForm()
-        print("nonono")
-        return locationform
+        connection = PolarModel.objects.using("default")
 
-    elif request.method == "POST":
-        locationform = locationForm(request.POST)
-        return locationform
-        # else:
-        #     print(locationform.errors)
-        #     return None
-        #     # return render(request, "add_ttype.html", {"ttypeform": ttypeform})
+        if "ttypes" not in request.GET:
+            trainingen = _return_trainrunning(connection)
+            # training = connection.filter(sport="RUNNING")
+        else:
+            ttype = request.GET["ttypes"]
+            print(len(ttype))
+            print(ttype)
+
+            trainingen = _return_trainttype(connection, ttype)
+            print(len(trainingen))
+
+        _set_cache_trainingdata(trainingen, 60)
+
+        ttypes = _return_configttype()
+        return render(
+            request,
+            "summary.html",
+            context={
+                "trainingen": trainingen,
+                "ttypes": ttypes,
+            },
+        )
+    else:
+        return HttpResponse()
 
 
 def action_adapt(request: HttpRequest) -> HttpResponse:
     connection = PolarModel.objects.using("default")
     trainingen = _return_trainrunning(connection)
-    print(request.method)
 
     if request.method == "GET":
-        _set_cache_trainingdata(trainingen, 60)
+        # TODO: add logging
+        print("GET action_adapt")
+        # _set_cache_trainingdata(trainingen, 60)
     elif request.method == "POST":
         _set_database(request, connection)
         trainingen = _return_trainrunning(connection)
-        _set_cache_trainingdata(trainingen, 60)
+    _set_cache_trainingdata(trainingen, 60)
 
     return render(
         request,
@@ -167,11 +150,7 @@ def show_form(request: HttpRequest, fname: str):
         return request
     elif request.method == "POST":
         data = json.loads(request.body.decode("utf-8"))
-        print(data)
         fname = data.pop("fname", None)
-        if not fname:
-            fname = data.get("lapdata", None)
-        print(fname)
         lapdata = _return_lapdata(connection, fname)
 
         training = _return_trainingdata(connection, fname)
@@ -180,24 +159,21 @@ def show_form(request: HttpRequest, fname: str):
             description = training["trainingdescription"]["description"]
         except:
             description = "unknown"
-        print(description)
 
         locationform = locationForm(
             use_required_attribute=True,
             initial={
                 "location": location,
                 "fname": fname,
-                # TODO: onderstaande werkt allemaal niet.
+                # TODO: onderstaande functionerend maken. Het werkt niet.
                 #  Waarschijnlijk op te lossen met apart model maken voor form ipv polarmodel
                 # "trainingdescription": {"description": description, "type": ""},
                 # "trainingdescription-description": "random",
                 # "trainingdescription-type": "",
-                # "dummy": "tralala",
             },
         )
 
         # lf_trainingdesc = locationform["trainingdescription-description"]
-        # print(dir(lf_trainingdesc))
         print(locationform.fields)
         print(locationform.is_valid())
         print(locationform.errors)
@@ -217,30 +193,16 @@ def show_lapdata(request: HttpRequest, fname: str) -> Union[HttpResponse, JsonRe
         print(fname)
 
         connection = PolarModel.objects.using("default")
-        # try:
-        #     print(request.GET.keys())
-        #     print(request.GET.get("value"))
-        #     data = request.GET
-        #     # print(request.body)
-        #     # data = json.loads(request.body.decode("utf-8"))
-        # except json.JSONDecodeError:
-        #     return JsonResponse(
-        #         {"status": "error", "message": "Invalid JSON in" + __name__}
-        #     )
-        # received_data = data.get("lapdata", "")
         lapdata = _return_lapdata(connection, fname)
-
-        # trainingen = _return_trainrunning(connection)
-        # print(trainingen)
-        ttypes = return_configttype()
+        ttypes = _return_configttype()
 
         return render(
             request,
             "summary.html",
             context={
                 "lapdata": lapdata,
-                # "trainingen": trainingen,
                 "ttypes": ttypes,
+                # "trainingen": trainingen,
             },
         )
     return JsonResponse(
