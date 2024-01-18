@@ -69,7 +69,7 @@ function showForm(cell) {
 
         }
     };
-
+    console.log(fname)
     var jsonData = JSON.stringify({ "fname": fname, "lapdata": fname });
     xhr.send(jsonData);
     toHeadofpage()
@@ -83,12 +83,14 @@ function showLapdata(cell) {
     var url = cell.parentNode.getAttribute("data-url")
     var csrftoken = getCookie('csrftoken');
     console.log(url)
-    // console.log(fname)
+    console.log(fname)
     // Use AJAX to send the data to the Django view
     var xhr = new XMLHttpRequest(value = fname);
-    xhr.open("POST", url, true);
+    // xhr.open("GET", url + fname, true);
+    xhr.open("GET", url, true);
     xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
     xhr.setRequestHeader("X-CSRFToken", csrftoken);
+
     xhr.onreadystatechange = function () {
         if (xhr.readyState === 4 && xhr.status === 200) {
             // Handle the response from the server if needed
@@ -101,7 +103,7 @@ function showLapdata(cell) {
         }
     };
 
-    var jsonData = JSON.stringify({ "lapdata": fname });
+    var jsonData = JSON.stringify({ "fname": fname });
     xhr.send(jsonData);
     toHeadofpage()
     // return fname

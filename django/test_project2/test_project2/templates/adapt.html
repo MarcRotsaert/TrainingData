@@ -32,12 +32,12 @@
             <th>Hsl avg(bpm)</th>
             <th>training description</th>
         </tr>
-        <p>{% cache 360 "training_data" %}
+        <p>{% cache 60 "training_data" %}
           {% for training in trainingen|dictsort:"startTime" %} 
             <tr value={{training.fname}}  
             name="traindata" 
             id="traindata"
-            data-url="{% url 'test_polar:showform' %}">
+            data-url="{% url 'test_polar:showform' training.fname %}">
             <td>{{training.startTime|slice:":10"}}</td> 
             
             {% if training.location != None %}
@@ -49,7 +49,8 @@
             <td>{{training.speed.avg|floatformat:1}}</td>
             <td>{{training.averageHeartRate|floatformat:0}} / {{training.maximumHeartRate|floatformat:0}}
             </td>
-            <td id="tdescr" onclick="showLapdata(this)">{{training.trainingdescription.description|linebreaks}}</td>
+            {% comment %} <td id="tdescr" onclick="showLapdata(this)">{{training.trainingdescription.description|linebreaks}}</td> {% endcomment %}
+            <td id="tdescr" onclick="showForm(this)">{{training.trainingdescription.description|linebreaks}}</td>
         </tr>
         {% endfor %}
         {% endcache %}
