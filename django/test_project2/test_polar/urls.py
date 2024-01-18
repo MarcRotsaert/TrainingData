@@ -4,10 +4,13 @@ from test_polar import views
 app_name = "test_polar"
 
 urlpatterns = [
-    # path('training/', views.select_ttype, name="testpage"),
-    # path('select_ttype/', views.select_ttype2, name="selectttype"),
     # re_path(r"^add_ttype/$", views.add_ttype, name="addttype")
-    # path("add_ttype/", views.add_ttype, name="addttype"),
-    path("polar/return_lapdata/", views.show_lapdata, name="showlapdata"),
-    path("polar/", views.show_polar, name="showpolar"),
+    path("summary/", views.show_polar, name="showpolar"),
+    path(
+        "summary/return_lapdata/<str:fname>",
+        views.show_lapdata,
+        name="showlapdata",
+    ),
+    path("adapt/", views.action_adapt, name="actionadapt"),
+    path("adapt/form/<str:fname>", views.show_form, name="showform"),
 ]
