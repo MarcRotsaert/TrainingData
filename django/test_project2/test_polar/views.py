@@ -177,12 +177,29 @@ def show_form(request: HttpRequest, fname: str):
         except:
             description = "unknown"
 
+        try:
+            description = training["trainingdescription"]["description"]
+        except:
+            description = "unknown"
+
+        interval = training["trainingtype"].get("interval")
+        sprint = training["trainingtype"].get("sprint")
+        easy = training["trainingtype"].get("easyrun")
+        road = training["trainingtype"].get("roadrace")
+        print(easy)
+        # xx
         initdict = {
             "location": location,
             "fname": fname,
         }
         hackdict = {
             "trainingdescription": {"description": description, "type": ""},
+            "trainingtype": {
+                "interval": interval,
+                "sprint": sprint,
+                "easyrun": easy,
+                "roadrace": road,
+            },
         }
         adaptform = _set_form_initial(adaptForm, initdict, hackdict)
 

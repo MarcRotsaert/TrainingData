@@ -153,7 +153,17 @@ class PolarModel(mongomod.Model):
     alaps = mongomod.ArrayField(model_container=Laps, null=True, blank=True)
     laps = mongomod.ArrayField(model_container=Laps, null=True, blank=True)
     trainingtype = mongomod.EmbeddedField(
-        model_container=TrainingtypeModel, null=True, blank=True
+        model_container=TrainingtypeModel,
+        null=True,
+        blank=True,
+        model_form_kwargs={
+            "initial": {
+                "easyrun": None,
+                "interval": None,
+                "roadrace": None,
+                "sprint": None,
+            }
+        },
     )
     trainingdescription = mongomod.EmbeddedField(
         model_container=TrainingDescription,
