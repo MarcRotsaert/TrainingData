@@ -9,7 +9,7 @@ from django.core.exceptions import ValidationError
 from django.db.models.query import QuerySet
 from django.core.cache import cache
 
-from test_polar.forms import locationForm, formType
+from test_polar.forms import adaptForm  # , formType
 from test_polar.models import PolarModel  # , PolarModel_test  # , Testpage
 
 from nosql_adapter import MongoPolar
@@ -68,11 +68,8 @@ def _set_cache_trainingdata(trainingen: list, cachetime: float):
 
 def _set_database(request: HttpRequest, connection):
     new_description = request.POST["trainingdescription-description"]
-    new_location = request.POST["location"]
     print(new_description)
     new_location = request.POST["location"]
-    new_description = request.POST["trainingdescription-description"]
-    # fname = "training-session-2022-01-12-6892575464-df5387b0-e271-48db-b0c2-4735c913b039.json"
     fname = request.POST["fname"]
     training = _return_trainingdata(connection, fname)
     obj_id = training["_id"]
@@ -130,6 +127,8 @@ def action_adapt(request: HttpRequest) -> HttpResponse:
         print("GET action_adapt")
         # _set_cache_trainingdata(trainingen, 60)
     elif request.method == "POST":
+        print(request.POST)
+        # print(xx)
         _set_database(request, connection)
         trainingen = _return_trainrunning(connection)
     _set_cache_trainingdata(trainingen, 60)
@@ -141,6 +140,24 @@ def action_adapt(request: HttpRequest) -> HttpResponse:
             "trainingen": trainingen,
         },
     )
+
+
+def _set_form_initial(form_class, initialdict, hackdict):
+    # TODO: onderstaande functionerend maken. Het werkt niet.
+    #  Waarschijnlijk op te lossen met apart model maken voor form ipv polarmodel
+    # "trainingdescription": {"description": description, "type": ""},
+    # "trainingdescription-description": "test",
+    form_inst = form_class(
+        use_required_attribute=True,
+        initial=initialdict,
+    )
+
+    for vkey in hackdict:
+        for skey in hackdict[vkey]:
+            sval = hackdict[vkey][skey]
+
+            form_inst.fields[vkey].model_form_kwargs["initial"].update({skey: sval})
+    return form_inst
 
 
 def show_form(request: HttpRequest, fname: str):
@@ -160,30 +177,29 @@ def show_form(request: HttpRequest, fname: str):
         except:
             description = "unknown"
 
-        locationform = locationForm(
-            use_required_attribute=True,
-            initial={
-                "location": location,
-                "fname": fname,
-                # TODO: onderstaande functionerend maken. Het werkt niet.
-                #  Waarschijnlijk op te lossen met apart model maken voor form ipv polarmodel
-                # "trainingdescription": {"description": description, "type": ""},
-                # "trainingdescription-description": "random",
-                # "trainingdescription-type": "",
-            },
-        )
+        initdict = {
+            "location": location,
+            "fname": fname,
+        }
+        hackdict = {
+            "trainingdescription": {"description": description, "type": ""},
+        }
+        adaptform = _set_form_initial(adaptForm, initdict, hackdict)
 
-        # lf_trainingdesc = locationform["trainingdescription-description"]
-        print(locationform.fields)
-        print(locationform.is_valid())
-        print(locationform.errors)
+        print(adaptform.fields)
+        print(adaptform.is_valid())
+        print(adaptform.errors)
+        print(dir(adaptform.fields["trainingdescription"]))
+
+        print(adaptform.fields["trainingdescription"].model_form_class)
+        # xx
 
         return render(
             request,
             "adapt.html",
             context={
                 "lapdata": lapdata,
-                "locationform": locationform,
+                "adaptform": adaptform,
             },
         )
 

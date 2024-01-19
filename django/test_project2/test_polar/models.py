@@ -1,5 +1,7 @@
 from djongo import models as mongomod
 
+# from django import forms
+
 
 # Create your models here.
 class AbstractSpeedModel(mongomod.Model):
@@ -87,7 +89,7 @@ class Laps(AbstractLaps):
 
 class AbstractTrainingtype(mongomod.Model):
     easyrun = mongomod.BooleanField(null=True)
-    interval = mongomod.CharField(max_length=50)
+    interval = mongomod.CharField(max_length=50, blank=True)
     roadrace = mongomod.BooleanField(null=True)
     sprint = mongomod.BooleanField(null=True)
     # other = mongomod.CharField(max_length=50)
@@ -114,12 +116,21 @@ class AbstractTrainingDescr(mongomod.Model):
 class TrainingDescription(AbstractTrainingDescr):
     _id = mongomod.ObjectIdField()
 
+    class Meta:
+        abstract = False
+
+
+# class TrainingDescriptionForm(forms.ModelForm):
+#     class Meta:
+#         model = TrainingDescription
+#         fields = "__all__"
+
 
 class PolarModel(mongomod.Model):
     _id = mongomod.ObjectIdField(primary_key=True)
     sport = mongomod.CharField(max_length=256, default="RUNNING")
     fname = mongomod.CharField(max_length=80)
-    location = mongomod.CharField(max_length=30)
+    location = mongomod.CharField(max_length=30, blank=True)
     distance = mongomod.IntegerField()
     duration = mongomod.DecimalField(
         decimal_places=1, max_digits=5, null=True, blank=True
@@ -144,7 +155,11 @@ class PolarModel(mongomod.Model):
     trainingtype = mongomod.EmbeddedField(
         model_container=TrainingtypeModel, null=True, blank=True
     )
-    trainingdescription = mongomod.EmbeddedField(model_container=TrainingDescription)
+    trainingdescription = mongomod.EmbeddedField(
+        model_container=TrainingDescription,
+        # model_form_class=TrainingDescriptionForm,
+        model_form_kwargs={"initial": {"description": "Initial Description"}},
+    )
     objects = mongomod.DjongoManager()
 
     class Meta:
@@ -155,3 +170,21 @@ class PolarModel(mongomod.Model):
     # @classmethod
     # def using_mongo(cls):
     #     return cls.objects.using("default")
+
+
+class FormModel(mongomod.Model):
+    _id = mongomod.ObjectIdField(primary_key=True)
+    fname = mongomod.CharField(max_length=80)
+    location = mongomod.CharField(max_length=30)
+    # trainingtype = mongomod.EmbeddedField(
+    #     model_container=TrainingtypeModel, null=True, blank=True
+    # )
+    trainingdescription = mongomod.EmbeddedField(
+        model_container=TrainingDescription,
+    )
+    # objects = mongomod.DjongoManager()
+
+    class Meta:
+        # db_table = "polar2022"
+        # app_label = "test_training2"
+        managed = False

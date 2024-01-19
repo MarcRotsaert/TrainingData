@@ -1,6 +1,7 @@
 from django import forms
 
-from test_polar.models import PolarModel, TrainingDescription
+# from test_polar.models import PolarModel, TrainingDescription, TrainingtypeModel
+from test_polar.models import PolarModel, FormModel, TrainingDescription
 
 
 class formType(forms.Form):
@@ -8,14 +9,8 @@ class formType(forms.Form):
     ttype = forms.CharField(max_length=20)
 
 
-class TrainingDescriptionForm(forms.ModelForm):
-    class Meta:
-        model = TrainingDescription
-        fields = ("description", "type")
-
-
-class locationForm(forms.ModelForm):
-    trainingdescription = TrainingDescriptionForm()
+class adaptForm(forms.ModelForm):
+    # trainingdescription = TrainingDescriptionForm()
 
     class Meta:
         model = PolarModel
