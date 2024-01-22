@@ -1,0 +1,16 @@
+DATA DUMP
+Data dump for mongo database, to bson-file
+	mongodump -d <database name> --uri="mongodb://<username>:<password>@127.0.0.1:27017/<database name>?authSource=admin"
+example
+	mongodump -d polartest --uri="mongodb://dummy:abcde@127.0.0.1:27017/polartest?authSource=admin"
+
+Data is set into a directory dump/<database name>
+/app directory is mounted to the windows filesystem. Here you can set 
+
+
+RESTORE DATA 
+	mongorestore --uri="mongodb://<username>:<password>@127.0.0.1:27017/<name restore database >" dump/<database name>
+example
+	mongorestore --uri="mongodb://<username>:<password>@127.0.0.1:27017/polartest_backup" dump/polartest
+You can choose another name of the restore database as the the name of the datadump. 
+Of course there are all kind of options for dumping and restoring specific collections from the data. 
