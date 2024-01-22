@@ -22,3 +22,7 @@ Almost everything is work in progress.
 Coupling between files and database is in a reasonable.
 Analysis tools is very simple and not foul proof. 
 Web interface is for a next phase.
+
+
+# Backup Database
+See mongodb/backup-notes.txt
