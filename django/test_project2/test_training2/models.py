@@ -1,6 +1,8 @@
 from django.db import models
 from djongo import models as mongomod
 
+
+from django.contrib.auth.models import User
 # Create your models here.
 
 
@@ -40,3 +42,13 @@ class Testpage(models.Model):
     email = models.EmailField()
     text = models.CharField(max_length=20)
     date = models.DateField()
+
+
+class UserProfile(models.model):
+    user = models.OneToOneField(User)
+    portfolio = models.UrlField(blank=True)
+
+
+    def __str__(self):
+        return self.user.username
+    

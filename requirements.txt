@@ -8,3 +8,5 @@ tomli
 fitdecode
 Django
 djongo
+bcrypt
+django[argon2]

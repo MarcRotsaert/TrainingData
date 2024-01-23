@@ -16,6 +16,7 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
 TEMP_DIR = Path(__file__).resolve().parent.joinpath("templates")
 STATIC_DIR = Path(__file__).parent.joinpath("static")
+STATIC_DIR = Path(__file__).parent.joinpath("media")
 # STATIC_ROOT = "C:/TEMP/css"
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
@@ -103,12 +104,22 @@ DATABASE_ROUTERS = ["test_project2.mongorouter.MongoRouter"]
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
 
+PASSWORD_HASHERS = [
+    "django.contrib.auth.hashers.Argon2PasswordHasher",
+    "django.contrib.auth.hashers.BCryptSHA256PasswordHasher",
+    "django.contrib.auth.hashers.BCryptPasswordHasher",
+    "django.contrib.auth.hashers.PBDK2PasswordHasher",
+    "django.contrib.auth.hashers.PBDK2PasswordHasher",
+
+]
+
 AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
     },
     {
         "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
+        "OPTIONS": {"min_lengt": 8},
     },
     {
         "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
@@ -140,3 +151,6 @@ STATICFILES_DIRS = [STATIC_DIR]
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+MEDIA_ROOT = MEDIA_DIR
+MEDIA_URL = "/media"
