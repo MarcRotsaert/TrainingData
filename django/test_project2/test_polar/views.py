@@ -66,14 +66,36 @@ def _set_cache_trainingdata(trainingen: list, cachetime: float):
     cache.set(cache_key, trainingen, cachetime)
 
 
+def _create_ttype_dict(request: HttpRequest) -> dict:
+    # terribly hacky, but for now it's alright
+    ttype_db = {}
+    ttypes = {"interval", "sprint", "roadrace", "easyrun"}
+    for tt in ttypes:
+        new_val = request.POST["trainingtype-" + tt]
+        if tt != "interval":
+            if new_val == "unknown" or "":
+                new_val = None
+            elif new_val == "false":
+                new_val = False
+            else:
+                new_val = True
+        ttype_db.update({tt: new_val})
+    return ttype_db
+
+
 def _set_database(request: HttpRequest, connection):
+    print("")
+    # print(PolarModel.trainingtype.field.value_from_object("interval"))
+    new_trainingtype = _create_ttype_dict(request)
     new_description = request.POST["trainingdescription-description"]
     print(new_description)
     new_location = request.POST["location"]
+
     fname = request.POST["fname"]
+    print(fname)
     training = _return_trainingdata(connection, fname)
     obj_id = training["_id"]
-    print(fname)
+
     db_table = PolarModel._meta.db_table
     config = tomli.load(open("config.toml", "rb"))
     database = config["mongodb"]["database"]
@@ -84,6 +106,7 @@ def _set_database(request: HttpRequest, connection):
         {
             "location": new_location,
             "trainingdescription": {"description": new_description},
+            "trainingtype": new_trainingtype,
         },
     )
 
