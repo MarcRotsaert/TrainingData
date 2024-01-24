@@ -30,6 +30,9 @@ def _return_trainttype(connection: QuerySet, ttype: str) -> list[Optional[dict]]
         comp = True
     elif ttype == "interval":
         comp = "interval"
+    elif ttype == "sprint":
+        comp = True
+
     else:
         print(ttype)
         return []
@@ -114,7 +117,7 @@ def _set_database(request: HttpRequest, connection):
 def show_polar(request: HttpRequest) -> HttpResponse:
     if request.method == "GET":
         connection = PolarModel.objects.using("default")
-
+        print(request.GET)
         if "ttypes" not in request.GET:
             trainingen = _return_trainrunning(connection)
             # training = connection.filter(sport="RUNNING")
