@@ -26,8 +26,15 @@
 
     <div id="lapdata"> 
         {% if lapdata %}
+        <h3> {{ lapdate|slice:10 }}</h3>
         {% comment %} <h3><LAPDATA</h3> {% endcomment %}
         <table>
+            
+        <th>Dist</th> 
+        <th>V avg</th> 
+        <th>V avg,<br></br>corr</th> 
+        <th>HR avg</th> 
+        <th>HR max</th> 
         {% for lap in lapdata %}
             <tr><td>{{lap.distance|floatformat:0}}</td> 
                 <td>{{lap.speed.avg|floatformat:1 }}</td> 

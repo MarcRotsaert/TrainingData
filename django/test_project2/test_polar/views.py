@@ -63,6 +63,12 @@ def _return_lapdata(connection: QuerySet, fname: str) -> list[Optional[dict]]:
         return trainingen.values()[0]["alaps"]
 
 
+def _return_trainingdate(connection, fname: str):
+    training = _return_trainingdata(connection, fname)
+    trainingdate = training["startTime"]
+    return trainingdate
+
+
 def _set_cache_trainingdata(trainingen: list, cachetime: float):
     cache_key = "training_data"
     cache.clear()
@@ -195,6 +201,7 @@ def show_form(request: HttpRequest, fname: str):
         data = json.loads(request.body.decode("utf-8"))
         fname = data.pop("fname", None)
         lapdata = _return_lapdata(connection, fname)
+        ldate = _return_trainingdate(connection, fname)
 
         training = _return_trainingdata(connection, fname)
         location = training["location"]
@@ -241,6 +248,7 @@ def show_form(request: HttpRequest, fname: str):
             request,
             "adapt.html",
             context={
+                "lapdate": ldate,
                 "lapdata": lapdata,
                 "adaptform": adaptform,
             },
@@ -255,10 +263,13 @@ def show_lapdata(request: HttpRequest, fname: str) -> Union[HttpResponse, JsonRe
         lapdata = _return_lapdata(connection, fname)
         ttypes = _return_configttype()
 
+        ldate = _return_trainingdate(connection, fname)
+
         return render(
             request,
             "summary.html",
             context={
+                "lapdate": ldate,
                 "lapdata": lapdata,
                 "ttypes": ttypes,
                 # "trainingen": trainingen,
