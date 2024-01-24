@@ -34,11 +34,17 @@
         </tr>
         <p>{% cache 60 "training_data" %}
           {% for training in trainingen|dictsort:"startTime" %} 
-            <tr value={{training.fname}}  
+            <tr value={{training.fname}}
             name="traindata" 
             id="traindata"
+            {% if training.trainingtype.roadrace %}  
+            class="roadrace"
+            {% endif %}
+
             data-url="{% url 'test_polar:showform' training.fname %}">
-            <td>{{training.startTime|slice:":10"}}</td> 
+            <td>{{training.startTime|slice:":10"}}
+  
+            </td> 
             
             {% if training.location != None %}
             <td id="location" onclick="showForm(this)">{{training.location|upper}}</td>

@@ -82,7 +82,10 @@
             <tr value={{training.fname}}  
             name="traindata" 
             id="traindata"
-            
+            {% if training.trainingtype.roadrace %}  
+            class="roadrace"
+            {% endif %}
+
             data-url="{% url 'test_polar:showlapdata' training.fname %}">
             <td>{{training.startTime|slice:":10"}}</td> 
             
