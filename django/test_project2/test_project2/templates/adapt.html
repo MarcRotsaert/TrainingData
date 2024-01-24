@@ -39,6 +39,13 @@
             id="traindata"
             {% if training.trainingtype.roadrace %}  
             class="roadrace"
+            {% elif training.trainingtype.easyrun %}  
+            class="easyrun"
+            {% elif training.trainingtype.sprint %}  
+            class="sprint"
+            {% elif training.trainingtype.interval == "interval" %}
+            class="interval"
+
             {% endif %}
 
             data-url="{% url 'test_polar:showform' training.fname %}">

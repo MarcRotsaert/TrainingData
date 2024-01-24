@@ -67,5 +67,17 @@ table {
 }
 
 tr.roadrace {
-    background-color: aqua;
+    background-color: red;
+}
+
+tr.sprint {
+    background-color: lightgreen;
+}
+
+tr.easyrun {
+    background-color: lightgray;
+}
+
+tr.interval {
+    background-color: lightcoral;
 }
