@@ -29,14 +29,15 @@
         <h3> {{ lapdate|slice:10 }}</h3>
         {% comment %} <h3><LAPDATA</h3> {% endcomment %}
         <table>
-            
-        <th>Dist</th> 
-        <th>V avg</th> 
-        <th>V avg,<br></br>corr</th> 
-        <th>HR avg</th> 
-        <th>HR max</th> 
+            <th>Dur</th> 
+            <th>Dist.</th> 
+            <th>V avg</th> 
+            <th>V avg,<br></br>corr</th> 
+            <th>HR avg</th> 
+            <th>HR max</th> 
         {% for lap in lapdata %}
-            <tr><td>{{lap.distance|floatformat:0}}</td> 
+            <tr><td>{{lap.duration|duration2min }}</td>
+                <td>{{lap.distance|floatformat:0}}</td> 
                 <td>{{lap.speed.avg|kmh2minkm }}</td> 
                 <td>{{lap.speed.avg_corr|kmh2minkm }}</td> 
                 <td>{{lap.heartRate.avg|floatformat:0}}</td> 
