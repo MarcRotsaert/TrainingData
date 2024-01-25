@@ -22,7 +22,9 @@ def _return_configttype() -> list[str]:
 
 
 def _return_trainttype(connection: QuerySet, ttype: str) -> list[Optional[dict]]:
-    if ttype == "easy":
+    if ttype == "sprint":
+        comp = True
+    elif ttype == "easy":
         ttype = "easyrun"
         comp = True
     elif ttype == "road":
@@ -30,8 +32,6 @@ def _return_trainttype(connection: QuerySet, ttype: str) -> list[Optional[dict]]
         comp = True
     elif ttype == "interval":
         comp = "interval"
-    elif ttype == "sprint":
-        comp = True
 
     else:
         print(ttype)
@@ -135,7 +135,7 @@ def show_polar(request: HttpRequest) -> HttpResponse:
             trainingen = _return_trainttype(connection, ttype)
             print(len(trainingen))
 
-        _set_cache_trainingdata(trainingen, 60)
+        _set_cache_trainingdata(trainingen, 360)
 
         ttypes = _return_configttype()
         return render(
@@ -157,13 +157,12 @@ def action_adapt(request: HttpRequest) -> HttpResponse:
     if request.method == "GET":
         # TODO: add logging
         print("GET action_adapt")
-        # _set_cache_trainingdata(trainingen, 60)
     elif request.method == "POST":
         print(request.POST)
         # print(xx)
         _set_database(request, connection)
         trainingen = _return_trainrunning(connection)
-    _set_cache_trainingdata(trainingen, 60)
+    _set_cache_trainingdata(trainingen, 360)
 
     return render(
         request,

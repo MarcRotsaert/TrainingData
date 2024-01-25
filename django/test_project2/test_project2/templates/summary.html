@@ -2,6 +2,7 @@
 {% extends "base.html" %}
 {% load static %}
 {% load cache %}
+{% load table_filters %}
 <html lang="en">
 <head>
     {% block summary_block %}
@@ -15,14 +16,13 @@
     <link rel="stylesheet" href="{% static "css/test_polar.css" %}">
     
 </head>
-        
+
     <body>
         {% comment %} <script src={% static  "/js/training_test.js" %}></script> {% endcomment %}
         <script src={% static  "js/training_test.js" %}></script>
 
 
         {% comment %} <img src={% static "images/knmirotterdam_220814_07.png" %} {% endcomment %}
-    <p> This is a test </p>
 
     <div id="lapdata"> 
         {% if lapdata %}
@@ -37,8 +37,8 @@
         <th>HR max</th> 
         {% for lap in lapdata %}
             <tr><td>{{lap.distance|floatformat:0}}</td> 
-                <td>{{lap.speed.avg|floatformat:1 }}</td> 
-                <td>{{lap.speed.avg_corr|floatformat:1 }}</td> 
+                <td>{{lap.speed.avg|kmh2minkm }}</td> 
+                <td>{{lap.speed.avg_corr|kmh2minkm }}</td> 
                 <td>{{lap.heartRate.avg|floatformat:0}}</td> 
                 <td>{{lap.heartRate.max|floatformat:0}}</td> </tr>
         {% endfor %}
@@ -73,7 +73,7 @@
             <th>Date</th>
             <th>location</th>
             <th>Distance(m)</th>
-            <th>vel avg(km/u)</th>
+            <th>vel avg(min/km)</th>
             <th>Hsl avg(bpm)</th>
             <th>training description</th>
         </tr>
@@ -95,7 +95,7 @@
             {% endif %}
 
             data-url="{% url 'test_polar:showlapdata' training.fname %}">
-            <td>{{training.startTime|slice:":10"}}</td> 
+            <td>{{training.startTime|slice:":10"|weekday}}</td> 
             
             {% if training.location != None %}
             <td id="location">{{training.location|upper}}</td>
@@ -103,7 +103,7 @@
             <td id="location">not defined</td>
             {% endif %}
             <td>{{training.distance|floatformat:0}}</td>
-            <td>{{training.speed.avg|floatformat:1}}</td>
+            <td>{{training.speed.avg| kmh2minkm}}</td>
             <td>{{training.averageHeartRate|floatformat:0}} / {{training.maximumHeartRate|floatformat:0}}
             </td>
             <td id="tdescr" 

@@ -3,6 +3,7 @@
 {% comment %} {% extends "base.html" %} {% endcomment %}
 {% load static %}
 {% load cache %}
+{% load table_filters %}
 
 {% block adapt_block %}
   {% if adaptform %}
@@ -15,7 +16,7 @@
                 {% csrf_token %}
                 <input type="submit" class="btn btn-primary", value="Commit" method="POST">
                 {% comment %} <input type=" text" id="text-box" size="20" value="Hello world!" /> {% endcomment %}
-            {% comment %} </form> {% endcomment %}
+            </form>
         </div>
     </div>
     </div>
@@ -28,11 +29,11 @@
             <th>Date</th>
             <th>location</th>
             <th>Distance(m)</th>
-            <th>vel avg(km/u)</th>
+            <th>vel avg(min/km)</th>
             <th>Hsl avg(bpm)</th>
             <th>training description</th>
         </tr>
-        <p>{% cache 60 "training_data" %}
+        <p>{% cache 360 "training_data" %}
           {% for training in trainingen|dictsort:"startTime" %} 
             <tr value={{training.fname}}
             name="traindata" 
@@ -49,7 +50,7 @@
             {% endif %}
 
             data-url="{% url 'test_polar:showform' training.fname %}">
-            <td>{{training.startTime|slice:":10"}}
+            <td>{{training.startTime|slice:":10"|weekday}}
   
             </td> 
             
@@ -59,7 +60,7 @@
             <td id="location" onclick="showForm(this)">not defined</td>
             {% endif %}
             <td>{{training.distance|floatformat:0}}</td>
-            <td>{{training.speed.avg|floatformat:1}}</td>
+            <td>{{training.speed.avg|kmh2minkm}}</td>
             <td>{{training.averageHeartRate|floatformat:0}} / {{training.maximumHeartRate|floatformat:0}}
             </td>
             {% comment %} <td id="tdescr" onclick="showLapdata(this)">{{training.trainingdescription.description|linebreaks}}</td> {% endcomment %}
