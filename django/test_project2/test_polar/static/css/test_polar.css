@@ -65,3 +65,19 @@ table {
     /* border: 1px solid; */
     font-size: 30px;
 }
+
+tr.roadrace {
+    background-color: red;
+}
+
+tr.sprint {
+    background-color: lightgreen;
+}
+
+tr.easyrun {
+    background-color: lightgray;
+}
+
+tr.interval {
+    background-color: lightcoral;
+}

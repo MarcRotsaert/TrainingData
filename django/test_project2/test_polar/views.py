@@ -22,7 +22,9 @@ def _return_configttype() -> list[str]:
 
 
 def _return_trainttype(connection: QuerySet, ttype: str) -> list[Optional[dict]]:
-    if ttype == "easy":
+    if ttype == "sprint":
+        comp = True
+    elif ttype == "easy":
         ttype = "easyrun"
         comp = True
     elif ttype == "road":
@@ -30,6 +32,7 @@ def _return_trainttype(connection: QuerySet, ttype: str) -> list[Optional[dict]]
         comp = True
     elif ttype == "interval":
         comp = "interval"
+
     else:
         print(ttype)
         return []
@@ -58,6 +61,12 @@ def _return_lapdata(connection: QuerySet, fname: str) -> list[Optional[dict]]:
         return trainingen.values()[0]["laps"]
     else:
         return trainingen.values()[0]["alaps"]
+
+
+def _return_trainingdate(connection, fname: str):
+    training = _return_trainingdata(connection, fname)
+    trainingdate = training["startTime"]
+    return trainingdate
 
 
 def _set_cache_trainingdata(trainingen: list, cachetime: float):
@@ -114,7 +123,7 @@ def _set_database(request: HttpRequest, connection):
 def show_polar(request: HttpRequest) -> HttpResponse:
     if request.method == "GET":
         connection = PolarModel.objects.using("default")
-
+        print(request.GET)
         if "ttypes" not in request.GET:
             trainingen = _return_trainrunning(connection)
             # training = connection.filter(sport="RUNNING")
@@ -126,7 +135,7 @@ def show_polar(request: HttpRequest) -> HttpResponse:
             trainingen = _return_trainttype(connection, ttype)
             print(len(trainingen))
 
-        _set_cache_trainingdata(trainingen, 60)
+        _set_cache_trainingdata(trainingen, 360)
 
         ttypes = _return_configttype()
         return render(
@@ -148,13 +157,12 @@ def action_adapt(request: HttpRequest) -> HttpResponse:
     if request.method == "GET":
         # TODO: add logging
         print("GET action_adapt")
-        # _set_cache_trainingdata(trainingen, 60)
     elif request.method == "POST":
         print(request.POST)
         # print(xx)
         _set_database(request, connection)
         trainingen = _return_trainrunning(connection)
-    _set_cache_trainingdata(trainingen, 60)
+    _set_cache_trainingdata(trainingen, 360)
 
     return render(
         request,
@@ -192,6 +200,7 @@ def show_form(request: HttpRequest, fname: str):
         data = json.loads(request.body.decode("utf-8"))
         fname = data.pop("fname", None)
         lapdata = _return_lapdata(connection, fname)
+        ldate = _return_trainingdate(connection, fname)
 
         training = _return_trainingdata(connection, fname)
         location = training["location"]
@@ -238,6 +247,7 @@ def show_form(request: HttpRequest, fname: str):
             request,
             "adapt.html",
             context={
+                "lapdate": ldate,
                 "lapdata": lapdata,
                 "adaptform": adaptform,
             },
@@ -252,10 +262,13 @@ def show_lapdata(request: HttpRequest, fname: str) -> Union[HttpResponse, JsonRe
         lapdata = _return_lapdata(connection, fname)
         ttypes = _return_configttype()
 
+        ldate = _return_trainingdate(connection, fname)
+
         return render(
             request,
             "summary.html",
             context={
+                "lapdate": ldate,
                 "lapdata": lapdata,
                 "ttypes": ttypes,
                 # "trainingen": trainingen,
