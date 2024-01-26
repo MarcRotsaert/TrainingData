@@ -4,7 +4,9 @@ dbase = "polartest"
 collections = []
 years = range(2013, 2023)
 collections = ["polar" + str(y) for y in years]
-collections.append("garminfit")
+years = range(2011, 2014)
+for year in range(2011, 2014):
+    collections.append("garmin_" + str(year))
 
 for collection in collections:
     classif = MongoRunningClassifier(dbase, collection)

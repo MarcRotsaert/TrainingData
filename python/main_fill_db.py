@@ -13,7 +13,7 @@ database = config["mongodb"]["database"]
 # database = "testdb"
 
 
-if True:
+if False:
     path = config["polar_json"]["datapath"]
     # for year in [2014, 2015, 2017]:
     # for year in [2017]:
@@ -47,18 +47,31 @@ if False:
     path = config["garmin_fit"]["datapath"]
     # for year in range(2013, 2022):
     files = glob.glob(os.path.join(path, "*.fit"))
-    mongad = MongoGarminfit(database, "garminfit")
+    mongad_2011 = MongoGarminfit(database, "garmin_2011")
+    mongad_2012 = MongoGarminfit(database, "garmin_2012")
+    mongad_2013 = MongoGarminfit(database, "garmin_2013")
+
     pointcoll = []
     for fi in files:
         # "training-session-2014-12-07-263916482-2cbe9312-6b71-4693-8519-a9a860a23cbc.json"
         try:
             abstract = ga_pa.Garminfit_parser(fi.split("\\")[-1]).extract_abstract()
             if abstract is not None:
-                curs = MongoQuery(database, "garminfit").simplequery(
+                if abstract["startTime"][0:4] == "2011":
+                    mongad = mongad_2011
+                elif abstract["startTime"][0:4] == "2012":
+                    mongad = mongad_2012
+                elif abstract["startTime"][0:4] == "2013":
+                    mongad = mongad_2013
+                else:
+                    print("no starttime in abstract")
+
+                curs = MongoQuery(database, mongad.collection).simplequery(
                     "startTime", abstract["startTime"]
                 )
                 if len(list(curs)) == 0:
                     filename = fi.split("\\")[-1]
+                    print(filename)
                     try:
                         mongad.put_jsonresume(filename)
                     except:
