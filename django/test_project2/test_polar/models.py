@@ -173,7 +173,7 @@ class PolarModel(mongomod.Model):
     objects = mongomod.DjongoManager()
 
     class Meta:
-        db_table = "garminfit"
+        db_table = "garmin_2013"
         app_label = "test_training2"
         managed = False
 
