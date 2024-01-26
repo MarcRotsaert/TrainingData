@@ -57,10 +57,12 @@ def _return_trainingdata(connection: QuerySet, fname: str) -> dict:
 
 def _return_lapdata(connection: QuerySet, fname: str) -> list[Optional[dict]]:
     trainingen = connection.filter(fname=fname)
-    if trainingen.values()[0]["laps"] is not None:
-        return trainingen.values()[0]["laps"]
+    lapdata = trainingen.values()[0]["laps"]
+    alapdata = trainingen.values()[0]["alaps"]
+    if lapdata is None or len(lapdata) == 0:
+        return alapdata
     else:
-        return trainingen.values()[0]["alaps"]
+        return lapdata
 
 
 def _return_trainingdate(connection, fname: str):
