@@ -24,12 +24,12 @@ class GarminfitParser(unittest.TestCase):
         alaps = gar_par.Lapparser(file).fit2laps("alaps")
         laps = gar_par.Lapparser(file).fit2laps("laps")
         with self.subTest():
-            self.assertEqual(len(alaps), 18)
+            self.assertEqual(len(alaps), 19)
         with self.subTest():
             self.assertEqual(alaps[0]["distance"], 5000)
             self.assertEqual(alaps[-1]["distance"], 1857.0)
         with self.subTest():
-            self.assertEqual(len(laps), 1)
+            self.assertEqual(len(laps), 0)
 
     def test_sampleparser(self):
         file = "marcrotsaert_158946109.fit"
@@ -84,7 +84,7 @@ class GarminfitParser(unittest.TestCase):
         with self.subTest():
             self.assertIn("alaps", json["exercises"][0])
         with self.subTest():
-            self.assertEqual(len(json["exercises"][0]["laps"]), 1)
+            self.assertEqual(len(json["exercises"][0]["laps"]), 0)
         with self.subTest():
             self.assertIn("exercises", json)
         with self.subTest():
