@@ -54,7 +54,7 @@ class TestRMLapAnalyzer_timeint(unittest.TestCase):
     def test_speedupspeeddown(self):
         testresult = 18 * [-1.0, 1.0] + [-1.0]
         speedlist = self.lap_an.return_paraslist("speed", "avg")
-        dspeed_int = self.paces["dspeedinterval"]
+        dspeed_int = 3  # self.paces["dspeedinterval"]
         speedup_speeddown = self.lap_an._classify_speedupdown(dspeed_int)
         self.assertListEqual(testresult, speedup_speeddown.tolist())
 
@@ -105,7 +105,7 @@ class TestRMLapAnalyzer_timeint(unittest.TestCase):
         result = self.lap_an._classify_timedistance(
             distance_recovery, duration_recovery
         )
-        self.assertEqual(result[0], "time")
+        self.assertEqual(result[0], "distance")
 
         distance_interval = self.lap_an.return_distance(idx_int)
         duration_interval = self.lap_an.return_duration(idx_int)

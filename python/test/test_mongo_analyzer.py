@@ -9,7 +9,7 @@ class MongoAnalyzer(unittest.TestCase):
     @classmethod
     def setUp(cls) -> None:
         cls.startime = time.time()
-        cls.dbase = "polartest4"
+        cls.dbase = "polartest"
         cls.testyear = "polar2017"
         cls.adapter = mongodb.MongoPolar(cls.dbase, cls.testyear)
         cursor = cls.adapter.simplequery(
