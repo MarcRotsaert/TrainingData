@@ -114,6 +114,66 @@ class LapAnalyzer:
         minhrt = np.max(hrt)
         return stdhrt, maxhrt, minhrt
 
+    def determine_startuprunoutlaps(
+        self, su_speed=None
+    ) -> (Union[List[int], None], Union[List[int], None]):
+        # nospeed = self._check_param_none("speed")
+        # nodata = self._check_allempty_data("speed")
+        # if nodata:
+        #     return None, None
+        valid = self.check_paramvalidity("speed")
+        if not valid:
+            return None, None
+
+        if su_speed is None:
+            su_speed = self.paces["maxruninout"]
+        idx_su = []
+        i1 = 0
+
+        # code hieronder kan niet omgaan met een lege dictionaryin laps["speed"]
+        for speed in self.laps_an["speed"]:
+            if len(speed) == 0:
+                idx_su.append(i1)
+                i1 += 1
+            else:
+                if speed["avg"] == None:
+                    idx_su.append(i1)
+                    i1 += 1
+                elif speed["avg"] > su_speed:
+                    break
+                else:
+                    idx_su.append(i1)
+                    i1 += 1
+
+        if len(idx_su) == 0:
+            idx_su = []
+
+        idx_ro = []
+        i2 = len(self.laps_an["speed"]) - 1
+
+        test1 = True
+        test2 = True
+        # while self.laps_an["speed"][i2]["avg"] < su_speed and i2 > i1:
+        while test1 and test2:
+            if self.laps_an["speed"][i2]["avg"] == None:
+                test1 = True
+            elif self.laps_an["speed"][i2]["avg"] < su_speed:
+                test1 = True
+            else:
+                test1 = False
+
+            test2 = i2 > i1
+
+            if test1 and test2:
+                idx_ro.append(i2)
+                i2 -= 1
+
+        if len(idx_ro) == len(self.laps_an["speed"]) + 1:
+            idx_ro = []
+        elif len(idx_ro) == 0:
+            idx_ro = []
+        return idx_su, idx_ro
+
 
 class RLapAnalyzerBasic(LapAnalyzer):
     """
@@ -178,66 +238,6 @@ class RManualLapAnalyzer(RLapAnalyzerBasic):
     def __init__(self, laps: dict):
         # TODO: check on laps
         super().__init__(laps)
-
-    def determine_startuprunoutlaps(
-        self, su_speed=None
-    ) -> (Union[List[int], None], Union[List[int], None]):
-        # nospeed = self._check_param_none("speed")
-        # nodata = self._check_allempty_data("speed")
-        # if nodata:
-        #     return None, None
-        valid = self.check_paramvalidity("speed")
-        if not valid:
-            return None, None
-
-        if su_speed is None:
-            su_speed = self.paces["maxruninout"]
-        idx_su = []
-        i1 = 0
-
-        # code hieronder kan niet omgaan met een lege dictionaryin laps["speed"]
-        for speed in self.laps_an["speed"]:
-            if len(speed) == 0:
-                idx_su.append(i1)
-                i1 += 1
-            else:
-                if speed["avg"] == None:
-                    idx_su.append(i1)
-                    i1 += 1
-                elif speed["avg"] > su_speed:
-                    break
-                else:
-                    idx_su.append(i1)
-                    i1 += 1
-
-        if len(idx_su) == 0:
-            idx_su = []
-
-        idx_ro = []
-        i2 = len(self.laps_an["speed"]) - 1
-
-        test1 = True
-        test2 = True
-        # while self.laps_an["speed"][i2]["avg"] < su_speed and i2 > i1:
-        while test1 and test2:
-            if self.laps_an["speed"][i2]["avg"] == None:
-                test1 = True
-            elif self.laps_an["speed"][i2]["avg"] < su_speed:
-                test1 = True
-            else:
-                test1 = False
-
-            test2 = i2 > i1
-
-            if test1 and test2:
-                idx_ro.append(i2)
-                i2 -= 1
-
-        if len(idx_ro) == len(self.laps_an["speed"]) + 1:
-            idx_ro = []
-        elif len(idx_ro) == 0:
-            idx_ro = []
-        return idx_su, idx_ro
 
     def determine_lapswithoutsu(self) -> Union[dict, None]:
         su, ro = self.determine_startuprunoutlaps()
