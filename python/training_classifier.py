@@ -85,8 +85,9 @@ class MongoRunningClassifier(MongoClassifier):
 
         if len(training.alaps) == 0:
             return False
+        ri, ru = training.RAutoLapAnalyzer.determine_startuprunoutlaps()
 
-        isroadrace = training.RAutoLapAnalyzer.identify_roadrace()
+        isroadrace = training.RAutoLapAnalyzer.identify_roadrace(ri + ru)
         if isroadrace:
             print(training.abstract["fname"])
             return training.abstract["fname"]
