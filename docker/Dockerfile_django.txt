@@ -1,0 +1,21 @@
+# Debian Base Image with Python 3.11
+FROM python:3.11-bullseye
+
+# Environment variables
+ENV PYTHONBUFFERED=1
+ENV DJANGO_SETTINGS_MODULE="test_project2.settings"
+
+# Copy sources
+COPY . /app
+
+# Install Pyton libraries
+RUN python -m pip install --no-cache-dir -r /app/requirements.txt 
+
+# Filepath location in Docker container
+WORKDIR /app
+
+# Expose Django port. 
+EXPOSE 8000  
+# Eigenlijk is "0.0.0.0:8000" niet nodig, 8000 is standaard. 
+ENTRYPOINT ["python", "django/test_project2/manage.py", "runserver", "0.0.0.0:8000"]
+
