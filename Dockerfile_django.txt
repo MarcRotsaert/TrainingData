@@ -8,13 +8,13 @@ ENV PYTHONPATH=/app/python:/app/python/parser:/app/python/analyzer
 
 # Copy sources
 COPY . /app
-# COPY /app/config_docker.toml /app/config.toml
-
+WORKDIR /app
+COPY ./config_docker.toml /app/config.toml
+COPY ./docker/settings_django.py /app/django/test_project2/test_project2/settings.py
 # Install Pyton libraries
 RUN python -m pip install --no-cache-dir -r /app/requirements.txt 
 
 # Filepath location in Docker container
-WORKDIR /app
 
 # Expose Django port. 
 EXPOSE 8000

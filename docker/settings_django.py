@@ -82,9 +82,9 @@ DATABASES = {
         "NAME": "polartest",
         "ENFORCE_SCHEMA": False,
         "CLIENT": {
-            "host": "localhost",  # local
+            # "host": "localhost",  # local
             # "host": "127.0.0.1", # local
-            # "host": "polardb",  # docker container
+            "host": "polardb",  # docker container
             "port": 27017,
             "username": "student",
             "password": "miw3",
