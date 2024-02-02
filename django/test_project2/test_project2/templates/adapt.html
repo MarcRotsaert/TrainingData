@@ -64,7 +64,7 @@
             <td>{{training.averageHeartRate|floatformat:0}} / {{training.maximumHeartRate|floatformat:0}}
             </td>
             {% comment %} <td id="tdescr" onclick="showLapdata(this)">{{training.trainingdescription.description|linebreaks}}</td> {% endcomment %}
-            <td id="tdescr" onclick="showForm(this)">{{training.trainingdescription.description|linebreaks}}</td>
+            <td id="tdescr" onclick="showDelete(this)">{{training.trainingdescription.description|linebreaks}}</td>
         </tr>
         {% endfor %}
         {% endcache %}

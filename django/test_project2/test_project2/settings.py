@@ -9,6 +9,7 @@ https://docs.djangoproject.com/en/4.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
+
 import sys
 from pathlib import Path
 
@@ -79,7 +80,7 @@ WSGI_APPLICATION = "test_project2.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "djongo",
-        "NAME": "polartest",
+        "NAME": "testdb",
         "ENFORCE_SCHEMA": False,
         "CLIENT": {
             "host": "localhost",  # local
@@ -90,7 +91,7 @@ DATABASES = {
             "password": "miw3",
             "authMechanism": "DEFAULT",
             "authSource": "admin",
-        }
+        },
         # "CLIENT": {"host": "mongodb://student:miw3@127.0.0.1:27017/?authMechanism=DEFAULT&authSource=admin"},
         # "SERVER_PROTOCOL":"x",
     },

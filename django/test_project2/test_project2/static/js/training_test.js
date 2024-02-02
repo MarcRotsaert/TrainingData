@@ -54,8 +54,15 @@ function showForm(cell) {
     var url = cell.parentNode.getAttribute("data-url")
     make_xhr("POST", fname, url)
     toHeadofpage()
-
 }
+
+function showDelete(cell) {
+    var fname = cell.parentNode.getAttribute("value")
+    var url = cell.parentNode.getAttribute("data-url")
+    make_xhr("DELETE", fname, url)
+    toHeadofpage()
+}
+
 
 function showLapdata(cell) {
     var fname = cell.parentNode.getAttribute("value")
@@ -80,6 +87,14 @@ function make_xhr(hmethod, fname, url) {
         xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
         xhr.setRequestHeader("X-CSRFToken", csrftoken);
     }
+
+    else if (hmethod === "DELETE") {
+        var csrftoken = getCookie('csrftoken');
+        xhr.open("DELETE", url, true);
+        xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+        xhr.setRequestHeader("X-CSRFToken", csrftoken);
+    }
+
 
     xhr.onreadystatechange = function () {
         if (xhr.readyState === 4 && xhr.status === 200) {

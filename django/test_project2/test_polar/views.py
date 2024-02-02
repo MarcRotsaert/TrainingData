@@ -148,6 +148,10 @@ def show_polar(request: HttpRequest) -> HttpResponse:
                 "ttypes": ttypes,
             },
         )
+
+    elif request.method == "DELETE":
+        pass
+
     else:
         return HttpResponse()
 
@@ -198,6 +202,13 @@ def show_form(request: HttpRequest, fname: str):
     connection = PolarModel.objects.using("default")
     if request.method == "GET":
         return request
+    elif request.method == "DELETE":
+        data = json.loads(request.body.decode("utf-8"))
+        fname = data.pop("fname", None)
+        connection.filter(fname=fname).delete()
+        trainingen = _return_trainrunning(connection)
+        return render(request, "adapt.html", context={"trainingen": trainingen})
+
     elif request.method == "POST":
         data = json.loads(request.body.decode("utf-8"))
         fname = data.pop("fname", None)
