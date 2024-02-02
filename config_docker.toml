@@ -1,0 +1,77 @@
+[polar_json]
+datapath = "C:\\Users\\marcr\\OneDrive\\Documenten\\logboek_looptracks\\polarroutes"  # datapath = "/mnt/Polar/looptracks/polar-user-data-export"
+datatypes = ["laps", "autoLaps", "samples"]
+sport = ["RUNNING", "CYCLING", "OTHER"]
+
+[forerunner_xml]
+datapath= "C:\\Users\\marcr\\OneDrive\\Documenten\\logboek_looptracks\\looptracks_forerunner\\Looptracks\\XMLfiles"  # datapath= "/mnt/Polar/looptracks/XMLfiles"
+datatypes = ["laps", "samples"]
+
+[garmin_fit]
+datapath= "C:/Users/marcr/OneDrive/Documenten/logboek_looptracks/looptracks_garmin"
+datatypes = ["laps", "alaps", "samples"]
+sport = ["running", "cycling"]
+enhanced_record = ['altitude', 'speed']
+enhanced_lap = ['max_speed', 'avg_speed']
+
+[garmin_fit.paramnameconversion]
+heartRate="heart_rate"
+duration="total_elapsed_time"
+startTime="start_time"
+distance="total_distance"
+descent="total_descent"
+ascent="total_ascent"
+maximumHeartRate="max_heart_rate"
+averageHeartRate="avg_heart_rate"
+sport="sport"
+speed.avg="avg_speed"
+speed.max="avg_speed"
+
+
+[mongodb]
+database = "polartest"
+password = "miw3"
+loginname = "student"
+host = "polardb:27017"
+timeout=3000
+[mongodb.level]
+database = "person"
+collection = "year"
+doc = "training"
+
+[generalsport]
+lap_param =[ "speed", "heartRate", "ascent", "descent", "duration", "startTime", "stopTime"]
+sample_param = ["altitude", "heartRate", "speed", "distance", "recordedRoute"]
+sport = ["RUNNING", "CYCLING", "ELLIPTIGO", "OTHER"]
+
+[generalsport.sample_loc]
+        develden=[[85575,440076], [700]]
+        baanbras=[[85085, 449400],[600]]
+        kopjesloop=[[85055, 448570],[100]]
+        schiehaven=[[90775, 435330], [700]]
+        wippolder=[[86255, 446810], [600]]
+        bergenopzoom=[[81385, 389191],[600]]
+        menmoerhoeve=[[104258, 394390],[300]]
+        sola=[[395744, -72146],[15000]]
+        meijendel=[[82905, 460500],[400]]
+        hermanbavinckstraat=[[95580,436480], [800]]
+        pac=[[94240, 438880],[600]]
+        
+[running]
+overall_param = ["distance", "speed", "heartRate", 
+                 "ascent", "descent", "duration", 
+                 "cadence","startTime", "stopTime", 
+                 "sport" ]
+lap_param = ["distance", "duration", "cadence", "heartRate", "speed", "ascent", "descent"]
+sample_param = ["altitude", "heartRate", "speed", "distance", "recordedRoute"]
+
+trainingtypes = ["easy", "interval", "road race", "sprint"]
+
+[running.lap_paces]
+maxeasy = 14
+minroadrace = 15.3
+maxruninout = 13.8
+dspeedinterval = 2
+
+[running.sample_paces]
+        low_movement = 7

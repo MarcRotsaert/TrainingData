@@ -22,7 +22,8 @@ class PolarModel(mongomod.Model):
 
 class Trainingtype(models.Model):
     type_name = models.CharField(max_length=50, unique=True, primary_key=True)
-    datapath = models.FilePathField(max_length=256, path="C:/TEMP")
+    # datapath = models.FilePathField(max_length=256, path="C:/TEMP")
+    datapath = models.FilePathField(max_length=256, path=".")
 
     @classmethod
     def using_sqlite(cls):
