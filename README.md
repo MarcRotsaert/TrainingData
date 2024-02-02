@@ -23,6 +23,22 @@ Coupling between files and database is in a reasonable.
 Analysis tools is very simple and not foul proof. 
 Web interface is for a next phase.
 
-
 # Backup Database
 See mongodb/backup-notes.txt
+
+
+# Docker app
+## Build image
+start script for building image in map **docker**
+ `. build_docker_django.sh`
+Image polar_django should appear in the docker desktop
+
+
+## Start container
+start script for kick start a container in map **docker**
+    `. start_django_container.sh`
+After a while a webpage should open. 
+
+
+
+
