@@ -59,8 +59,20 @@ function showForm(cell) {
 function showDelete(cell) {
     var fname = cell.parentNode.getAttribute("value")
     var url = cell.parentNode.getAttribute("data-url")
-    make_xhr("DELETE", fname, url)
-    toHeadofpage()
+    var elem1 = document.getElementById("rb_delete")
+    var elem2 = document.getElementById("rb_update")
+    if (elem1.checked) {
+        make_xhr("DELETE", fname, url)
+        elem1.checked = true
+        cell.parentNode.remove()
+    }
+
+    else if (elem2.checked) {
+        make_xhr("POST", fname, url)
+        elem2.checked = true
+        toHeadofpage()
+    }
+
 }
 
 
@@ -109,7 +121,7 @@ function make_xhr(hmethod, fname, url) {
     };
     var jsonData = JSON.stringify({ "fname": fname });
     xhr.send(jsonData);
-    toHeadofpage()
+    // toHeadofpage()
 }
 
 

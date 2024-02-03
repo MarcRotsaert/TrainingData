@@ -149,9 +149,6 @@ def show_polar(request: HttpRequest) -> HttpResponse:
             },
         )
 
-    elif request.method == "DELETE":
-        pass
-
     else:
         return HttpResponse()
 
@@ -207,6 +204,7 @@ def show_form(request: HttpRequest, fname: str):
         fname = data.pop("fname", None)
         connection.filter(fname=fname).delete()
         trainingen = _return_trainrunning(connection)
+        _set_cache_trainingdata(trainingen, 360)
         return render(request, "adapt.html", context={"trainingen": trainingen})
 
     elif request.method == "POST":

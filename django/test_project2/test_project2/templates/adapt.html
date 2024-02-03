@@ -7,24 +7,32 @@
 
 {% block adapt_block %}
   {% if adaptform %}
+
+  
   <div class="container">
     <div class="row">
-        <div class="col">
-            <form method="POST", enctype="multipart/form-data">
-                {% comment %} {{form.as_p}} {% endcomment %}
-                {{ adaptform.as_p }}
-                {% csrf_token %}
-                <input type="submit" class="btn btn-primary", value="Commit" method="POST">
-                {% comment %} <input type=" text" id="text-box" size="20" value="Hello world!" /> {% endcomment %}
-            </form>
-        </div>
+      <div class="col">
+        <form method="POST", enctype="multipart/form-data">
+          {% comment %} {{form.as_p}} {% endcomment %}
+          {{ adaptform.as_p }}
+          {% csrf_token %}
+          <input type="submit" class="btn btn-primary", value="Commit" method="POST">
+          {% comment %} <input type=" text" id="text-box" size="20" value="Hello world!" /> {% endcomment %}
+        </form>
+      </div>
     </div>
-    </div>
-    {% endif %} 
+  </div>
+  {% endif %} 
   {% endblock %}
- 
-{% block traintab_block %}
-  <table name="traindata">
+  
+  
+  {% block traintab_block %}
+  <div class="btn-group">
+      <input type="radio" id="rb_delete" name="group1"><label for="rb_delete"  value="Delete">Delete training active</label><br> 
+      <input type="radio" id="rb_update" name="group1" checked><label for="rb_update" value="Update">Update training active</label>
+  </div>
+  
+    <table name="traindata">
     <tr>
             <th>Date</th>
             <th>location</th>
