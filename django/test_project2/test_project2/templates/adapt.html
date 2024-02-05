@@ -27,12 +27,12 @@
   
   
   {% block traintab_block %}
-  <div class="btn-group">
-      <input type="radio" id="rb_delete" name="group1"><label for="rb_delete"  value="Delete">Delete training active</label><br> 
-      <input type="radio" id="rb_update" name="group1" checked><label for="rb_update" value="Update">Update training active</label>
+  <div class="btn-group-vertical">
+    <label for="rb_delete"  value="Delete">Delete training active</label><input type="radio" class="btn btn-primary" id="rb_delete" name="group1" {% if delete_checked %} checked {% endif %}> 
+    <label for="rb_update" value="Update" >Update training active</label><input type="radio" class="btn btn-primary"id="rb_update" name="group1" {% if update_checked %} checked {% endif %}>
   </div>
   
-    <table name="traindata">
+  <table name="traindata">
     <tr>
             <th>Date</th>
             <th>location</th>
@@ -56,23 +56,24 @@
             class="interval"
 
             {% endif %}
-
-            data-url="{% url 'test_polar:showform' training.fname %}">
+            data-url="{% url 'test_polar:showadapt' training.fname %}"
+            onclick="showAdapt(this)">
+            
             <td>{{training.startTime|slice:":10"|weekday}}
   
             </td> 
             
             {% if training.location != None %}
-            <td id="location" onclick="showForm(this)">{{training.location|upper}}</td>
+            <td id="location">{{training.location|upper}}</td>
             {% else %}
-            <td id="location" onclick="showForm(this)">not defined</td>
+            <td id="location">not defined</td>
             {% endif %}
             <td>{{training.distance|floatformat:0}}</td>
             <td>{{training.speed.avg|kmh2minkm}}</td>
             <td>{{training.averageHeartRate|floatformat:0}} / {{training.maximumHeartRate|floatformat:0}}
             </td>
             {% comment %} <td id="tdescr" onclick="showLapdata(this)">{{training.trainingdescription.description|linebreaks}}</td> {% endcomment %}
-            <td id="tdescr" onclick="showDelete(this)">{{training.trainingdescription.description|linebreaks}}</td>
+            <td id="tdescr" >{{training.trainingdescription.description|linebreaks}}</td>
         </tr>
         {% endfor %}
         {% endcache %}

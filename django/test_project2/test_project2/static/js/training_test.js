@@ -49,16 +49,11 @@ function selectText2() {
 }
 
 
-function showForm(cell) {
-    var fname = cell.parentNode.getAttribute("value")
-    var url = cell.parentNode.getAttribute("data-url")
-    make_xhr("POST", fname, url)
-    toHeadofpage()
-}
 
-function showDelete(cell) {
-    var fname = cell.parentNode.getAttribute("value")
-    var url = cell.parentNode.getAttribute("data-url")
+
+function showAdapt(cell) {
+    var fname = cell.getAttribute("value")
+    var url = cell.getAttribute("data-url")
     var elem1 = document.getElementById("rb_delete")
     var elem2 = document.getElementById("rb_update")
     if (elem1.checked) {
@@ -93,6 +88,7 @@ function make_xhr(hmethod, fname, url) {
         xhr.open("GET", url, true);
         xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
     }
+
     else if (hmethod === "POST") {
         var csrftoken = getCookie('csrftoken');
         xhr.open("POST", url, true);
@@ -107,7 +103,6 @@ function make_xhr(hmethod, fname, url) {
         xhr.setRequestHeader("X-CSRFToken", csrftoken);
     }
 
-
     xhr.onreadystatechange = function () {
         if (xhr.readyState === 4 && xhr.status === 200) {
             // Handle the response from the server if needed
@@ -121,7 +116,6 @@ function make_xhr(hmethod, fname, url) {
     };
     var jsonData = JSON.stringify({ "fname": fname });
     xhr.send(jsonData);
-    // toHeadofpage()
 }
 
 

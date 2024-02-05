@@ -11,6 +11,6 @@ urlpatterns = [
         views.show_lapdata,
         name="showlapdata",
     ),
-    path("adapt/", views.action_adapt, name="actionadapt"),
-    path("adapt/form/<str:fname>", views.show_form, name="showform"),
+    path("adapt/", views.start_adapt, name="startadapt"),
+    path("adapt/form/<str:fname>", views.show_adapt, name="showadapt"),
 ]

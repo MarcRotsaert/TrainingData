@@ -153,7 +153,7 @@ def show_polar(request: HttpRequest) -> HttpResponse:
         return HttpResponse()
 
 
-def action_adapt(request: HttpRequest) -> HttpResponse:
+def start_adapt(request: HttpRequest) -> HttpResponse:
     connection = PolarModel.objects.using("default")
     trainingen = _return_trainrunning(connection)
 
@@ -172,6 +172,7 @@ def action_adapt(request: HttpRequest) -> HttpResponse:
         "adapt.html",
         context={
             "trainingen": trainingen,
+            "update_checked": True,
         },
     )
 
@@ -194,9 +195,9 @@ def _set_form_initial(form_class, initialdict, hackdict):
     return form_inst
 
 
-def show_form(request: HttpRequest, fname: str):
-    print(__name__)
+def show_adapt(request: HttpRequest, fname: str):
     connection = PolarModel.objects.using("default")
+    # print(__name__)
     if request.method == "GET":
         return request
     elif request.method == "DELETE":
@@ -205,7 +206,15 @@ def show_form(request: HttpRequest, fname: str):
         connection.filter(fname=fname).delete()
         trainingen = _return_trainrunning(connection)
         _set_cache_trainingdata(trainingen, 360)
-        return render(request, "adapt.html", context={"trainingen": trainingen})
+        return render(
+            request,
+            "adapt.html",
+            context={
+                "trainingen": trainingen,
+                "delete_checked": True,
+                "update_checked": False,
+            },
+        )
 
     elif request.method == "POST":
         data = json.loads(request.body.decode("utf-8"))
@@ -229,7 +238,7 @@ def show_form(request: HttpRequest, fname: str):
         sprint = training["trainingtype"].get("sprint")
         easy = training["trainingtype"].get("easyrun")
         road = training["trainingtype"].get("roadrace")
-        print(easy)
+        # print(easy)
         # xx
         initdict = {
             "location": location,
@@ -246,12 +255,12 @@ def show_form(request: HttpRequest, fname: str):
         }
         adaptform = _set_form_initial(adaptForm, initdict, hackdict)
 
-        print(adaptform.fields)
+        # print(adaptform.fields)
         print(adaptform.is_valid())
-        print(adaptform.errors)
-        print(dir(adaptform.fields["trainingdescription"]))
+        # print(adaptform.errors)
+        # print(dir(adaptform.fields["trainingdescription"]))
 
-        print(adaptform.fields["trainingdescription"].model_form_class)
+        # print(adaptform.fields["trainingdescription"].model_form_class)
         # xx
 
         return render(
@@ -261,6 +270,8 @@ def show_form(request: HttpRequest, fname: str):
                 "lapdate": ldate,
                 "lapdata": lapdata,
                 "adaptform": adaptform,
+                "update_checked": True,
+                "delete_checked": False,
             },
         )
 
