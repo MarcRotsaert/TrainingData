@@ -18,11 +18,7 @@
 </head>
 
     <body>
-        {% comment %} <script src={% static  "/js/training_test.js" %}></script> {% endcomment %}
-        <script src={% static  "js/training_test.js" %}></script>
-
-
-        {% comment %} <img src={% static "images/knmirotterdam_220814_07.png" %} {% endcomment %}
+        <script src={% static  "js/polar_test.js" %}></script>
 
     <div id="lapdata"> 
         {% if lapdata %}
@@ -49,9 +45,7 @@
         <br> number of run training in table: {{ trainingen|length }} </br>
         </div>
     <p>{{ ttypes }}</p>
-    {% comment %} <select id="trainingtype" name="ttypes" size="4" onclick="updateText2()"> {% endcomment %}
     
-
         {% if  ttypes %}
         <form id="trainingForm" action="/summary/" method="get">
             {% csrf_token %}
@@ -59,8 +53,6 @@
             {% for type_name in ttypes %}
                 <option value={{ type_name}}>{{type_name}}</option>
             {% endfor %}
-            {% comment %} {% else %} {% endcomment %}
-            {% comment %} <option value="No Choice">No Choice</option> {% endcomment %}
             
         </select>
         <input type="submit" id="to_addtt" value="to next page" onclick="toHeadofpage()"> </input>
@@ -91,8 +83,6 @@
             class="sprint"
             {% elif training.trainingtype.interval == "interval" %}
             class="interval"
-
-
             {% endif %}
 
             data-url="{% url 'test_polar:showlapdata' training.fname %}">
@@ -108,7 +98,6 @@
             <td>{{training.averageHeartRate|floatformat:0}} / {{training.maximumHeartRate|floatformat:0}}
             </td>
             <td id="tdescr" 
-            
             onclick="showLapdata(this)">{{training.trainingdescription.description|linebreaks}}</td>
         </tr>
         {% endfor %}
@@ -116,8 +105,6 @@
         </p>
     <br><br>
     {% endblock %}
-    
-    
     
 </body>
 </html>

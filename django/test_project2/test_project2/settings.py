@@ -80,7 +80,7 @@ WSGI_APPLICATION = "test_project2.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "djongo",
-        "NAME": "testdb",
+        "NAME": "polartest",
         "ENFORCE_SCHEMA": False,
         "CLIENT": {
             "host": "localhost",  # local
