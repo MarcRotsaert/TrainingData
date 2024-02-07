@@ -170,6 +170,9 @@ class PolarModel(mongomod.Model):
         # model_form_class=TrainingDescriptionForm,
         model_form_kwargs={"initial": {"description": "Initial Description"}},
     )
+
+    db_table_name = mongomod.CharField(max_length=28, default="polar2019")
+
     objects = mongomod.DjongoManager()
 
     class Meta:
@@ -180,6 +183,11 @@ class PolarModel(mongomod.Model):
     # @classmethod
     # def using_mongo(cls):
     #     return cls.objects.using("default")
+
+    @classmethod
+    def set_dtable(cls, tablename):
+        cls._meta.db_table = tablename
+        return cls.objects.using("default")
 
 
 class FormModel(mongomod.Model):
