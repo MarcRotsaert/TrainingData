@@ -122,6 +122,21 @@ def _set_database(request: HttpRequest, connection):
     )
 
 
+def select_collections(request: HttpRequest) -> HttpResponse:
+    if request.method == "GET":
+        config = tomli.load(open("config.toml", "rb"))
+        database = config["mongodb"]["database"]
+        db_table = PolarModel._meta.db_table
+        mongpol = MongoPolar(database, db_table)
+        collections = mongpol.getAvailableCollections()
+        collections.sort()
+        collections.remove("__schema__")
+        collections.remove("django_migrations")
+        return render(request, "home.html", context={"dbtables": collections})
+    else:
+        return request
+
+
 def show_polar(request: HttpRequest) -> HttpResponse:
     if request.method == "GET":
         connection = PolarModel.objects.using("default")
