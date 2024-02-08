@@ -4,15 +4,15 @@ from djongo import models as mongomod
 # Create your models here.
 
 
-class PolarModel(mongomod.Model):
-    sport = mongomod.CharField(max_length=256, default="RUNNING")
-    latitude = mongomod.DecimalField(decimal_places=6, max_digits=8)
-    longitude = mongomod.DecimalField(decimal_places=6, max_digits=8)
+# class PolarModel(mongomod.Model):
+#     sport = mongomod.CharField(max_length=256, default="RUNNING")
+#     latitude = mongomod.DecimalField(decimal_places=6, max_digits=8)
+#     longitude = mongomod.DecimalField(decimal_places=6, max_digits=8)
 
-    class Meta:
-        db_table = "polar2022"
-        app_label = "test_polar"
-        managed = False
+#     class Meta:
+#         # db_table = "polar2022"
+#         app_label = "test_polar"
+#         managed = False
 
 
 # @classmethod

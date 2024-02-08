@@ -48,7 +48,7 @@
     
         {% if  ttypes %}
         <form id="trainingForm" action="/summary/" method="get">
-            {% csrf_token %}
+            {% comment %} {% csrf_token %} {% endcomment %}
             <select id="trainingtype" name="ttypes" size="5" onclick="" >
             {% for type_name in ttypes %}
                 <option value={{ type_name}}>{{type_name}}</option>
