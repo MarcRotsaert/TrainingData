@@ -34,6 +34,10 @@ class MongoAdapter:
     def _getDatabase(self) -> pymongo.database.Database:
         return self.client[self.dbname]
 
+    def getAvailableCollections(self) -> list:
+        dbase = self._getDatabase()
+        return dbase.list_collection_names()
+
     def getCollection(self) -> pymongo.collection.Collection:
         db = self._getDatabase()
         return db[self.collection]
@@ -152,7 +156,6 @@ class MongoGarminfit(MongoQuery):
 
 
 class MongoForerunner(MongoQuery):
-
     """
     Mongo-extension for Forerunner data.
     Data for
