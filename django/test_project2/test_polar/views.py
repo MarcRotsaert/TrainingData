@@ -13,11 +13,13 @@ from test_polar.models import PolarModel  # , PolarModel_test  # , Testpage
 
 from nosql_adapter import MongoPolar
 
+from .utils import _return_configttype, _create_ttype_dict
 
-def _return_configttype() -> list[str]:
-    # config = tomli.load(open("../../config.toml", "rb"))
-    config = tomli.load(open("config.toml", "rb"))
-    return config["running"]["trainingtypes"]
+
+# def _return_configttype() -> list[str]:
+#     # config = tomli.load(open("../../config.toml", "rb"))
+#     config = tomli.load(open("config.toml", "rb"))
+#     return config["running"]["trainingtypes"]
 
 
 def _return_trainttype(connection: QuerySet, ttype: str) -> list[Optional[dict]]:
@@ -54,17 +56,17 @@ def _return_trainingdata(connection: QuerySet, fname: str) -> dict:
     return trainingen.values()[0]
 
 
-def _return_lapdata(connection: QuerySet, fname: str) -> list[Optional[dict]]:
-    trainingen = connection.filter(fname=fname)
-    lapdata = trainingen.values()[0]["laps"]
-    alapdata = trainingen.values()[0]["alaps"]
-    if lapdata is None or len(lapdata) == 0:
-        return alapdata
-    else:
-        return lapdata
+# def _return_lapdata(connection: QuerySet, fname: str) -> list[Optional[dict]]:
+#     trainingen = connection.filter(fname=fname)
+#     lapdata = trainingen.values()[0]["laps"]
+#     alapdata = trainingen.values()[0]["alaps"]
+#     if lapdata is None or len(lapdata) == 0:
+#         return alapdata
+#     else:
+#         return lapdata
 
 
-def _return_trainingdate(connection, fname: str):
+def _return_trainingdate(connection: QuerySet, fname: str):
     training = _return_trainingdata(connection, fname)
     trainingdate = training["startTime"]
     return trainingdate
@@ -76,21 +78,21 @@ def _set_cache_trainingdata(trainingen: list, cachetime: float):
     cache.set(cache_key, trainingen, cachetime)
 
 
-def _create_ttype_dict(request: HttpRequest) -> dict:
-    # terribly hacky, but for now it's alright
-    ttype_db = {}
-    ttypes = {"interval", "sprint", "roadrace", "easyrun"}
-    for tt in ttypes:
-        new_val = request.POST["trainingtype-" + tt]
-        if tt != "interval":
-            if new_val == "unknown" or "":
-                new_val = None
-            elif new_val == "false":
-                new_val = False
-            else:
-                new_val = True
-        ttype_db.update({tt: new_val})
-    return ttype_db
+# def _create_ttype_dict(request: HttpRequest) -> dict:
+#     # terribly hacky, but for now it's alright
+#     ttype_db = {}
+#     ttypes = {"interval", "sprint", "roadrace", "easyrun"}
+#     for tt in ttypes:
+#         new_val = request.POST["trainingtype-" + tt]
+#         if tt != "interval":
+#             if new_val == "unknown" or "":
+#                 new_val = None
+#             elif new_val == "false":
+#                 new_val = False
+#             else:
+#                 new_val = True
+#         ttype_db.update({tt: new_val})
+#     return ttype_db
 
 
 def _set_database(request: HttpRequest, connection):
@@ -248,7 +250,8 @@ def show_adapt(request: HttpRequest, fname: str):
     elif request.method == "POST":
         data = json.loads(request.body.decode("utf-8"))
         fname = data.pop("fname", None)
-        lapdata = _return_lapdata(connection, fname)
+        lapdata = PolarModel.return_lapdata(fname)
+        # lapdata = _return_lapdata(connection, fname)
         ldate = _return_trainingdate(connection, fname)
 
         training = _return_trainingdata(connection, fname)
@@ -310,9 +313,12 @@ def show_lapdata(request: HttpRequest, fname: str) -> Union[HttpResponse, JsonRe
         print(fname)
 
         connection = PolarModel.objects.using("default")
-        lapdata = _return_lapdata(connection, fname)
+        print(dir(PolarModel))
+        lapdata = PolarModel.return_lapdata(fname)
+        print(lapdata)
+        # lapdata = _return_lapdata(connection, fname)
         ttypes = _return_configttype()
-
+        # xx
         ldate = _return_trainingdate(connection, fname)
 
         return render(

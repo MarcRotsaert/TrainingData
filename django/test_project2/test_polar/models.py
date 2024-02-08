@@ -1,3 +1,5 @@
+from typing import Optional
+
 from djongo import models as mongomod
 
 # from djongo import admin
@@ -176,6 +178,7 @@ class PolarModel(mongomod.Model):
     db_table = mongomod.CharField(max_length=28, default="polar2019")
 
     objects = mongomod.DjongoManager()
+    # objects = PolarModelQuerySet.as_manager()
 
     def __str__(self):
         return f"PolarModel: id={self.pk}, sport={self.sport}, fname={self.fname}, location={self.location}"
@@ -189,6 +192,18 @@ class PolarModel(mongomod.Model):
     def set_dtable(cls, tablename):
         # cls.
         cls._meta.db_table = tablename
+
+    @classmethod
+    def return_lapdata(cls, fname: str) -> list[Optional[dict]]:
+        training = cls.objects.filter(fname=fname).first()
+        if training:
+            lapdata = training.laps
+            alapdata = training.alaps
+            if lapdata is None or len(lapdata) == 0:
+                return alapdata
+            else:
+                return lapdata
+        return []
 
     # @classmethod
     # def using_mongo(cls):
