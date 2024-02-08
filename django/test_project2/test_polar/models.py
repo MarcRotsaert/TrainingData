@@ -1,11 +1,13 @@
 from djongo import models as mongomod
 
+# from djongo import admin
+
 # from django import forms
 
 
 # Create your models here.
 class AbstractSpeedModel(mongomod.Model):
-    _id = mongomod.ObjectIdField(primary_key=True)
+    _id = mongomod.ObjectIdField(primary_key=False)
     avg = mongomod.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
     max = mongomod.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
     avg_corr = mongomod.DecimalField(
@@ -171,23 +173,26 @@ class PolarModel(mongomod.Model):
         model_form_kwargs={"initial": {"description": "Initial Description"}},
     )
 
-    db_table_name = mongomod.CharField(max_length=28, default="polar2019")
+    db_table = mongomod.CharField(max_length=28, default="polar2019")
 
     objects = mongomod.DjongoManager()
 
+    def __str__(self):
+        return f"PolarModel: id={self.pk}, sport={self.sport}, fname={self.fname}, location={self.location}"
+
     class Meta:
         db_table = "polar2019"
-        app_label = "test_training2"
+        app_label = "test_polar"
         managed = False
+
+    @classmethod
+    def set_dtable(cls, tablename):
+        # cls.
+        cls._meta.db_table = tablename
 
     # @classmethod
     # def using_mongo(cls):
     #     return cls.objects.using("default")
-
-    @classmethod
-    def set_dtable(cls, tablename):
-        cls._meta.db_table = tablename
-        return cls.objects.using("default")
 
 
 class FormModel(mongomod.Model):

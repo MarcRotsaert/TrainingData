@@ -5,6 +5,7 @@ app_name = "test_polar"
 
 urlpatterns = [
     # re_path(r"^add_ttype/$", views.add_ttype, name="addttype")
+    path("", views.redirect_to_home, name="tohome"),
     path("home/", views.select_collections, name="selectcol"),
     path("summary/", views.show_polar, name="showpolar"),
     path(

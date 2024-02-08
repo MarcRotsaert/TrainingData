@@ -8,7 +8,6 @@ from django.http import HttpResponse, HttpRequest, HttpResponseRedirect, JsonRes
 from django.core.exceptions import ValidationError
 from django.db.models.query import QuerySet
 from django.core.cache import cache
-
 from test_polar.forms import adaptForm  # , formType
 from test_polar.models import PolarModel  # , PolarModel_test  # , Testpage
 
@@ -137,10 +136,25 @@ def select_collections(request: HttpRequest) -> HttpResponse:
         return request
 
 
+def redirect_to_home(request: HttpRequest) -> HttpResponse:
+    return redirect("home/")
+
+
 def show_polar(request: HttpRequest) -> HttpResponse:
     if request.method == "GET":
+        # PolarModel.set_dtable("polar2018")
+        if "dtable" in request.GET:
+            collection = request.GET["dtable"]
+            print(collection)
+            PolarModel.set_dtable(collection)
+            print(PolarModel.check())
         connection = PolarModel.objects.using("default")
-        print(request.GET)
+        # for instance in PolarModel.objects.all():
+        #     instance.refresh_from_db()
+        print(connection.all())
+
+        trainingen = _return_trainrunning(connection)
+
         if "ttypes" not in request.GET:
             trainingen = _return_trainrunning(connection)
             # training = connection.filter(sport="RUNNING")
@@ -164,8 +178,8 @@ def show_polar(request: HttpRequest) -> HttpResponse:
             },
         )
 
-    else:
-        return HttpResponse()
+    # else:
+    #     return HttpResponse()
 
 
 def start_adapt(request: HttpRequest) -> HttpResponse:
