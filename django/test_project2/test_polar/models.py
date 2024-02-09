@@ -1,8 +1,9 @@
 from typing import Optional
 import json
 
-from django.http import HttpResponse, HttpRequest
-from django.db.models.query import QuerySet
+from django.http import HttpRequest
+
+# from django.db.models.query import QuerySet
 from django.conf import settings
 from djongo import models as mongomod
 
@@ -182,7 +183,6 @@ class PolarModel(mongomod.Model):
     db_table = mongomod.CharField(max_length=28, default="polar2019")
 
     objects = mongomod.DjongoManager()
-    # objects = PolarModelQuerySet.as_manager()
 
     def __str__(self):
         return f"PolarModel: id={self.pk}, sport={self.sport}, fname={self.fname}, location={self.location}"
@@ -250,8 +250,48 @@ class PolarModel(mongomod.Model):
         return trainingdate
 
     @classmethod
+    def _return_training_adaptdata(cls, fname: str):
+        training = PolarModel._return_trainingdata(fname)
+
+        location = training["location"]
+
+        training = PolarModel._return_trainingdata(fname)
+        location = training["location"]
+        try:
+            description = training["trainingdescription"]["description"]
+        except (KeyError, TypeError):
+            description = "unknown"
+
+        try:
+            description = training["trainingdescription"]["description"]
+        except (KeyError, TypeError):
+            description = "unknown"
+
+        interval = training["trainingtype"].get("interval")
+        sprint = training["trainingtype"].get("sprint")
+        easy = training["trainingtype"].get("easyrun")
+        road = training["trainingtype"].get("roadrace")
+        initdict = {
+            "location": location,
+            "fname": fname,
+        }
+
+        hackdict = {
+            "trainingdescription": {"description": description, "type": ""},
+            "trainingtype": {
+                "interval": interval,
+                "sprint": sprint,
+                "easyrun": easy,
+                "roadrace": road,
+            },
+        }
+        return initdict, hackdict
+
+    @classmethod
     def delete_training(cls, request):
         data = json.loads(request.body.decode("utf-8"))
+        print(data)
+        # xx
         fname = data.pop("fname", None)
         cls.objects.filter(fname=fname).delete()
         # trainingen = cls._return_trainrunning()
@@ -265,10 +305,6 @@ class PolarModel(mongomod.Model):
         fname = request.POST["fname"]
         print(fname)
 
-        # connection = cls.objects.using("default")
-        # connection = cls.objects
-        # con = cls.objects.using("default")
-        # training = cls._return_trainingdata(connection, fname)
         training = cls._return_trainingdata(fname)
 
         obj_id = training["_id"]
@@ -301,46 +337,11 @@ class FormModel(mongomod.Model):
     trainingdescription = mongomod.EmbeddedField(
         model_container=TrainingDescription,
     )
-    # objects = mongomod.DjongoManager()
 
     class Meta:
         # db_table = "polar2022"
         # app_label = "test_training2"
         managed = False
-
-
-# def _return_trainttype(connection: QuerySet, ttype: str) -> list[Optional[dict]]:
-#     if ttype == "sprint":
-#         comp = True
-#     elif ttype == "easy":
-#         ttype = "easyrun"
-#         comp = True
-#     elif ttype == "road":
-#         ttype = "roadrace"
-#         comp = True
-#     elif ttype == "interval":
-#         comp = "interval"
-
-#     else:
-#         print(ttype)
-#         return []
-
-#     training = connection.filter(trainingtype={ttype: comp})
-#     trainingen = [t for t in training.values()]
-#     return trainingen
-
-
-# def _return_trainrunning(connection: QuerySet) -> list[Optional[dict]]:
-#     training = connection.filter(sport="RUNNING")
-#     if len(training) > 0:
-#         return [t for t in training.values()]
-#     else:
-#         return []
-
-
-# def _return_trainingdata(connection: QuerySet, fname: str) -> dict:
-#     trainingen = connection.filter(fname=fname)
-#     return trainingen.values()[0]
 
 
 def _create_ttype_dict(request: HttpRequest) -> dict:

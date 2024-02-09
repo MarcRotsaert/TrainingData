@@ -1,7 +1,6 @@
 import tomli
 from django.core.cache import cache
 from django.conf import settings
-from django.http import HttpRequest
 
 from test_polar.models import PolarModel
 

@@ -1,7 +1,6 @@
 from django import forms
 
-# from test_polar.models import PolarModel, TrainingDescription, TrainingtypeModel
-from test_polar.models import PolarModel, FormModel, TrainingDescription
+from test_polar.models import PolarModel  # , FormModel, TrainingDescription
 
 
 class formType(forms.Form):
@@ -11,6 +10,21 @@ class formType(forms.Form):
 
 class adaptForm(forms.ModelForm):
     # trainingdescription = TrainingDescriptionForm()
+
+    def set_form_initial(self, initialdict, hackdict):
+        # TODO: onderstaande netter maken. Het werkt niet.
+        #  Waarschijnlijk op te lossen met apart model maken voor form ipv polarmodel
+        # "trainingdescription": {"description": description, "type": ""},
+        # "trainingdescription-description": "test",
+
+        self.use_required_attribute = True
+        self.initial = initialdict
+        for vkey in hackdict:
+            for skey in hackdict[vkey]:
+                sval = hackdict[vkey][skey]
+                self.fields[vkey].model_form_kwargs["initial"].update({skey: sval})
+
+        return self
 
     class Meta:
         model = PolarModel
