@@ -67,6 +67,7 @@ def start_adapt(request: HttpRequest) -> HttpResponse:
         print("GET action_adapt")
     elif request.method == "POST":
         print(request.POST)
+        # xx
         PolarModel._set_database_adapt(request)
         trainingen = PolarModel._return_trainrunning()
     _set_cache_trainingdata(trainingen, 360)

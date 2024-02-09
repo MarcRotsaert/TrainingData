@@ -193,26 +193,27 @@ class PolarModel(mongomod.Model):
         managed = False
 
     @classmethod
-    def set_dtable(cls, tablename):
+    def set_dtable(cls, tablename: str):
         cls._meta.db_table = tablename
 
     @classmethod
     def return_lapdata(cls, fname: str) -> list[Optional[dict]]:
         training = cls.objects.filter(fname=fname).first()
         if training:
-            lapdata = training.laps
-            alapdata = training.alaps
-            if lapdata is None or len(lapdata) == 0:
-                return alapdata
+            return training.laps or training.alaps or []
+            # lapdata = training.laps
+            # alapdata = training.alaps
+            # if lapdata is None or len(lapdata) == 0:
+            #     return alapdata
             # else:
-            return lapdata
+            # return lapdata
         return []
 
     @classmethod
     def _return_trainrunning(cls) -> list[Optional[dict]]:
         training = cls.objects.filter(sport="RUNNING")
         if len(training) > 0:
-            return list(training.values())
+            return list(cls.objects.filter(sport="RUNNING").values()) or []
 
         else:
             return []
@@ -241,13 +242,12 @@ class PolarModel(mongomod.Model):
     @classmethod
     def _return_trainingdata(cls, fname: str) -> dict:
         trainingen = cls.objects.filter(fname=fname)
-        return trainingen.values()[0]
+        return trainingen.values()[0] if trainingen else {}
 
     @classmethod
     def _return_trainingdate(cls, fname: str):
         training = cls._return_trainingdata(fname)
-        trainingdate = training["startTime"]
-        return trainingdate
+        return training.get("startTime", "")
 
     @classmethod
     def _return_training_adaptdata(cls, fname: str):
@@ -257,11 +257,6 @@ class PolarModel(mongomod.Model):
 
         training = PolarModel._return_trainingdata(fname)
         location = training["location"]
-        try:
-            description = training["trainingdescription"]["description"]
-        except (KeyError, TypeError):
-            description = "unknown"
-
         try:
             description = training["trainingdescription"]["description"]
         except (KeyError, TypeError):
@@ -288,7 +283,7 @@ class PolarModel(mongomod.Model):
         return initdict, hackdict
 
     @classmethod
-    def delete_training(cls, request):
+    def delete_training(cls, request: HttpRequest):
         data = json.loads(request.body.decode("utf-8"))
         print(data)
         # xx
@@ -297,10 +292,9 @@ class PolarModel(mongomod.Model):
         # trainingen = cls._return_trainrunning()
 
     @classmethod
-    def _set_database_adapt(cls, request):
+    def _set_database_adapt(cls, request: HttpRequest):
         new_trainingtype = _create_ttype_dict(request)
         new_description = request.POST["trainingdescription-description"]
-        print(new_description)
         new_location = request.POST["location"]
         fname = request.POST["fname"]
         print(fname)
