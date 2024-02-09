@@ -65,7 +65,7 @@ overall_param = ["distance", "speed", "heartRate",
 lap_param = ["distance", "duration", "cadence", "heartRate", "speed", "ascent", "descent"]
 sample_param = ["altitude", "heartRate", "speed", "distance", "recordedRoute"]
 
-trainingtypes = ["easy", "interval", "road race", "sprint"]
+trainingtypes = ["easy", "interval", "road race", "sprint", "climax"]
 
 [running.lap_paces]
 maxeasy = 14

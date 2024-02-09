@@ -139,7 +139,6 @@ def show_lapdata(request: HttpRequest, fname: str) -> Union[HttpResponse, JsonRe
                 "lapdate": ldate,
                 "lapdata": lapdata,
                 "ttypes": ttypes,
-                # "trainingen": trainingen,
             },
         )
     return JsonResponse(

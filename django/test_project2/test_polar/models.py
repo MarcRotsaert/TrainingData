@@ -101,7 +101,7 @@ class AbstractTrainingtype(mongomod.Model):
     interval = mongomod.CharField(max_length=50, blank=True)
     roadrace = mongomod.BooleanField(null=True)
     sprint = mongomod.BooleanField(null=True)
-    # other = mongomod.CharField(max_length=50)
+    climax = mongomod.BooleanField(null=True)
 
     class Meta:
         abstract = True
@@ -230,6 +230,8 @@ class PolarModel(mongomod.Model):
             comp = True
         elif ttype == "interval":
             comp = "interval"
+        elif ttype == "climax":
+            comp = True
 
         else:
             print(ttype)
@@ -266,6 +268,7 @@ class PolarModel(mongomod.Model):
         sprint = training["trainingtype"].get("sprint")
         easy = training["trainingtype"].get("easyrun")
         road = training["trainingtype"].get("roadrace")
+        climax = training["trainingtype"].get("climax")
         initdict = {
             "location": location,
             "fname": fname,
@@ -278,6 +281,7 @@ class PolarModel(mongomod.Model):
                 "sprint": sprint,
                 "easyrun": easy,
                 "roadrace": road,
+                "climax": climax,
             },
         }
         return initdict, hackdict
@@ -341,7 +345,7 @@ class FormModel(mongomod.Model):
 def _create_ttype_dict(request: HttpRequest) -> dict:
     # terribly hacky, but for now it's alright
     ttype_db = {}
-    ttypes = {"interval", "sprint", "roadrace", "easyrun"}
+    ttypes = {"interval", "sprint", "roadrace", "easyrun", "climax"}
     for tt in ttypes:
         new_val = request.POST["trainingtype-" + tt]
         if tt != "interval":

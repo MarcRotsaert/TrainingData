@@ -111,6 +111,11 @@ tr.roadrace {
     background-color: red;
 }
 
+tr.climax {
+    background-color: orange;
+}
+
+
 tr.sprint {
     background-color: lightgreen;
 }
@@ -120,5 +125,5 @@ tr.easyrun {
 }
 
 tr.interval {
-    background-color: lightcoral;
+    background-color: rgb(201, 50, 206);
 }
