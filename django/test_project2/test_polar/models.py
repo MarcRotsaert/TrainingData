@@ -1,10 +1,14 @@
 from typing import Optional
+import json
 
+from django.http import HttpResponse, HttpRequest
+from django.db.models.query import QuerySet
+from django.conf import settings
 from djongo import models as mongomod
 
-# from djongo import admin
+from nosql_adapter import MongoPolar
 
-# from django import forms
+# from .utils import _create_ttype_dict, _return_configttype, _set_cache_trainingdata
 
 
 # Create your models here.
@@ -190,7 +194,6 @@ class PolarModel(mongomod.Model):
 
     @classmethod
     def set_dtable(cls, tablename):
-        # cls.
         cls._meta.db_table = tablename
 
     @classmethod
@@ -201,9 +204,87 @@ class PolarModel(mongomod.Model):
             alapdata = training.alaps
             if lapdata is None or len(lapdata) == 0:
                 return alapdata
-            else:
-                return lapdata
+            # else:
+            return lapdata
         return []
+
+    @classmethod
+    def _return_trainrunning(cls) -> list[Optional[dict]]:
+        training = cls.objects.filter(sport="RUNNING")
+        if len(training) > 0:
+            return list(training.values())
+
+        else:
+            return []
+
+    @classmethod
+    def _return_trainttype(cls, ttype: str) -> list[Optional[dict]]:
+        if ttype == "sprint":
+            comp = True
+        elif ttype == "easy":
+            ttype = "easyrun"
+            comp = True
+        elif ttype == "road":
+            ttype = "roadrace"
+            comp = True
+        elif ttype == "interval":
+            comp = "interval"
+
+        else:
+            print(ttype)
+            return []
+
+        training = cls.objects.filter(trainingtype={ttype: comp})
+        trainingen = [t for t in training.values()]
+        return trainingen
+
+    @classmethod
+    def _return_trainingdata(cls, fname: str) -> dict:
+        trainingen = cls.objects.filter(fname=fname)
+        return trainingen.values()[0]
+
+    @classmethod
+    def _return_trainingdate(cls, fname: str):
+        training = cls._return_trainingdata(fname)
+        trainingdate = training["startTime"]
+        return trainingdate
+
+    @classmethod
+    def delete_training(cls, request):
+        data = json.loads(request.body.decode("utf-8"))
+        fname = data.pop("fname", None)
+        cls.objects.filter(fname=fname).delete()
+        # trainingen = cls._return_trainrunning()
+
+    @classmethod
+    def _set_database_adapt(cls, request):
+        new_trainingtype = _create_ttype_dict(request)
+        new_description = request.POST["trainingdescription-description"]
+        print(new_description)
+        new_location = request.POST["location"]
+        fname = request.POST["fname"]
+        print(fname)
+
+        # connection = cls.objects.using("default")
+        # connection = cls.objects
+        # con = cls.objects.using("default")
+        # training = cls._return_trainingdata(connection, fname)
+        training = cls._return_trainingdata(fname)
+
+        obj_id = training["_id"]
+
+        database = settings.DATABASES["default"]["NAME"]
+        db_table = cls._meta.db_table
+
+        mongpol = MongoPolar(database, db_table)
+        mongpol.updateOne(
+            obj_id,
+            {
+                "location": new_location,
+                "trainingdescription": {"description": new_description},
+                "trainingtype": new_trainingtype,
+            },
+        )
 
     # @classmethod
     # def using_mongo(cls):
@@ -226,3 +307,54 @@ class FormModel(mongomod.Model):
         # db_table = "polar2022"
         # app_label = "test_training2"
         managed = False
+
+
+# def _return_trainttype(connection: QuerySet, ttype: str) -> list[Optional[dict]]:
+#     if ttype == "sprint":
+#         comp = True
+#     elif ttype == "easy":
+#         ttype = "easyrun"
+#         comp = True
+#     elif ttype == "road":
+#         ttype = "roadrace"
+#         comp = True
+#     elif ttype == "interval":
+#         comp = "interval"
+
+#     else:
+#         print(ttype)
+#         return []
+
+#     training = connection.filter(trainingtype={ttype: comp})
+#     trainingen = [t for t in training.values()]
+#     return trainingen
+
+
+# def _return_trainrunning(connection: QuerySet) -> list[Optional[dict]]:
+#     training = connection.filter(sport="RUNNING")
+#     if len(training) > 0:
+#         return [t for t in training.values()]
+#     else:
+#         return []
+
+
+# def _return_trainingdata(connection: QuerySet, fname: str) -> dict:
+#     trainingen = connection.filter(fname=fname)
+#     return trainingen.values()[0]
+
+
+def _create_ttype_dict(request: HttpRequest) -> dict:
+    # terribly hacky, but for now it's alright
+    ttype_db = {}
+    ttypes = {"interval", "sprint", "roadrace", "easyrun"}
+    for tt in ttypes:
+        new_val = request.POST["trainingtype-" + tt]
+        if tt != "interval":
+            if new_val == "unknown" or "":
+                new_val = None
+            elif new_val == "false":
+                new_val = False
+            else:
+                new_val = True
+        ttype_db.update({tt: new_val})
+    return ttype_db
