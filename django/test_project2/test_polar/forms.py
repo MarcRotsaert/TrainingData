@@ -23,7 +23,7 @@ class adaptForm(forms.ModelForm):
             for skey in hackdict[vkey]:
                 sval = hackdict[vkey][skey]
                 self.fields[vkey].model_form_kwargs["initial"].update({skey: sval})
-
+        print(self.fields)
         return self
 
     class Meta:

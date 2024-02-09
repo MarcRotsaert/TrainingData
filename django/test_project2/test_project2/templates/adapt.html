@@ -54,6 +54,8 @@
             class="sprint"
             {% elif training.trainingtype.interval == "interval" %}
             class="interval"
+            {% elif training.trainingtype.climax %}
+            class="climax"
 
             {% endif %}
             data-url="{% url 'test_polar:showadapt' training.fname %}"

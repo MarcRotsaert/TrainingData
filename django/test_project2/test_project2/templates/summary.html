@@ -46,12 +46,12 @@
         </div>
     <p>{{ ttypes }}</p>
     
-        {% if  ttypes %}
+        {% if ttypes %}
         <form id="trainingForm" action="/summary/" method="get">
             {% comment %} {% csrf_token %} {% endcomment %}
-            <select id="trainingtype" name="ttypes" size="5" onclick="" >
+            <select id="trainingtype" name="ttypes" size="6" onclick="" >
             {% for type_name in ttypes %}
-                <option value={{ type_name}}>{{type_name}}</option>
+                <option value={{type_name}}>{{type_name}}</option>
             {% endfor %}
             
         </select>
@@ -81,6 +81,8 @@
             class="easyrun"
             {% elif training.trainingtype.sprint %}  
             class="sprint"
+            {% elif training.trainingtype.climax %}  
+            class="climax"
             {% elif training.trainingtype.interval == "interval" %}
             class="interval"
             {% endif %}
