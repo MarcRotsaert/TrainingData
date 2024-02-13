@@ -9,7 +9,7 @@ Data is set into a directory dump/<database name>
 
 
 RESTORE DATA 
-	mongorestore --uri="mongodb://<username>:<password>@127.0.0.1:27017/<name restore database >" dump/<database name>
+	mongorestore --uri="mongodb://<username>:<password>@127.0.0.1:27017/<name restore database >?authSource=admin" dump/<database name>
 example
 	mongorestore --uri="mongodb://<username>:<password>@127.0.0.1:27017/polartest_backup" dump/polartest
 You can choose another name of the restore database as the the name of the datadump. 
