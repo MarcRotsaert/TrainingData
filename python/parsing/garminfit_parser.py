@@ -169,8 +169,14 @@ class Garminfit_parser:
                 if pn == "speed":
                     avgvalue = frame.get_value("avg_speed")
                     maxvalue = frame.get_value("max_speed")
-                    avgvalue = avgvalue * 3600 / 1000
-                    maxvalue = avgvalue * 3600 / 1000
+                    if avgvalue:
+                        avgvalue = avgvalue * 3600 / 1000
+                    else:
+                        avgvalue = None
+                    if maxvalue:
+                        maxvalue = avgvalue * 3600 / 1000
+                    else:
+                        maxvalue = None
                     abstract.update(
                         {
                             "speed": {"avg": avgvalue, "max": maxvalue},
@@ -232,11 +238,13 @@ class Lapparser(Garminfit_parser):
         # try:
         speed_arr = np.array(speed_list)
         speed_arr[speed_arr == np.nan] = 0
-        speed_arr[speed_arr is None] = 0
+        # speed_arr[speed_arr is None] = 0
+        speed_arr[speed_arr == None] = 0
         try:
             speed_kmu = speed_arr * 3600 / 1000  # m/s -> km/u
         except TypeError:
-            print(speed_kmu)
+            print(speed_arr)
+            xx
         # speed_kmu[speed_kmu == 0] = None
         # except TypeError:
         # speed_kmu = len(speed_list) * [None]
