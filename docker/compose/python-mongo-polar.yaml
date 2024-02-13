@@ -2,7 +2,7 @@ version: '3.7'
 
 services:
 
-  mongo:
+  polardb:
     image: mongo
     container_name: polardb
     restart: always
@@ -14,3 +14,18 @@ services:
     volumes:
       - $PWD/mongodb:/app
       - $PWD/mongodb/logs:/var/log/mongodb
+    
+  barriedb:
+    image: mongo
+    container_name: barriedb 
+    restart: always
+    ports:
+      - 27018:27017
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=barriedb
+      - MONGO_INITDB_ROOT_PASSWORD=< password >
+    volumes:
+      - $PWD/mongodb:/app
+      - $PWD/mongodb/logs:/var/log/mongodb
+
+

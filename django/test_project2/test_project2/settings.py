@@ -145,5 +145,5 @@ STATICFILES_DIRS = [STATIC_DIR]
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # sys.path.append(r"C:\Users\marcr\Polar\Polar")
-sys.path.append(r"C:\Users\marcr\Polar\Polar\python")
-sys.path.append(r"C:\Users\marcr\Polar\Polar\python\analyzer")
+sys.path.append(r"D:\Werk\Programmeren\python\Polar\python")
+sys.path.append(r"D:\Werk\Programmeren\python\Polar\analyzer")

@@ -29,6 +29,14 @@ def get_collections_name() -> list[str]:
     mongpol = MongoPolar(database, db_table)
     collections = mongpol.getAvailableCollections()
     collections.sort()
-    collections.remove("__schema__")
-    collections.remove("django_migrations")
+    print(collections)
+    try:
+        collections.remove("__schema__")
+    except ValueError: 
+        print("not present")
+    try:
+        collections.remove("django_migrations")
+    except ValueError: 
+        print("not present")
+
     return collections
