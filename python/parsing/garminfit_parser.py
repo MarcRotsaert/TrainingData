@@ -167,14 +167,28 @@ class Garminfit_parser:
             paramconv = self.config["garmin_fit"]["paramnameconversion"]
             for pn in paramnames:
                 if pn == "speed":
-                    avgvalue = frame.get_value("avg_speed")
-                    maxvalue = frame.get_value("max_speed")
+                    avgvalue = (
+                        frame.get_value("avg_speed")
+                        if frame.get_value("avg_speed")
+                        else frame.get_value("enhanced_avg_speed")
+                    )
+                    maxvalue = (
+                        frame.get_value("max_speed")
+                        if frame.get_value("max_speed")
+                        else frame.get_value("enhanced_max_speed")
+                    )
+
+                    # avgvalue = frame.get_value("avg_speed")
+                    # maxvalue = frame.get_value("max_speed")
+                    # print(frame.get_value("enhanced_avg_speed"))
+                    # print(frame.get_value("enhanced_max_speed"))
+
                     if avgvalue:
                         avgvalue = avgvalue * 3600 / 1000
                     else:
                         avgvalue = None
                     if maxvalue:
-                        maxvalue = avgvalue * 3600 / 1000
+                        maxvalue = maxvalue * 3600 / 1000
                     else:
                         maxvalue = None
                     abstract.update(
