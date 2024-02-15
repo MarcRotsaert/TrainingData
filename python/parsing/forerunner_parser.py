@@ -32,6 +32,7 @@ class Lapparser(Forerunner_parser):
             lat = float(temp.find(f"{self.Namespace}Latitude").text)
         except AttributeError:
             return None
+        return lat
 
     def _return_longitude(self, lap: ET.Element) -> float:
         temp = lap.find(f"{self.Namespace}BeginPosition")
@@ -46,14 +47,20 @@ class Lapparser(Forerunner_parser):
         return float(length)
 
     def _return_duration(self, lap: ET.Element) -> str:
-        return lap.find(f"{self.Namespace}Duration").text
+        temp = lap.find(f"{self.Namespace}Duration").text
+        durfloat = self._timestr2float(temp)
+        return durfloat
 
     def _return_speed(self, lap: ET.Element) -> float:
         duration = self._return_duration(lap)
-        s_duration = float(duration[2:-1])
+        # s_duration = float(duration[2:-1])
         distance = self._return_distance(lap)
-        speed = 3600 * (distance / s_duration) / 1000
+        speed = 3600 * (distance / duration) / 1000
         return round(speed, 1)
+
+    @staticmethod
+    def _timestr2float(val: str) -> float:
+        return float(val.strip("PT").strip("S"))
 
     def xml2laps(self) -> list:
         if len(self.laps) > 1:
@@ -141,8 +148,15 @@ class Parser(Forerunner_parser):
 
         abstract = laps.pop(0)
         exercise = {"samples": {"recordedRoute": recordedroute}}
+
         if len(laps) > 1:
+            distance = sum(la["distance"] for la in laps)
+            duration = sum(la["duration"] for la in laps)
+            abstract["duration"] = duration
+            abstract["distance"] = distance
+            abstract.update({"speed": {"avg": 3600 * distance / (duration * 1000)}})
             exercise.update({"laps": laps})
+
         json = abstract
         json.update({"exercises": [exercise]})
         return json
