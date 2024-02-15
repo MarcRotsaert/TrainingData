@@ -21,6 +21,7 @@ class MongoAdapter:
             username=config["mongodb"]["loginname"],
             password=config["mongodb"]["password"],
         )
+        self.trainingtypes = config["running"]["trainingtypes"]
         self.dbname: str = mongoDB
         self.collection: str = collection
 
@@ -167,4 +168,12 @@ class MongoForerunner(MongoQuery):
         resume = sess.abstract
         loc = sess.SamAnalRunning.determine_s_location()
         resume.update({"location": loc, "laps": sess.laps})
+        ttypes = self.trainingtypes
+
+        trainingtypes = {}
+        for tt in ttypes:
+
+            trainingtypes.update({tt.replace(" ", ""): None})
+        resume.update({"trainingtype": trainingtypes})
+
         self.insertOne(resume)
