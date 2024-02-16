@@ -28,6 +28,6 @@ class adaptForm(forms.ModelForm):
 
     class Meta:
         model = PolarModel
-        fields = ("fname", "location", "trainingdescription", "trainingtype")
+        fields = ("fname", "location", "sport", "trainingdescription", "trainingtype")
         # fields = ["laps", "alaps"]
         # fields = "__all__"

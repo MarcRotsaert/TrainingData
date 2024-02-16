@@ -300,6 +300,7 @@ class PolarModel(mongomod.Model):
         new_trainingtype = _create_ttype_dict(request)
         new_description = request.POST["trainingdescription-description"]
         new_location = request.POST["location"]
+        new_sport = request.POST["sport"]
         fname = request.POST["fname"]
         print(fname)
 
@@ -314,6 +315,7 @@ class PolarModel(mongomod.Model):
         mongpol.updateOne(
             obj_id,
             {
+                "sport": new_sport,
                 "location": new_location,
                 "trainingdescription": {"description": new_description},
                 "trainingtype": new_trainingtype,
