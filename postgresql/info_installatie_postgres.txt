@@ -1,0 +1,29 @@
+
+- Installatie postgres
+
+
+- gebruiker postgres toevoegen/ password aanpassen
+- naar gebruiker postgres toe gaan.
+
+- Database toegankelijk maken voor externen
+	/etc/postgresql/16/main/pg_hba.conf
+	/etc/postgresql/16/main/postgresql.conf  listen_adress
+- service starten
+		 sudo service postgresql start
+- Database starten createdb <name>
+- Poort 5432 openen
+
+
+python client 
+	psycopg3 
+
+________________________________________________
+POSTGIS
+- install postgis:
+	sudo apt update
+	sudo apt install postgis
+
+Om het te activeren in een postgres database
+- CREATE EXTENSION postgis;
+
+
