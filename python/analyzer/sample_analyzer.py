@@ -7,6 +7,7 @@ from matplotlib import pyplot as pp
 import shapely as shp
 import numpy as np
 import geopandas as gpd
+import shapely
 import tomli
 
 import vector
@@ -251,6 +252,50 @@ class SamAnalExtra(SamAnalTiming):
         # relwind = relwind[inds1:inds2]
         return relwind
 
+    def _point2geojson(self):
+        dtRoute = self.return_s_timeroute()
+        lon, lat = self.return_s_rcoord()
+        dt = self.return_s_timesamples()
+        i_start = self.lineup_troute2tsamples()
+        print("_______________________________________")
+
+        if abs(len(dt[i_start:]) - len(dtRoute)) > 30:
+            raise IndexError
+
+        if len(dt[i_start:]) < len(dtRoute):
+            l_index = len(dt[i_start:])
+        else:
+            l_index = len(dtRoute)
+
+        features = []
+        for i in range(0, l_index):
+            level310 = {
+                "speed": self.return_v_sample("speed", i + i_start),
+                "heartrate": self.return_v_sample("heartRate", i + i_start),
+                "distance": self.return_v_sample("distance", i + i_start),
+                "tijd": dt[i + i_start].isoformat(),
+            }
+            level300 = {"type": "Point", "coordinates": [lon[i], lat[i]]}
+            level20 = {"type": "Feature", "geometry": level300, "properties": level310}
+            features.append(level20)
+        level1 = {"type": "FeatureCollection", "features": features}
+        return level1
+
+    def _line2geojson(self):
+        # dtRoute = self.return_s_timeroute()
+        lon, lat = self.return_s_rcoord()
+        # dt = self.return_s_timesamples()
+        # i_start = self.lineup_troute2tsamples()
+        features = []
+        linecoordinates = [[lon[i], lat[i]] for i in range(len(lon))]
+        level301 = {"type": "LineString", "coordinates": linecoordinates}
+        # level311 = {"sport": "dummy"}
+        # level21 = {"type": "Feature", "geometry": level301, "properties": level311}
+        level21 = {"type": "Feature", "geometry": level301}
+        features.append(level21)
+        level1 = {"type": "FeatureCollection", "features": features}
+        return level1
+
     def export_geojson(self, filename="geojsontest", pad=r"C:\temp") -> None:
         dtRoute = self.return_s_timeroute()
         lon, lat = self.return_s_rcoord()
@@ -292,6 +337,16 @@ class SamAnalExtra(SamAnalTiming):
         fp = open(os.path.join(pad, filename + "_lijn.json"), "w")
         json.dump(level1, fp)
         fp.close()
+
+    def to_postgis(self, tablename, conn, schema=None):
+        gpd.points_from_xy
+        points = self.return_s_pointsel()
+        points = [(p.x, p.y) for p in points]
+
+        hr = self.return_s_heartrate()
+        line = shapely.LineString(points)
+        geod = gpd.GeoDataFrame([{"hr": 120}], geometry=[line])
+        return geod
 
 
 class SamAnalRunning(SamAnalExtra):
