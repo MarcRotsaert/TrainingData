@@ -6,22 +6,10 @@ from nosql_adapter import MongoQuery
 
 from analyzer import sample_analyzer as saman
 import analyzer.polar_analyzer as polan
-from trainsession import Trainsession_file
-
-training = polan.Trainses_json(
-    "training-session-2023-12-28-7788129097-dec336e5-f1c8-405d-872d-0c73bc6cffe4.json"
-)
-
-samples = training.return_samples()
-samobj = saman.SamAnalExtra(samples)
 
 
 conn = "postgresql://postgres:NederlandBelgie@localhost:5432/testdb?"
 # obj = samobj.to_postgis("qgis2", conn)
-geoline = samobj._line2geojson()
-# geopoint = samobj._point2geojson()
-
-print(geoline)
 # print(geopoint)
 
 mongocurs = MongoQuery("polartest", "polar2023").returnDocs()
@@ -34,17 +22,44 @@ with psql.connect(
         # Execute a command: this creates a new table
         cur.execute(
             """
-            CREATE TABLE IF NOT EXISTS qgis3 (
-                _id text PRIMARY KEY,
-                fname text,
-                geom geometry(LineString, 4326))
+            DROP TABLE IF EXISTS qgis3
             """
         )
 
-        cur.execute("DELETE FROM qgis3 WHERE _id = %s ;", ("2",))
-
         cur.execute(
-            "INSERT INTO qgis3 (_id, fname, geom ) VALUES (%s, %s, ST_GeomFromGeoJSON(%s))",
-            (2, "dummy.json", json.dumps(geoline["features"][0]["geometry"])),
+            """
+            CREATE TABLE IF NOT EXISTS qgis3 (
+                _id serial PRIMARY KEY,
+                fname text,
+                distance int,
+                duration int,
+                geom geometry(LineString, 4326))
+            """
         )
+        conn.commit()
+        # cur.execute("DELETE FROM qgis3 WHERE _id = %s ;", ("2",))
+
+        for doc in mongocurs:
+            filename = doc["fname"]
+            print(filename)
+            training = polan.Trainses_json(filename)
+            if training.return_sport() == "RUNNING":
+                samples = training.return_samples()
+                samobj = saman.SamAnalExtra(samples)
+                geoline = samobj._line2geojson()
+                if geoline is None:
+                    continue
+                # geopoint = samobj._point2geojson()
+
+                dist = training.abstract["distance"]
+                dur = training.abstract["duration"]
+                cur.execute(
+                    "INSERT INTO qgis3 (_id, fname, distance, duration, geom ) VALUES (DEFAULT, %s, %s, %s, ST_GeomFromGeoJSON(%s))",
+                    (
+                        filename,
+                        dist,
+                        dur,
+                        json.dumps(geoline["features"][0]["geometry"]),
+                    ),
+                )
     conn.commit()

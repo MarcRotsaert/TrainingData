@@ -45,6 +45,8 @@ class SampleAnalyzerBasic:
 
     def return_s_rcoord(self) -> [list, list]:
         recordedroute = self.return_s_route()
+        if not recordedroute:
+            return None, None
         lon = [rec["longitude"] for rec in recordedroute]
         lat = [rec["latitude"] for rec in recordedroute]
         return lon, lat
@@ -284,6 +286,8 @@ class SamAnalExtra(SamAnalTiming):
     def _line2geojson(self):
         # dtRoute = self.return_s_timeroute()
         lon, lat = self.return_s_rcoord()
+        if lon is None:
+            return None
         # dt = self.return_s_timesamples()
         # i_start = self.lineup_troute2tsamples()
         features = []
