@@ -12,7 +12,7 @@ WORKDIR /app
 COPY ./config_docker.toml /app/config.toml
 COPY ./docker/settings_django.py /app/django/test_project2/test_project2/settings.py
 # Install Pyton libraries
-RUN python -m pip install --no-cache-dir -r /app/requirements.txt 
+RUN python -m pip install --no-cache-dir -r /app/requirements_v2.txt 
 
 # Filepath location in Docker container
 
