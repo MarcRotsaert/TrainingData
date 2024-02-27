@@ -36,7 +36,7 @@ with psql.connect(
             )
 
         # Query the database and obtain data as Python objects.
-        cur.execute("SELECT * FROM test")
+        cur.execute("SELECT * FROM test2")
         cur.fetchall()
         # will return (1, 100, "abc'def")
 

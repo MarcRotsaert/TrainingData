@@ -1,17 +1,25 @@
 
 - Installatie postgres
-
+Zoek installatie versie 16
 
 - gebruiker postgres toevoegen/ password aanpassen
+- postgres toevoegen aan sudo 
 - naar gebruiker postgres toe gaan.
+- sudo -i -u postgres
+systemctl status postgresql
+
 
 - Database toegankelijk maken voor externen
 	/etc/postgresql/16/main/pg_hba.conf
-	/etc/postgresql/16/main/postgresql.conf  listen_adress
+		host    all          all                <ip-adres>            md5
+	IP-adress geassocieerd met de WSL
+	/etc/postgresql/16/main/postgresql.conf  
+		activeren lijn met 	`listen_adress`
 - service starten
 		 sudo service postgresql start
 - Database starten createdb <name>
 - Poort 5432 openen
+	sudo ufw enable 5432
 
 
 python client 
