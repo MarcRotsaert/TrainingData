@@ -291,7 +291,9 @@ class SamAnalExtra(SamAnalTiming):
         # dt = self.return_s_timesamples()
         # i_start = self.lineup_troute2tsamples()
         features = []
-        linecoordinates = [[lon[i], lat[i]] for i in range(len(lon))]
+        linecoordinates = [
+            [lon[i], lat[i]] for i in range(len(lon)) if lon[i] is not None
+        ]
         level301 = {"type": "LineString", "coordinates": linecoordinates}
         # level311 = {"sport": "dummy"}
         # level21 = {"type": "Feature", "geometry": level301, "properties": level311}
