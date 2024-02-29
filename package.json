@@ -1,6 +1,8 @@
 {
   "dependencies": {
+    "chart.js": "^4.4.1",
     "concat-stream": "^2.0.0",
+    "plotly": "^1.0.6",
     "toml": "^3.0.0"
   }
 }

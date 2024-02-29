@@ -82,6 +82,13 @@ def start_adapt(request: HttpRequest) -> HttpResponse:
     )
 
 
+def start_analyze(request: HttpRequest) -> HttpResponse:
+    return render(
+        request,
+        "analyze.html",
+    )
+
+
 def show_adapt(request: HttpRequest, fname: str):
     # connection = PolarModel.objects.using("default")
     # print(__name__)
