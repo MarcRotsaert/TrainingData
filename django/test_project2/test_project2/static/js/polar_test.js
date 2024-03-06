@@ -23,6 +23,132 @@ function showAdapt(cell) {
 
 }
 
+function plotLapdata(cell) {
+    var fname = cell.getAttribute("value");
+    var url = cell.getAttribute("data-url");
+    console.log(fname)
+    console.log(url)
+
+    // fetch(url + "?fname=" + fname)
+    // fetch(url + fname)
+    fetch(url)
+        .then(response => response.json())
+        .then(data => {
+            // Process the retrieved data and plot using Chart.js
+            // console.log(data)
+            plotje(data)
+                ;
+        })
+        .catch(error => console.error('Error:', error));
+}
+
+
+function createDataset(valArray, duration) {
+    const totalDuration = duration.reduce((total, duration) => total + duration, 0);
+    const barPercentages = duration.map(duration => duration / totalDuration);
+
+    const datasets = []
+    for (let i = 0; i < valArray.length; i++) {
+        datasets[i] = {
+            label: 'Speed 1',
+            data: [valArray[i]],
+            backgroundColor: 'rgba(255, 99, 132, 0.2)',
+            borderWidth: 1,
+            barPercentage: barPercentages[i] * 3, // Adjust barPercentage to control the width of the first bar
+        }
+
+    }
+
+    return datasets
+
+}
+
+
+function plotje(data) {
+    const ctx = document.getElementById('myChart').getContext('2d');
+
+    const speedarr = data.map(lap => parseFloat(lap.speed.avg));
+    const duration = data.map(lap => parseInt(lap.duration));
+
+    if (window.myChart && window.myChart instanceof Chart) {
+        window.myChart.destroy();
+    }
+    // console.log(window.myChart)
+    // console.log(window.myChart instanceof Chart)
+    datasets = createDataset(speedarr, duration)
+    const datainp = {
+        labels: ["All"],
+        datasets: datasets,
+        categoryPercentage: 1,
+    }
+
+    const options = {
+        scales: {
+            y: {
+                beginAtZero: true
+            }
+        }
+    };
+
+    const myChart = new Chart(ctx, {
+        type: 'bar',
+        data: datainp,
+        options: options
+    });
+    window.myChart = myChart;
+    toHeadofpage()
+}
+
+function plotje2(data) {
+    console.log(data);
+    const ctx = document.getElementById('myChart');
+    const lapnr = data.map(lap => parseInt(lap.lapNumber) + 1);
+    const speedarr = data.map(lap => parseFloat(lap.speed.avg));
+    const duration = data.map(lap => parseInt(lap.duration));
+
+    if (window.myChart instanceof Chart) {
+        window.myChart.destroy();
+    }
+
+    const totalDuration = duration.reduce((total, duration) => total + duration, 0);
+    const barPercentages = duration.map(duration => duration / totalDuration);
+    console.log(barPercentages)
+    const datasets = [{
+        label: 'Speed',
+        data: [10, 30],
+        // barPercentage: barPercentages.map(percentage => percentage * 0.9),
+        barPercentage: [1, 1],
+        // categoryPercentage: 0.8,
+        backgroundColor: ['rgba(255, 99, 132, 0.2)', 'rgba(255, 99, 132, 0.2)'],
+        borderWidth: 10
+
+    }];
+
+    window.myChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            // labels: ['All Laps'], // Single category for all laps
+            datasets: datasets
+        },
+        // options: {
+        //     scales: {
+        //         y: {
+        //             beginAtZero: true,
+        //             title: {
+        //                 display: true,
+        //                 text: 'Speed'
+        //             }
+        //         },
+        //         x: {
+        //             title: {
+        //                 display: true,
+        //                 text: 'Lap Number'
+        //             }
+        //         }
+        //     }
+        // }
+    });
+}
 
 function showLapdata(cell) {
     var fname = cell.parentNode.getAttribute("value")

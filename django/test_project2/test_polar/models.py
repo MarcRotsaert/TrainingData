@@ -180,7 +180,8 @@ class PolarModel(mongomod.Model):
         model_form_kwargs={"initial": {"description": "Initial Description"}},
     )
 
-    db_table = mongomod.CharField(max_length=28, default="polar2019")
+    # db_table = mongomod.CharField(max_length=28, default="polar2019")
+    db_table = mongomod.CharField(max_length=28)
 
     objects = mongomod.DjongoManager()
 
@@ -188,7 +189,7 @@ class PolarModel(mongomod.Model):
         return f"PolarModel: id={self.pk}, sport={self.sport}, fname={self.fname}, location={self.location}"
 
     class Meta:
-        db_table = "polar2019"
+        # db_table = "polar2019"
         app_label = "test_polar"
         managed = False
 
@@ -199,6 +200,8 @@ class PolarModel(mongomod.Model):
     @classmethod
     def return_lapdata(cls, fname: str) -> list[Optional[dict]]:
         training = cls.objects.filter(fname=fname).first()
+        print(training)
+        # xx
         if training:
             return training.laps or training.alaps or []
             # lapdata = training.laps
@@ -243,6 +246,8 @@ class PolarModel(mongomod.Model):
 
     @classmethod
     def _return_trainingdata(cls, fname: str) -> dict:
+        db_table = cls._meta.db_table
+        cls._meta.db_table = db_table
         trainingen = cls.objects.filter(fname=fname)
         return trainingen.values()[0] if trainingen else {}
 

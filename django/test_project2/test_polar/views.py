@@ -3,14 +3,15 @@ import json
 
 # Create your views here.
 from django.shortcuts import render, redirect
-from django.http import HttpResponse, HttpRequest, JsonResponse
+from django.http import HttpResponse, HttpRequest, HttpResponseBadRequest, JsonResponse
 from django.core.exceptions import ValidationError
 
 # from django.db.models.query import QuerySet
 from test_polar.forms import adaptForm  # , formType
 from test_polar.models import PolarModel  # , PolarModel_test  # , Testpage
 
-# from nosql_adapter import MongoPolar
+from django.conf import settings
+from nosql_adapter import MongoPolar
 
 from .utils import (
     _return_configttype,
@@ -83,10 +84,39 @@ def start_adapt(request: HttpRequest) -> HttpResponse:
 
 
 def start_analyze(request: HttpRequest) -> HttpResponse:
-    return render(
-        request,
-        "analyze.html",
-    )
+    # ttype = request.GET["ttypes"]
+    trainingen = trainingen = PolarModel._return_trainrunning()
+
+    context = {
+        "trainingen": trainingen,
+    }
+    return render(request, "analyze.html", context)
+
+
+def plot_analyze(request, fname):
+    if request.method == "GET":
+        # fname = request.GET.get(
+        #     "fname"
+        # )  # Get the "fname" parameter from the GET request
+
+        if fname is not None:
+            # coll = PolarModel._meta.db_table
+            # database = settings.DATABASES["default"]["NAME"]
+            # print(database)
+            # print(coll)
+            # query = MongoPolar(database, coll).simplequery("fname", fname)
+            # lapdata = list(query)[0]["alaps"]
+
+            lapdata = PolarModel.return_lapdata(fname)
+            print(lapdata)
+            print(JsonResponse(lapdata, safe=False))
+            return JsonResponse(lapdata, safe=False)
+        else:
+            return HttpResponseBadRequest("No 'fname' parameter provided.")
+    else:
+        return HttpResponseBadRequest(
+            "Invalid request method. This view only accepts GET requests."
+        )
 
 
 def show_adapt(request: HttpRequest, fname: str):
