@@ -63,17 +63,24 @@ function createDataset(valArray, duration) {
 }
 
 function createPlot2(data) {
-    const ctx = document.getElementById('myChart2').getContext('2d');
+    const ctxS = document.getElementById('ChartS2').getContext('2d');
+    const ctxH = document.getElementById('ChartH2').getContext('2d');
     const speedarr = data.map(lap => parseFloat(lap.speed.avg));
+    const heartarr = data.map(lap => parseFloat(lap.heartRate.max));
     const duration = data.map(lap => parseInt(lap.duration));
 
-    datasets = createDataset(speedarr, duration)
-    console.log(datasets.length)
-    console.log(datasets[0].length)
+    datasets_speed = createDataset(speedarr, duration)
+    datasets_hr = createDataset(heartarr, duration)
 
-    const datainp = {
+    const datainp_hr = {
         labels: ["All"],
-        datasets: datasets,
+        datasets: datasets_hr,
+        categoryPercentage: 1,
+    }
+
+    const datainp_speed = {
+        labels: ["All"],
+        datasets: datasets_speed,
         categoryPercentage: 1,
     }
     const options = {
@@ -87,30 +94,44 @@ function createPlot2(data) {
         },
     };
 
-    const myChart = new Chart(ctx, {
+    const myChartS = new Chart(ctxS, {
         type: 'bar',
-        data: datainp,
+        data: datainp_speed,
         options: options
     });
-    window.myChart2 = myChart;
+    window.ChartS2 = myChartS;
+
+    const myChartH = new Chart(ctxH, {
+        type: 'bar',
+        data: datainp_hr,
+        options: options
+    });
+    window.ChartH2 = myChartH;
     toHeadofpage()
 }
 
 function plotje(data) {
-    const ctx = document.getElementById('myChart').getContext('2d');
-
+    const ctxS = document.getElementById('ChartS1').getContext('2d');
+    const ctxH = document.getElementById('ChartH1').getContext('2d');
+    const heartarr = data.map(lap => parseFloat(lap.heartRate.max));
     const speedarr = data.map(lap => parseFloat(lap.speed.avg));
     const duration = data.map(lap => parseInt(lap.duration));
 
-    if (!window.myChart || !(window.myChart instanceof Chart)) {
-        // console.log(window.myChart)
-        // console.log(window.myChart instanceof Chart)
-        datasets = createDataset(speedarr, duration)
-        const datainp = {
+    if (!window.ChartS1 || !(window.ChartS1 instanceof Chart)) {
+        datasets_speed = createDataset(speedarr, duration)
+        const datainp_speed = {
             labels: ["All"],
-            datasets: datasets,
+            datasets: datasets_speed,
             categoryPercentage: 1,
         }
+
+        datasets_hr = createDataset(heartarr, duration)
+        const datainp_hr = {
+            labels: ["All"],
+            datasets: datasets_hr,
+            categoryPercentage: 1,
+        }
+
 
         const options = {
             scales: {
@@ -123,18 +144,30 @@ function plotje(data) {
             },
         };
 
-        const myChart = new Chart(ctx, {
+        const myChartS = new Chart(ctxS, {
             type: 'bar',
-            data: datainp,
+            data: datainp_speed,
             options: options
         });
-        window.myChart = myChart;
+        window.ChartS1 = myChartS;
+
+        const myChartH = new Chart(ctxH, {
+            type: 'bar',
+            data: datainp_hr,
+            options: options
+        });
+        window.ChartH1 = myChartH;
+
+
         toHeadofpage()
     }
 
     else {
-        if (window.myChart2 && window.myChart2 instanceof Chart) {
-            window.myChart2.destroy();
+        if (window.ChartS2 && window.ChartS2 instanceof Chart) {
+            window.ChartS2.destroy();
+        }
+        if (window.ChartH2 && window.ChartH2 instanceof Chart) {
+            window.ChartH2.destroy();
         }
         createPlot2(data)
     }
