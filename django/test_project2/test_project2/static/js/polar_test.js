@@ -2,8 +2,6 @@
 // var concat = require('concat-stream');
 // var fs = require("fs")
 
-
-
 function showAdapt(cell) {
     var fname = cell.getAttribute("value")
     var url = cell.getAttribute("data-url")
@@ -50,44 +48,43 @@ function createDataset(valArray, duration) {
     const datasets = []
     for (let i = 0; i < valArray.length; i++) {
         datasets[i] = {
-            label: 'Speed 1',
+            // label: 'Speed 1',
             data: [valArray[i]],
             backgroundColor: 'rgba(255, 99, 132, 0.2)',
-            borderWidth: 1,
-            barPercentage: barPercentages[i] * 3, // Adjust barPercentage to control the width of the first bar
+            borderWidth: 3,
+            barPercentage: barPercentages[i] * 6, // Adjust barPercentage to control the width of the first bar
+            categoryPercentage: 0.95,
+            skipNull: false,
         }
-
     }
 
     return datasets
 
 }
 
-
-function plotje(data) {
-    const ctx = document.getElementById('myChart').getContext('2d');
-
+function createPlot2(data) {
+    const ctx = document.getElementById('myChart2').getContext('2d');
     const speedarr = data.map(lap => parseFloat(lap.speed.avg));
     const duration = data.map(lap => parseInt(lap.duration));
 
-    if (window.myChart && window.myChart instanceof Chart) {
-        window.myChart.destroy();
-    }
-    // console.log(window.myChart)
-    // console.log(window.myChart instanceof Chart)
     datasets = createDataset(speedarr, duration)
+    console.log(datasets.length)
+    console.log(datasets[0].length)
+
     const datainp = {
         labels: ["All"],
         datasets: datasets,
         categoryPercentage: 1,
     }
-
     const options = {
         scales: {
             y: {
-                beginAtZero: true
-            }
-        }
+                beginAtZero: false
+            },
+        },
+        plugins: {
+            legend: { display: false }
+        },
     };
 
     const myChart = new Chart(ctx, {
@@ -95,60 +92,54 @@ function plotje(data) {
         data: datainp,
         options: options
     });
-    window.myChart = myChart;
+    window.myChart2 = myChart;
     toHeadofpage()
 }
 
-function plotje2(data) {
-    console.log(data);
-    const ctx = document.getElementById('myChart');
-    const lapnr = data.map(lap => parseInt(lap.lapNumber) + 1);
+function plotje(data) {
+    const ctx = document.getElementById('myChart').getContext('2d');
+
     const speedarr = data.map(lap => parseFloat(lap.speed.avg));
     const duration = data.map(lap => parseInt(lap.duration));
 
-    if (window.myChart instanceof Chart) {
-        window.myChart.destroy();
+    if (!window.myChart || !(window.myChart instanceof Chart)) {
+        // console.log(window.myChart)
+        // console.log(window.myChart instanceof Chart)
+        datasets = createDataset(speedarr, duration)
+        const datainp = {
+            labels: ["All"],
+            datasets: datasets,
+            categoryPercentage: 1,
+        }
+
+        const options = {
+            scales: {
+                y: {
+                    beginAtZero: false
+                },
+            },
+            plugins: {
+                legend: { display: false }
+            },
+        };
+
+        const myChart = new Chart(ctx, {
+            type: 'bar',
+            data: datainp,
+            options: options
+        });
+        window.myChart = myChart;
+        toHeadofpage()
     }
 
-    const totalDuration = duration.reduce((total, duration) => total + duration, 0);
-    const barPercentages = duration.map(duration => duration / totalDuration);
-    console.log(barPercentages)
-    const datasets = [{
-        label: 'Speed',
-        data: [10, 30],
-        // barPercentage: barPercentages.map(percentage => percentage * 0.9),
-        barPercentage: [1, 1],
-        // categoryPercentage: 0.8,
-        backgroundColor: ['rgba(255, 99, 132, 0.2)', 'rgba(255, 99, 132, 0.2)'],
-        borderWidth: 10
-
-    }];
-
-    window.myChart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-            // labels: ['All Laps'], // Single category for all laps
-            datasets: datasets
-        },
-        // options: {
-        //     scales: {
-        //         y: {
-        //             beginAtZero: true,
-        //             title: {
-        //                 display: true,
-        //                 text: 'Speed'
-        //             }
-        //         },
-        //         x: {
-        //             title: {
-        //                 display: true,
-        //                 text: 'Lap Number'
-        //             }
-        //         }
-        //     }
-        // }
-    });
+    else {
+        if (window.myChart2 && window.myChart2 instanceof Chart) {
+            window.myChart2.destroy();
+        }
+        createPlot2(data)
+    }
 }
+
 
 function showLapdata(cell) {
     var fname = cell.parentNode.getAttribute("value")

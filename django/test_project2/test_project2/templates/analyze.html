@@ -22,58 +22,79 @@
   <script src={% static  "js/polar_test.js" %}></script>
   {% comment %} <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> {% endcomment %}
   <script src="{% static 'node_modules/chart.js/dist/chart.umd.js' %} "></script>
+  <table>
+    {% comment %} <tr> {% endcomment %}
+      <tr>
+      <td class="analyzegraph">
+      <div>
+        <canvas id="myChart"></canvas>
+      </div>
+    </td>
+    {% comment %} </tr>  {% endcomment %}
+    <td class="analyzegraph">
+      <div>
+        <canvas id="myChart2"></canvas>
+      </div>
+      </td>  
+    </tr>
+    <tr>
+    </tr>
+    <td class="analyzegraph">
+    </td>
+    <td class="analyzegraph">
+    </td>
 
-  <div>
-    <canvas id="myChart"></canvas>
-  </div> 
+
+    </table>
+    {% endblock %}
 {% block traintab_block %}
 <table name="traindata">
     <tr>
-            <th>Date</th>
-            <th>location</th>
-            <th>Distance(m)</th>
-            <th>vel avg(min/km)</th>
-            <th>Hsl avg(bpm)</th>
-            <th>training description</th>
-        </tr>
-        <p>
-          {% comment %} {% cache 60 "training_data" %} {% endcomment %}
-            {% for training in trainingen|dictsort:"startTime" %} 
-            <tr value={{training.fname}}  
-            name="traindata" 
-            id="traindata"
-            {% if training.trainingtype.roadrace %}  
-            class="roadrace"
-            {% elif training.trainingtype.easyrun %}  
-            class="easyrun"
-            {% elif training.trainingtype.sprint %}  
-            class="sprint"
-            {% elif training.trainingtype.climax %}  
-            class="climax"
-            {% elif training.trainingtype.interval == "interval" %}
-            class="interval"
-            {% endif %}
+        <th>Date</th>
+        <th>location</th>
+        <th>Distance(m)</th>
+        <th>vel avg(min/km)</th>
+        <th>Hsl avg(bpm)</th>
+        <th>training description</th>
+    </tr>
+      <p>
+        {% comment %} {% cache 60 "training_data" %} {% endcomment %}
+        {% for training in trainingen|dictsort:"startTime" %} 
+          <tr value={{training.fname}}  
+          name="traindata" 
+          id="traindata"
+          {% if training.trainingtype.roadrace %}  
+          class="roadrace"
+          {% elif training.trainingtype.easyrun %}  
+          class="easyrun"
+          {% elif training.trainingtype.sprint %}  
+          class="sprint"
+          {% elif training.trainingtype.climax %}  
+          class="climax"
+          {% elif training.trainingtype.interval == "interval" %}
+          class="interval"
+          {% endif %}
 
-            data-url="{% url 'test_polar:plotanalyze' training.fname %}"
-            onclick="plotLapdata(this)">
-            <td>{{training.startTime|slice:":10"|weekday}}</td> 
-            
-            {% if training.location != None %}
-            <td id="location">{{training.location|upper}}</td>
-            {% else %}
-            <td id="location">not defined</td>
-            {% endif %}
-            <td>{{training.distance|floatformat:0}}</td>
-            <td>{{training.speed.avg| kmh2minkm}}</td>
-            <td>{{training.averageHeartRate|floatformat:0}} / {{training.maximumHeartRate|floatformat:0}}
-            </td>
-            <td id="tdescr">{{training.trainingdescription.description|linebreaks}}</td>
-        </tr>
-        {% endfor %}
-        {% comment %} {% endcache %} {% endcomment %}
-        </p>
+          data-url="{% url 'test_polar:plotanalyze' training.fname %}"
+          onclick="plotLapdata(this)">
+          <td>{{training.startTime|slice:":10"|weekday}}</td> 
+          
+          {% if training.location != None %}
+          <td id="location">{{training.location|upper}}</td>
+          {% else %}
+          <td id="location">not defined</td>
+          {% endif %}
+          <td>{{training.distance|floatformat:0}}</td>
+          <td>{{training.speed.avg| kmh2minkm}}</td>
+          <td>{{training.averageHeartRate|floatformat:0}} / {{training.maximumHeartRate|floatformat:0}}
+          </td>
+          <td id="tdescr">{{training.trainingdescription.description|linebreaks}}</td>
+      </tr>
+      {% endfor %}
+      {% comment %} {% endcache %} {% endcomment %}
+      </p>
     <br><br>
       </table>
+
     {% endblock %}
-    {% endblock %}
-      </body>
+</body>
