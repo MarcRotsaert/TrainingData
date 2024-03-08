@@ -45,10 +45,12 @@ function createDataset(valArray, duration) {
     const totalDuration = duration.reduce((total, duration) => total + duration, 0);
     const barPercentages = duration.map(duration => duration / totalDuration);
 
+    let durationMin = duration.map(d => (d / 60).toFixed(1));
+
     const datasets = []
     for (let i = 0; i < valArray.length; i++) {
         datasets[i] = {
-            // label: 'Speed 1',
+            label: 'L ' + (i + 1) + "\nduration:" + durationMin[i] + 'min\n',
             data: [valArray[i]],
             backgroundColor: 'rgba(255, 99, 132, 0.2)',
             borderWidth: 3,
@@ -65,40 +67,39 @@ function createDataset(valArray, duration) {
 function createPlot2(data) {
     const ctxS = document.getElementById('ChartS2').getContext('2d');
     const ctxH = document.getElementById('ChartH2').getContext('2d');
-    const speedarr = data.map(lap => parseFloat(lap.speed.avg));
-    const heartarr = data.map(lap => parseFloat(lap.heartRate.max));
-    const duration = data.map(lap => parseInt(lap.duration));
+    var lapdata = data["lapdata"]
+    const ldate = data["ldate"]
+
+    const speedarr = lapdata.map(lap => parseFloat(lap.speed.avg));
+    const heartarr = lapdata.map(lap => parseFloat(lap.heartRate.max));
+    const duration = lapdata.map(lap => parseInt(lap.duration));
+    // const ldate = lapdata.map(lap => parseFloat(lap.ldate));
+    console.log(ldate)
 
     datasets_speed = createDataset(speedarr, duration)
     datasets_hr = createDataset(heartarr, duration)
 
     const datainp_hr = {
-        labels: ["All"],
+        labels: [""],
+        // labels: [duration],
         datasets: datasets_hr,
         categoryPercentage: 1,
     }
 
     const datainp_speed = {
-        labels: ["All"],
+        labels: [""],
         datasets: datasets_speed,
         categoryPercentage: 1,
     }
-    const options = {
-        scales: {
-            y: {
-                beginAtZero: false
-            },
-        },
-        plugins: {
-            legend: { display: false }
-        },
-    };
+
+    options = _creatOptions()
 
     const myChartS = new Chart(ctxS, {
         type: 'bar',
         data: datainp_speed,
         options: options
     });
+
     window.ChartS2 = myChartS;
 
     const myChartH = new Chart(ctxH, {
@@ -107,50 +108,78 @@ function createPlot2(data) {
         options: options
     });
     window.ChartH2 = myChartH;
+
+    elem = document.getElementById("ldate2")
+    elem.innerHTML = ldate;
     toHeadofpage()
 }
+
+function _creatOptions() {
+    const options = {
+        scales: {
+            y: {
+                beginAtZero: false
+            },
+        },
+        plugins: {
+            legend: { display: false },
+            tooltip: {
+                backgroundColor: 'rgba(200, 0, 0, 0.5)',
+                // callbacks: {
+                //     label: function (tooltipItems, data) {
+                //         console.log(data)
+                //         // const text = chartData[tooltipItems.datasetIndex]
+                //         return tooltipItems.datasetIndex;
+                //     },
+
+                // }
+            },
+
+        }
+    };
+
+    return options
+}
+
 
 function plotje(data) {
     const ctxS = document.getElementById('ChartS1').getContext('2d');
     const ctxH = document.getElementById('ChartH1').getContext('2d');
-    const heartarr = data.map(lap => parseFloat(lap.heartRate.max));
-    const speedarr = data.map(lap => parseFloat(lap.speed.avg));
-    const duration = data.map(lap => parseInt(lap.duration));
+    var lapdata = data["lapdata"]
+    const ldate = data["ldate"]
+    const heartarr = lapdata.map(lap => parseFloat(lap.heartRate.max));
+    const speedarr = lapdata.map(lap => parseFloat(lap.speed.avg));
+    const duration = lapdata.map(lap => parseInt(lap.duration));
+    // const ldate = data.map(lap => parseFloat(lap.ldate));
+    console.log(ldate)
 
     if (!window.ChartS1 || !(window.ChartS1 instanceof Chart)) {
         datasets_speed = createDataset(speedarr, duration)
         const datainp_speed = {
-            labels: ["All"],
+            labels: [""],
             datasets: datasets_speed,
             categoryPercentage: 1,
+            duration: duration
         }
 
         datasets_hr = createDataset(heartarr, duration)
         const datainp_hr = {
-            labels: ["All"],
+            labels: [""],
             datasets: datasets_hr,
             categoryPercentage: 1,
+            duration: duration
         }
 
 
-        const options = {
-            scales: {
-                y: {
-                    beginAtZero: false
-                },
-            },
-            plugins: {
-                legend: { display: false }
-            },
-        };
-
+        options = _creatOptions()
         const myChartS = new Chart(ctxS, {
             type: 'bar',
             data: datainp_speed,
             options: options
         });
-        window.ChartS1 = myChartS;
 
+        console.log(myChartS.data)
+        window.ChartS1 = myChartS;
         const myChartH = new Chart(ctxH, {
             type: 'bar',
             data: datainp_hr,
@@ -158,7 +187,8 @@ function plotje(data) {
         });
         window.ChartH1 = myChartH;
 
-
+        elem = document.getElementById("ldate1")
+        elem.innerHTML = ldate;
         toHeadofpage()
     }
 

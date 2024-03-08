@@ -100,17 +100,10 @@ def plot_analyze(request, fname):
         # )  # Get the "fname" parameter from the GET request
 
         if fname is not None:
-            # coll = PolarModel._meta.db_table
-            # database = settings.DATABASES["default"]["NAME"]
-            # print(database)
-            # print(coll)
-            # query = MongoPolar(database, coll).simplequery("fname", fname)
-            # lapdata = list(query)[0]["alaps"]
-
             lapdata = PolarModel.return_lapdata(fname)
-            print(lapdata)
-            print(JsonResponse(lapdata, safe=False))
-            return JsonResponse(lapdata, safe=False)
+            ldate = PolarModel._return_trainingdate(fname)
+            print(JsonResponse({"lapdata": lapdata, "ldate": ldate}, safe=False))
+            return JsonResponse({"lapdata": lapdata, "ldate": ldate}, safe=False)
         else:
             return HttpResponseBadRequest("No 'fname' parameter provided.")
     else:
