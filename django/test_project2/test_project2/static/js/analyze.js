@@ -101,16 +101,31 @@ function plotje(data) {
     }
 
     else {
-        if (window.ChartS2 && window.ChartS2 instanceof Chart) {
-            window.ChartS2.destroy();
-        }
-        if (window.ChartH2 && window.ChartH2 instanceof Chart) {
-            window.ChartH2.destroy();
-        }
+        _destroygraph("ChartS2")
+        _destroygraph("ChartH2")
         createPlot(data, 2)
     }
 }
 
+function _destroygraph(graphid) {
+    if (window[graphid] && window[graphid] instanceof Chart) {
+        window[graphid].destroy()
+        window[graphid] = undefined
+    }
+}
+
+function resetgraphs() {
+    graphids = ["ChartS1", "ChartS2", "ChartH1", "ChartH2"]
+    for (let i of graphids) {
+        _destroygraph(i)
+    }
+
+    elem = document.getElementById("ldate1")
+    elem.textContent = ""
+    elem = document.getElementById("ldate2")
+    elem.textContent = ""
+
+}
 
 function createPlot(data, nr) {
     const ctxS = document.getElementById('ChartS' + nr).getContext('2d');
