@@ -19,7 +19,7 @@ mongocurs = MongoQuery("barriedb", "garminfit").returnDocs()
 
 
 with psql.connect(
-    dbname="testdb", user="postgres", password="NederlandBelgie", host="localhost"
+    dbname="testdb", user="postgres", password=[dbpassword], host="localhost"
 ) as conn:
 
     # Open a cursor to perform database operations
