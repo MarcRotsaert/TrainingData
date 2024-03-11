@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+{% extends "base.html" %}
+{% load static %}
+{% comment %} {% load cache %} {% endcomment %}
+{% load table_filters %}
+<html lang="en">
+<head>
+
+  {% block analyze_block %}
+
+
+  <meta charset="utf-8">
+  <title>analyze</title>
+
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <link rel="stylesheet" href="{% static "css/test_polar.css" %}">
+    
+</head>
+<body>
+  <script src={% static  "js/analyze.js" %}></script>
+  {% comment %} <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> {% endcomment %}
+  <script src="{% static 'node_modules/chart.js/dist/chart.umd.js' %} "></script>
+
+
+  <input type="reset" onclick="resetgraphs()" value= "reset graphs" name="reset">
+  <table>
+      <tr><th id=ldate1></th><th id=ldate2></th></tr>
+      <tr>
+      <td class="analyzegraph">
+      <div>
+        <canvas id="ChartS1"></canvas>
+      </div>
+    </td>
+    {% comment %} </tr>  {% endcomment %}
+    <td class="analyzegraph">
+      <div>
+        <canvas id="ChartS2"></canvas>
+      </div>
+      </td>  
+    </tr>
+    <tr>
+    </tr>
+    <td class="analyzegraph">
+      <div>
+        <canvas id="ChartH1"></canvas>
+      </div>
+    </td>
+    <td class="analyzegraph">
+      <div>
+        <canvas id="ChartH2"></canvas>
+      </div>
+    </td>
+
+
+    </table>
+    {% endblock %}
+{% block traintab_block %}
+<table name="traindata">
+    <tr>
+        <th>Date</th>
+        <th>location</th>
+        <th>Distance(m)</th>
+        <th>vel avg(min/km)</th>
+        <th>Hsl avg(bpm)</th>
+        <th>training description</th>
+    </tr>
+      <p>
+        {% comment %} {% cache 60 "training_data" %} {% endcomment %}
+        {% for training in trainingen|dictsort:"startTime" %} 
+          <tr value={{training.fname}}  
+          name="traindata" 
+          id="traindata"
+          {% if training.trainingtype.roadrace %}  
+          class="roadrace"
+          {% elif training.trainingtype.easyrun %}  
+          class="easyrun"
+          {% elif training.trainingtype.sprint %}  
+          class="sprint"
+          {% elif training.trainingtype.climax %}  
+          class="climax"
+          {% elif training.trainingtype.interval == "interval" %}
+          class="interval"
+          {% endif %}
+
+          data-url="{% url 'test_polar:plotanalyze' training.fname %}"
+          onclick="plotLapdata(this)">
+
+
+          <td>{{training.startTime|slice:":10"|weekday}}</td> 
+          
+          {% if training.location != None %}
+          <td id="location">{{training.location|upper}}</td>
+          {% else %}
+          <td id="location">not defined</td>
+          {% endif %}
+          <td>{{training.distance|floatformat:0}}</td>
+          <td>{{training.speed.avg| kmh2minkm}}</td>
+          <td>{{training.averageHeartRate|floatformat:0}} / {{training.maximumHeartRate|floatformat:0}}
+          </td>
+          <td id="tdescr">{{training.trainingdescription.description|linebreaks}}</td>
+      </tr>
+      {% endfor %}
+      {% comment %} {% endcache %} {% endcomment %}
+      </p>
+    <br><br>
+      </table>
+
+    {% endblock %}
+</body>

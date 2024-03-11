@@ -2,8 +2,6 @@
 // var concat = require('concat-stream');
 // var fs = require("fs")
 
-
-
 function showAdapt(cell) {
     var fname = cell.getAttribute("value")
     var url = cell.getAttribute("data-url")

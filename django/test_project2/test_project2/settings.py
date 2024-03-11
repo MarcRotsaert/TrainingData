@@ -14,10 +14,17 @@ import sys
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
-TEMP_DIR = Path(__file__).resolve().parent.joinpath("templates")
-STATIC_DIR = Path(__file__).parent.joinpath("static")
-# STATIC_ROOT = "C:/TEMP/css"
+BASE_DIR = Path(__file__).resolve().parent.parent.resolve()
+TEMP_DIR = Path(__file__).resolve().parent.resolve().joinpath("templates")
+
+PYTHON_DIR = Path(BASE_DIR).resolve().parent.parent.joinpath("python")
+# sys.path.append(r"C:\Users\marcr\Polar\Polar")
+sys.path.append(PYTHON_DIR)
+sys.path.append(Path(PYTHON_DIR).joinpath("analyzer"))
+# sys.path.append(r"D:\Werk\Programmeren\python\Polar\python")
+# sys.path.append(r"D:\Werk\Programmeren\python\Polar\analyzer")
+
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
@@ -136,14 +143,18 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
+STATIC_DIR = Path(__file__).parent.resolve().joinpath("static")
+NODE_DIR = Path(BASE_DIR).resolve().parent.parent.joinpath("node_modules")
+# NODE_DIR = "C:/Users/marcr/Polar/Polar/node_modules"
+print(PYTHON_DIR)
+print(NODE_DIR)
 
-STATIC_URL = "static/"
-STATICFILES_DIRS = [STATIC_DIR]
+STATICFILES_DIRS = [STATIC_DIR, ("node_modules", NODE_DIR)]
+STATIC_URL = "/static/"
+# STATICFILES_DIRS = [NODE_DIR]
+STATIC_ROOT = "C:/TEMP/static/"
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
-DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-# sys.path.append(r"C:\Users\marcr\Polar\Polar")
-sys.path.append(r"D:\Werk\Programmeren\python\Polar\python")
-sys.path.append(r"D:\Werk\Programmeren\python\Polar\analyzer")
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"

@@ -42,8 +42,6 @@ td textarea {
 
 
 
-<style>
-
 /* Add this style block in the head of your HTML document or in an external CSS file */
 .btn-group-vertical {
     display: flex;
@@ -126,4 +124,10 @@ tr.easyrun {
 
 tr.interval {
     background-color: rgb(201, 50, 206);
+}
+
+.analyzegraph {
+    width: 600px;
+    max-width: 50%;
+
 }

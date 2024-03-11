@@ -15,4 +15,6 @@ urlpatterns = [
     ),
     path("adapt/", views.start_adapt, name="startadapt"),
     path("adapt/form/<str:fname>", views.show_adapt, name="showadapt"),
+    path("analyze/", views.start_analyze, name="startanalyze"),
+    path("analyze/plot/<str:fname>", views.plot_analyze, name="plotanalyze"),
 ]

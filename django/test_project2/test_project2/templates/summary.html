@@ -71,6 +71,7 @@
             <th>training description</th>
         </tr>
         <p>{% cache 60 "training_data" %}
+        <p>
             {% for training in trainingen|dictsort:"startTime" %} 
             <tr value={{training.fname}}  
             name="traindata" 
