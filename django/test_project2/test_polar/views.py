@@ -1,102 +1,58 @@
-from typing import Union, Optional
-import tomli
-
+from typing import Union
 import json
 
 # Create your views here.
 from django.shortcuts import render, redirect
-from django.http import HttpResponse, HttpRequest, HttpResponseRedirect, JsonResponse
+from django.http import HttpResponse, HttpRequest, HttpResponseBadRequest, JsonResponse
 from django.core.exceptions import ValidationError
-from django.db.models.query import QuerySet
 
-# from .forms import TrainingForm, TrainingModelForm
-import sys
-
-from test_polar.forms import formType
-
-sys.path.append(r"C:\Users\marcr\Polar\Polar\python")
-sys.path.append(r"C:\Users\marcr\Polar\Polar\python\analyzer")
-
-# from nosql_adapter import MongoPolar
-
+# from django.db.models.query import QuerySet
+from test_polar.forms import adaptForm  # , formType
 from test_polar.models import PolarModel  # , PolarModel_test  # , Testpage
 
+from django.conf import settings
+from nosql_adapter import MongoPolar
 
-def return_configttype() -> list[str]:
-    config = tomli.load(open("../../config.toml", "rb"))
-    return config["running"]["trainingtypes"]
+from .utils import (
+    _return_configttype,
+    _set_cache_trainingdata,
+    get_collections_name,
+)
 
 
-def _return_trainttype(connection: QuerySet, ttype: str) -> list[Optional[dict]]:
-    if ttype == "easy":
-        ttype = "easyrun"
-        comp = True
-    elif ttype == "road":
-        ttype = "roadrace"
-        comp = True
-    elif ttype == "interval":
-        comp = "interval"
+def select_collections(request: HttpRequest) -> HttpResponse:
+    if request.method == "GET":
+        collections = get_collections_name()
+        return render(request, "home.html", context={"dbtables": collections})
     else:
-        print(ttype)
-        return []
-
-    training = connection.filter(trainingtype={ttype: comp})
-    # FOR DEBUGGING
-    # for val in training.values():
-    #     try:
-    #         print(val["trainingtype"])
-    #     except TypeError:
-    #         print("no")
-    trainingen = [t for t in training.values()]
-    return trainingen
+        return request
 
 
-def _return_trainrunning(connection: QuerySet) -> list[Optional[dict]]:
-    training = connection.filter(sport="RUNNING")
-    if len(training) > 0:
-        return [t for t in training.values()]
-    else:
-        return []
-
-
-def _return_lapdata(connection: QuerySet, fname: str) -> list[Optional[dict]]:
-    trainingen = connection.filter(fname=fname)
-    # print(trainingen.values()[0]["laps"])
-    if len(trainingen.values()[0]["laps"]) > 0:
-        return trainingen.values()[0]["laps"]
-    else:
-        return []
+def redirect_to_home(request: HttpRequest) -> HttpResponse:
+    print(request)
+    return redirect("home/")
 
 
 def show_polar(request: HttpRequest) -> HttpResponse:
     if request.method == "GET":
-        connection = PolarModel.objects.using("default")
+        if "dtable" in request.GET:
+            collection = request.GET["dtable"]
+            print(collection)
+            PolarModel.set_dtable(collection)
+            print(PolarModel.check())
 
-        # print(request.POST) # print(request.body)
         if "ttypes" not in request.GET:
-            trainingen = _return_trainrunning(connection)
-            # training = connection.filter(sport="RUNNING")
+            trainingen = PolarModel._return_trainrunning()
         else:
             ttype = request.GET["ttypes"]
-            print(len(ttype))
+            trainingen = PolarModel._return_trainttype(ttype)
 
-            trainingen = _return_trainttype(connection, ttype)
-            # FOR DEBUG PURPOSES
-            # trainingen = []
-            # for t in range(200):
-            #     try:
-            #         print(training[t]["fname"])
-            #         trainingen.append(training[t])
-            #     except ValidationError:
-            #         print("no")
-            # xx
-            # trainingen = [t for t in training.values()]
+        _set_cache_trainingdata(trainingen, 360)
 
-        ttypes = return_configttype()
-
+        ttypes = _return_configttype()
         return render(
             request,
-            "polar.html",
+            "summary.html",
             context={
                 "trainingen": trainingen,
                 "ttypes": ttypes,
@@ -104,27 +60,117 @@ def show_polar(request: HttpRequest) -> HttpResponse:
         )
 
 
-def show_lapdata(request: HttpRequest) -> Union[HttpResponse, JsonResponse]:
-    connection = PolarModel.objects.using("default")
-    if request.method == "POST":
-        try:
-            print(request.body)
-            data = json.loads(request.body.decode("utf-8"))
-            received_data = data.get("lapdata", "")
-            lapdata = _return_lapdata(connection, received_data)
+def start_adapt(request: HttpRequest) -> HttpResponse:
+    trainingen = PolarModel._return_trainrunning()
 
-            trainingen = _return_trainrunning(connection)
-            ttypes = return_configttype()
+    if request.method == "GET":
+        # TODO: add logging
+        print("GET action_adapt")
+    elif request.method == "POST":
+        print(request.POST)
+        # xx
+        PolarModel._set_database_adapt(request)
+        trainingen = PolarModel._return_trainrunning()
+    _set_cache_trainingdata(trainingen, 360)
 
-            return render(
-                request,
-                "polar.html",
-                context={
-                    "lapdata": lapdata,
-                    "trainingen": trainingen,
-                    "ttypes": ttypes,
-                },
-            )
-        except json.JSONDecodeError:
-            return JsonResponse({"status": "error", "message": "Invalid JSON"})
-    return JsonResponse({"status": "error", "message": "Invalid request method"})
+    return render(
+        request,
+        "adapt.html",
+        context={
+            "trainingen": trainingen,
+            "update_checked": True,
+        },
+    )
+
+
+def start_analyze(request: HttpRequest) -> HttpResponse:
+    # ttype = request.GET["ttypes"]
+    trainingen = trainingen = PolarModel._return_trainrunning()
+
+    context = {
+        "trainingen": trainingen,
+    }
+    return render(request, "analyze.html", context)
+
+
+def plot_analyze(request, fname):
+    if request.method == "GET":
+        # fname = request.GET.get(
+        #     "fname"
+        # )  # Get the "fname" parameter from the GET request
+
+        if fname is not None:
+            lapdata = PolarModel.return_lapdata(fname)
+            ldate = PolarModel._return_trainingdate(fname)
+            print(JsonResponse({"lapdata": lapdata, "ldate": ldate}, safe=False))
+            return JsonResponse({"lapdata": lapdata, "ldate": ldate}, safe=False)
+        else:
+            return HttpResponseBadRequest("No 'fname' parameter provided.")
+    else:
+        return HttpResponseBadRequest(
+            "Invalid request method. This view only accepts GET requests."
+        )
+
+
+def show_adapt(request: HttpRequest, fname: str):
+    # connection = PolarModel.objects.using("default")
+    # print(__name__)
+    if request.method == "GET":
+        return request
+    elif request.method == "DELETE":
+        PolarModel.delete_training(request)
+        trainingen = PolarModel._return_trainrunning()
+        _set_cache_trainingdata(trainingen, 360)
+
+        return render(
+            request,
+            "adapt.html",
+            context={
+                "trainingen": trainingen,
+                "delete_checked": True,
+                "update_checked": False,
+            },
+        )
+
+    elif request.method == "POST":
+        data = json.loads(request.body.decode("utf-8"))
+        fname = data.pop("fname", None)
+        lapdata = PolarModel.return_lapdata(fname)
+        ldate = PolarModel._return_trainingdate(fname)
+        initdict, hackdict = PolarModel._return_training_adaptdata(fname)
+        # adaptform = _set_form_initial(adaptForm, initdict, hackdict)
+        adaptform = adaptForm().set_form_initial(initdict, hackdict)
+
+        return render(
+            request,
+            "adapt.html",
+            context={
+                "lapdate": ldate,
+                "lapdata": lapdata,
+                "adaptform": adaptform,
+                "update_checked": True,
+                "delete_checked": False,
+            },
+        )
+
+
+def show_lapdata(request: HttpRequest, fname: str) -> Union[HttpResponse, JsonResponse]:
+    if request.method == "GET":
+        print(dir(PolarModel))
+        lapdata = PolarModel.return_lapdata(fname)
+        # print(lapdata)
+        ttypes = _return_configttype()
+        ldate = PolarModel._return_trainingdate(fname)
+
+        return render(
+            request,
+            "summary.html",
+            context={
+                "lapdate": ldate,
+                "lapdata": lapdata,
+                "ttypes": ttypes,
+            },
+        )
+    return JsonResponse(
+        {"status": "error", "message": "Invalid request method in " + __name__}
+    )

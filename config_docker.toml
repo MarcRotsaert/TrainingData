@@ -1,14 +1,14 @@
 [polar_json]
-datapath = "{{datapath_polar}}"
+datapath = "C:\\Users\\marcr\\OneDrive\\Documenten\\logboek_looptracks\\polarroutes"  # datapath = "/mnt/Polar/looptracks/polar-user-data-export"
 datatypes = ["laps", "autoLaps", "samples"]
 sport = ["RUNNING", "CYCLING", "OTHER"]
 
 [forerunner_xml]
-datapath= "{{datapath_forerunner}}"
+datapath= "C:\\Users\\marcr\\OneDrive\\Documenten\\logboek_looptracks\\looptracks_forerunner\\Looptracks\\XMLfiles"  # datapath= "/mnt/Polar/looptracks/XMLfiles"
 datatypes = ["laps", "samples"]
 
 [garmin_fit]
-datapath= "{{datapath_garmin}}"
+datapath= "C:/Users/marcr/OneDrive/Documenten/logboek_looptracks/looptracks_garmin"
 datatypes = ["laps", "alaps", "samples"]
 sport = ["running", "cycling"]
 enhanced_record = ['altitude', 'speed']
@@ -24,12 +24,15 @@ ascent="total_ascent"
 maximumHeartRate="max_heart_rate"
 averageHeartRate="avg_heart_rate"
 sport="sport"
+speed.avg="avg_speed"
+speed.max="avg_speed"
+
 
 [mongodb]
-database = "{{databasename}}"
-password = "{{password}}"
-loginname = "{{inlogname}}"
-host = "localhost:27017"
+database = "polartest"
+password = "miw3"
+loginname = "student"
+host = "polardb:27017"
 timeout=3000
 [mongodb.level]
 database = "person"
@@ -53,22 +56,22 @@ sport = ["RUNNING", "CYCLING", "ELLIPTIGO", "OTHER"]
         meijendel=[[82905, 460500],[400]]
         hermanbavinckstraat=[[95580,436480], [800]]
         pac=[[94240, 438880],[600]]
-
+        
 [running]
 overall_param = ["distance", "speed", "heartRate", 
                  "ascent", "descent", "duration", 
                  "cadence","startTime", "stopTime", 
                  "sport" ]
 lap_param = ["distance", "duration", "cadence", "heartRate", "speed", "ascent", "descent"]
+sample_param = ["altitude", "heartRate", "speed", "distance", "recordedRoute"]
 
 trainingtypes = ["easy", "interval", "road race", "sprint", "climax"]
-lap_paces.maxeasy = 13.8
-lap_paces.minroadrace = 15.3
-lap_paces.maxruninout = 13.8
-lap_paces.dspeedinterval = 2.5
 
-sample_param = ["altitude", "heartRate", "speed", "distance", "recordedRoute"]
+[running.lap_paces]
+maxeasy = 14
+minroadrace = 15.3
+maxruninout = 13.8
+dspeedinterval = 2
 
 [running.sample_paces]
         low_movement = 7
-

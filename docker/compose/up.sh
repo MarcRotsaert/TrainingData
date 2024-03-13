@@ -11,6 +11,7 @@ fi
 
 composeFile="$1"
 
-cmd="docker-compose -f ${composeFile} down && docker-compose -f ${composeFile} up${mode} --remove-orphans"
+#cmd="docker-compose -f ${composeFile} down && docker-compose -f ${composeFile} up${mode} --remove-orphans"
+cmd="docker-compose -f ${composeFile} down && docker-compose -f ${composeFile} up${mode}"
 printf "%s cmd : \n\t%s\n\n" "$0" "${cmd}"
 eval ${cmd}

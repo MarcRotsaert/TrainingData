@@ -45,5 +45,7 @@ Define interactivity backend-frontend
 
 
 12) Make templates
+
 13) start server
-    python manage.py runserver
+    start the server from the project base directory:
+    python django/<django project>/manage.py runserver

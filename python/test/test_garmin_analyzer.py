@@ -4,6 +4,7 @@ import tomli
 
 import analyzer.garmin_analyzer as gar_an
 
+
 class GarminAnalyzer(unittest.TestCase):
     @classmethod
     def setUp(cls) -> None:
@@ -15,10 +16,10 @@ class GarminAnalyzer(unittest.TestCase):
         file = "marcrotsaert_217112806.fit"
         session = gar_an.Trainses_fit(file)
         with self.subTest():
-            self.assertTrue(hasattr(session, 'abstract'))
-            self.assertTrue(hasattr(session, 'laps'))
-            self.assertTrue(hasattr(session, 'alaps'))
-            self.assertTrue(hasattr(session, 'samples'))
+            self.assertTrue(hasattr(session, "abstract"))
+            self.assertTrue(hasattr(session, "laps"))
+            self.assertTrue(hasattr(session, "alaps"))
+            self.assertTrue(hasattr(session, "samples"))
         with self.subTest():
             self.assertIn("fname", session.abstract)
 
@@ -26,12 +27,12 @@ class GarminAnalyzer(unittest.TestCase):
         file = "marcrotsaert_217112806.fit"
         session = gar_an.Trainses_fit(file)
         with self.subTest():
-            self.assertTrue(hasattr(session, 'abstract'))
-            self.assertTrue(hasattr(session, 'laps'))
-            self.assertTrue(hasattr(session, 'alaps'))
-            self.assertTrue(hasattr(session, 'samples'))
+            self.assertTrue(hasattr(session, "abstract"))
+            self.assertTrue(hasattr(session, "laps"))
+            self.assertTrue(hasattr(session, "alaps"))
+            self.assertTrue(hasattr(session, "samples"))
         with self.subTest():
-            self.assertEqual(len(session.laps), 19)
+            self.assertEqual(len(session.laps), 20)
 
     def test_read_data_autolap(self):
         file = "marcrotsaert_651691100.fit"
@@ -39,22 +40,22 @@ class GarminAnalyzer(unittest.TestCase):
         with self.subTest():
             self.assertEqual(len(session.alaps), 8)
         with self.subTest():
-            self.assertIn('heartRate', session.alaps[0])
-            self.assertIn('speed', session.alaps[0])
-            self.assertIn('duration', session.alaps[0])
-            self.assertIn('distance', session.alaps[0])
-            self.assertIn('avg', session.alaps[0]['speed'])
+            self.assertIn("heartRate", session.alaps[0])
+            self.assertIn("speed", session.alaps[0])
+            self.assertIn("duration", session.alaps[0])
+            self.assertIn("distance", session.alaps[0])
+            self.assertIn("avg", session.alaps[0]["speed"])
 
     def test_read_data_samples(self):
         file = "marcrotsaert_651691100.fit"
         session = gar_an.Trainses_fit(file)
         with self.subTest():
-            self.assertIn( 'recordedRoute', session.samples)
+            self.assertIn("recordedRoute", session.samples)
         with self.subTest():
-            self.assertEqual(len(session.samples['recordedRoute']), 568)
+            self.assertEqual(len(session.samples["recordedRoute"]), 568)
         with self.subTest():
-            self.assertIn('heartRate', session.samples)
-            self.assertIn('speed', session.samples)
-            self.assertIn('latitude', session.samples['recordedRoute'][0])
-            self.assertIn('longitude', session.samples['recordedRoute'][0])
-            self.assertIn('dateTime', session.samples['recordedRoute'][0])
+            self.assertIn("heartRate", session.samples)
+            self.assertIn("speed", session.samples)
+            self.assertIn("latitude", session.samples["recordedRoute"][0])
+            self.assertIn("longitude", session.samples["recordedRoute"][0])
+            self.assertIn("dateTime", session.samples["recordedRoute"][0])

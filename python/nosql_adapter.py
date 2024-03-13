@@ -21,6 +21,7 @@ class MongoAdapter:
             username=config["mongodb"]["loginname"],
             password=config["mongodb"]["password"],
         )
+        self.trainingtypes = config["running"]["trainingtypes"]
         self.dbname: str = mongoDB
         self.collection: str = collection
 
@@ -33,6 +34,10 @@ class MongoAdapter:
 
     def _getDatabase(self) -> pymongo.database.Database:
         return self.client[self.dbname]
+
+    def getAvailableCollections(self) -> list:
+        dbase = self._getDatabase()
+        return dbase.list_collection_names()
 
     def getCollection(self) -> pymongo.collection.Collection:
         db = self._getDatabase()
@@ -152,7 +157,6 @@ class MongoGarminfit(MongoQuery):
 
 
 class MongoForerunner(MongoQuery):
-
     """
     Mongo-extension for Forerunner data.
     Data for
@@ -164,4 +168,12 @@ class MongoForerunner(MongoQuery):
         resume = sess.abstract
         loc = sess.SamAnalRunning.determine_s_location()
         resume.update({"location": loc, "laps": sess.laps})
+        ttypes = self.trainingtypes
+
+        trainingtypes = {}
+        for tt in ttypes:
+
+            trainingtypes.update({tt.replace(" ", ""): None})
+        resume.update({"trainingtype": trainingtypes})
+
         self.insertOne(resume)

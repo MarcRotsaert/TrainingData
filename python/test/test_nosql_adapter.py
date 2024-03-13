@@ -7,7 +7,7 @@ import nosql_adapter as mongodb
 class TestMongoAdapter(unittest.TestCase):
     @classmethod
     def setUp(cls):
-        cls.dbase = "polartest4"
+        cls.dbase = "polartest"
         cls.collections = range(2012, 2021)
         cls.testyear = "polar2014"
         cls.adapter = mongodb.MongoAdapter(cls.dbase, cls.testyear)
@@ -23,7 +23,7 @@ class TestMongoAdapter(unittest.TestCase):
 class TestMongoQuery(unittest.TestCase):
     @classmethod
     def setUp(cls):
-        cls.dbase = "polartest4"
+        cls.dbase = "polartest"
         cls.collections = range(2012, 2021)
         cls.testyear = "polar2014"
         cls.adapter = mongodb.MongoQuery(cls.dbase, cls.testyear)

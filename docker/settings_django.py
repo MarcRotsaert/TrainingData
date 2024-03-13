@@ -9,22 +9,14 @@ https://docs.djangoproject.com/en/4.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
-
 import sys
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent.resolve()
-TEMP_DIR = Path(__file__).resolve().parent.resolve().joinpath("templates")
-
-PYTHON_DIR = Path(BASE_DIR).resolve().parent.parent.joinpath("python")
-# sys.path.append(r"C:\Users\marcr\Polar\Polar")
-sys.path.append(PYTHON_DIR)
-sys.path.append(Path(PYTHON_DIR).joinpath("analyzer"))
-# sys.path.append(r"D:\Werk\Programmeren\python\Polar\python")
-# sys.path.append(r"D:\Werk\Programmeren\python\Polar\analyzer")
-
-
+BASE_DIR = Path(__file__).resolve().parent.parent
+TEMP_DIR = Path(__file__).resolve().parent.joinpath("templates")
+STATIC_DIR = Path(__file__).parent.joinpath("static")
+# STATIC_ROOT = "C:/TEMP/css"
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
@@ -90,15 +82,15 @@ DATABASES = {
         "NAME": "polartest",
         "ENFORCE_SCHEMA": False,
         "CLIENT": {
-            "host": "localhost",  # local
+            # "host": "localhost",  # local
             # "host": "127.0.0.1", # local
-            # "host": "polardb",  # docker container
+            "host": "polardb",  # docker container
             "port": 27017,
             "username": "student",
             "password": "miw3",
             "authMechanism": "DEFAULT",
             "authSource": "admin",
-        },
+        }
         # "CLIENT": {"host": "mongodb://student:miw3@127.0.0.1:27017/?authMechanism=DEFAULT&authSource=admin"},
         # "SERVER_PROTOCOL":"x",
     },
@@ -113,21 +105,12 @@ DATABASE_ROUTERS = ["test_project2.mongorouter.MongoRouter"]
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
 
-PASSWORD_HASHERS = [
-    "django.contrib.auth.hashers.Argon2PasswordHasher",
-    "django.contrib.auth.hashers.BCryptSHA256PasswordHasher",
-    "django.contrib.auth.hashers.BCryptPasswordHasher",
-    "django.contrib.auth.hashers.PBDK2PasswordHasher",
-    "django.contrib.auth.hashers.PBDK2PasswordHasher",
-]
-
 AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
     },
     {
         "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
-        "OPTIONS": {"min_lengt": 8},
     },
     {
         "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
@@ -152,21 +135,14 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
-STATIC_DIR = Path(__file__).parent.resolve().joinpath("static")
-NODE_DIR = Path(BASE_DIR).resolve().parent.parent.joinpath("node_modules")
-# NODE_DIR = "C:/Users/marcr/Polar/Polar/node_modules"
-print(PYTHON_DIR)
-print(NODE_DIR)
 
-STATICFILES_DIRS = [STATIC_DIR, ("node_modules", NODE_DIR)]
-STATIC_URL = "/static/"
-# STATICFILES_DIRS = [NODE_DIR]
-STATIC_ROOT = "C:/TEMP/static/"
+STATIC_URL = "static/"
+STATICFILES_DIRS = [STATIC_DIR]
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
-
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-MEDIA_ROOT = MEDIA_DIR
-MEDIA_URL = "/media"
+# sys.path.append(r"C:\Users\marcr\Polar\Polar")
+sys.path.append(r"C:\Users\marcr\Polar\Polar\python")
+sys.path.append(r"C:\Users\marcr\Polar\Polar\python\analyzer")

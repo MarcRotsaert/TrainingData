@@ -2,8 +2,82 @@ p {
     margin: 0;
     font-size: 85%;
     font-style: italic;
-    text-align: center;
+    text-align: left;
+    /* width: 600px; */
+    /* height: 300px; */
 
+}
+
+#id_fname,
+label[for="id_fname"] {
+    display: none;
+}
+
+#id_trainingdescription-type,
+label[for="id_trainingdescription-type"],
+#id_trainingdescription-type~th,
+#id_trainingdescription-type~tr {
+    display: none;
+    visibility: hidden;
+}
+
+td input {
+    max-height: 100px;
+}
+
+td textarea {
+    border: 2px dashed red;
+    margin: 0;
+    font-size: 100%;
+    text-align: left;
+    padding: 0;
+    background-color: lightblue;
+    width: 100 px;
+    height: 300 px;
+    max-width: 500px;
+    max-height: 100px;
+    ;
+}
+
+
+
+
+/* Add this style block in the head of your HTML document or in an external CSS file */
+.btn-group-vertical {
+    display: flex;
+    flex-direction: column;
+}
+
+.btn-group-vertical label {
+    display: flex;
+    align-items: center;
+    margin-bottom: 5px;
+    /* Adjust the margin as needed */
+}
+
+.btn-group-vertical input {
+    margin-right: 5px;
+    /* Adjust the margin as needed */
+}
+
+
+/* Add this style block in the head of your HTML document or in an external CSS file */
+.btn-group-vertical {
+    /* display: flex; */
+    /* flex-direction: column; */
+}
+
+.btn-group-vertical label {
+    /* display: flex; */
+    align-items: normal;
+    font-size: 125%;
+    /* Adjust the margin as needed */
+}
+
+.btn-group-vertical input {
+    margin-right: 15px;
+    margin-bottom: 15px;
+    /* Adjust the margin as needed */
 }
 
 /* table, */
@@ -12,11 +86,48 @@ td {
     border: 1px solid;
     padding: 1cqb;
     border-collapse: collapse;
-    text-align: center;
-    white-space: pre-wrap;
+    text-align: right;
+    margin: 20%
+}
+
+#tdescr {
+    text-wrap: wrap;
+
 }
 
 table {
     position: relative;
     left: 15px
+}
+
+.info {
+    /* border: 1px solid; */
+    font-size: 30px;
+}
+
+tr.roadrace {
+    background-color: red;
+}
+
+tr.climax {
+    background-color: orange;
+}
+
+
+tr.sprint {
+    background-color: lightgreen;
+}
+
+tr.easyrun {
+    background-color: lightgray;
+}
+
+tr.interval {
+    background-color: rgb(201, 50, 206);
+}
+
+.analyzegraph {
+    width: 600px;
+    max-width: 50%;
+
 }

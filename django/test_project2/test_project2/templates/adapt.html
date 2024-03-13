@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+{% extends "summary.html" %}
+{% comment %} {% extends "base.html" %} {% endcomment %}
+{% load static %}
+{% load cache %}
+{% load table_filters %}
+
+{% block adapt_block %}
+  {% if adaptform %}
+
+  
+  <div class="container">
+    <div class="row">
+      <div class="col">
+        <form method="POST", enctype="multipart/form-data">
+          {% comment %} {{form.as_p}} {% endcomment %}
+          {{ adaptform.as_p }}
+          {% csrf_token %}
+          <input type="submit" class="btn btn-primary", value="Commit" method="POST">
+          {% comment %} <input type=" text" id="text-box" size="20" value="Hello world!" /> {% endcomment %}
+        </form>
+      </div>
+    </div>
+  </div>
+  {% endif %} 
+  {% endblock %}
+  
+  
+  {% block traintab_block %}
+  <div class="btn-group-vertical">
+    <label for="rb_delete"  value="Delete">Delete training active</label><input type="radio" class="btn btn-primary" id="rb_delete" name="group1" {% if delete_checked %} checked {% endif %}> 
+    <label for="rb_update" value="Update" >Update training active</label><input type="radio" class="btn btn-primary"id="rb_update" name="group1" {% if update_checked %} checked {% endif %}>
+  </div>
+  
+  <table name="traindata">
+    <tr>
+            <th>Date</th>
+            <th>location</th>
+            <th>Distance(m)</th>
+            <th>vel avg(min/km)</th>
+            <th>Hsl avg(bpm)</th>
+            <th>training description</th>
+        </tr>
+        <p>{% cache 360 "training_data" %}
+          {% for training in trainingen|dictsort:"startTime" %} 
+            <tr value={{training.fname}}
+            name="traindata" 
+            id="traindata"
+            {% if training.trainingtype.roadrace %}  
+            class="roadrace"
+            {% elif training.trainingtype.easyrun %}  
+            class="easyrun"
+            {% elif training.trainingtype.sprint %}  
+            class="sprint"
+            {% elif training.trainingtype.interval == "interval" %}
+            class="interval"
+            {% elif training.trainingtype.climax %}
+            class="climax"
+
+            {% endif %}
+            data-url="{% url 'test_polar:showadapt' training.fname %}"
+            onclick="showAdapt(this)">
+            
+            <td>{{training.startTime|slice:":10"|weekday}}
+  
+            </td> 
+            
+            {% if training.location != None %}
+            <td id="location">{{training.location|upper}}</td>
+            {% else %}
+            <td id="location">not defined</td>
+            {% endif %}
+            <td>{{training.distance|floatformat:0}}</td>
+            <td>{{training.speed.avg|kmh2minkm}}</td>
+            <td>{{training.averageHeartRate|floatformat:0}} / {{training.maximumHeartRate|floatformat:0}}
+            </td>
+            {% comment %} <td id="tdescr" onclick="showLapdata(this)">{{training.trainingdescription.description|linebreaks}}</td> {% endcomment %}
+            <td id="tdescr" >{{training.trainingdescription.description|linebreaks}}</td>
+        </tr>
+        {% endfor %}
+        {% endcache %}
+    </p>
+    <br><br>
+    {% endblock %}
+ 
+</html>    

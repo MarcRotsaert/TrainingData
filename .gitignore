@@ -144,3 +144,10 @@ docker/makeaiwork3_files
 
 # node/js
 node_modules
+
+# old stuff
+old/
+
+
+# mongo data
+mongodb/dump

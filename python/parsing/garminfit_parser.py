@@ -19,28 +19,48 @@ class Garminfit_parser:
         self.filename = filename
         self.config = config
 
+    @staticmethod
+    def _fit_parser_alllaps(alllaps: list) -> (list, list):
+        triggers, frames = zip(*alllaps)
+        if triggers.count("manual") < 3:
+            laps = []
+            alaps = frames
+        else:
+            alaps = []
+            laps = frames
+
+        return laps, alaps
+
     def _fit_parser(self) -> [list, list, list, list]:
         extractor = self._data_extractor()
         samples = []
         session = []
-        alaps = []
-        laps = []
+        # alaps = []
+        all_laps = []
         for kind, frame in extractor:
             if kind == "sample":
                 samples.append(frame)
-            if kind == "lap":
+            elif kind == "lap":
                 field_lap_trigger = self._find_onefield(frame, "lap_trigger")
                 if field_lap_trigger.value in ["manual"]:
-                    laps.append(frame)
+                    all_laps.append(["manual", frame])
+                    # laps.append(frame)
                 elif field_lap_trigger.value in [
                     "distance",
                     "time",
                     "session_end",
                 ]:
-                    alaps.append(frame)
-            if kind == "session":
+                    all_laps.append(["automatic", frame])
+                else:
+                    print(field_lap_trigger.value)
+                    xx
+            elif kind == "session":
                 session.append(frame)
-        return session, alaps, laps, samples
+        if len(all_laps) > 0:
+            laps, alaps = self._fit_parser_alllaps(all_laps)
+        else:
+            laps, alaps = [[], []]
+        return session, laps, alaps, samples
 
     def _data_extractor(self) -> [str, fitdecode.FIT_FRAME_DATA]:
         with fitdecode.FitReader(os.path.join(self.path, self.filename)) as fitreader:
@@ -128,6 +148,7 @@ class Garminfit_parser:
     def extract_abstract(self) -> dict:
         framename = "session"
         paramnames = [
+            "speed",
             "sport",
             "startTime",
             "duration",
@@ -145,10 +166,44 @@ class Garminfit_parser:
             abstract = {}
             paramconv = self.config["garmin_fit"]["paramnameconversion"]
             for pn in paramnames:
-                value = frame.get_value(paramconv[pn])
-                if pn == "sport":
-                    value = value.upper()
-                abstract.update({pn: value})
+                if pn == "speed":
+                    avgvalue = (
+                        frame.get_value("avg_speed")
+                        if frame.get_value("avg_speed")
+                        else frame.get_value("enhanced_avg_speed")
+                    )
+                    maxvalue = (
+                        frame.get_value("max_speed")
+                        if frame.get_value("max_speed")
+                        else frame.get_value("enhanced_max_speed")
+                    )
+
+                    # avgvalue = frame.get_value("avg_speed")
+                    # maxvalue = frame.get_value("max_speed")
+                    # print(frame.get_value("enhanced_avg_speed"))
+                    # print(frame.get_value("enhanced_max_speed"))
+
+                    if avgvalue:
+                        avgvalue = avgvalue * 3600 / 1000
+                    else:
+                        avgvalue = None
+                    if maxvalue:
+                        maxvalue = maxvalue * 3600 / 1000
+                    else:
+                        maxvalue = None
+                    abstract.update(
+                        {
+                            "speed": {"avg": avgvalue, "max": maxvalue},
+                        }
+                    )
+                else:
+                    value = frame.get_value(paramconv[pn])
+                    if pn == "sport":
+                        value = value.upper()
+                    elif pn == "startTime":
+                        value = str(value)
+
+                    abstract.update({pn: value})
             return abstract
         # framename = 'device'
         # fnames = ['serial_number']
@@ -157,7 +212,7 @@ class Garminfit_parser:
 class Lapparser(Garminfit_parser):
     def __init__(self, filename: str):
         super().__init__(filename)
-        _, self.alaps, self.laps, _ = self._fit_parser()
+        _, self.laps, self.alaps, _ = self._fit_parser()
 
     def _return_starttime(self, lap: FitDataMessage) -> str:
         par_name = "start_time"
@@ -197,11 +252,13 @@ class Lapparser(Garminfit_parser):
         # try:
         speed_arr = np.array(speed_list)
         speed_arr[speed_arr == np.nan] = 0
-        speed_arr[speed_arr is None] = 0
+        # speed_arr[speed_arr is None] = 0
+        speed_arr[speed_arr == None] = 0
         try:
             speed_kmu = speed_arr * 3600 / 1000  # m/s -> km/u
         except TypeError:
-            print(speed_kmu)
+            print(speed_arr)
+            xx
         # speed_kmu[speed_kmu == 0] = None
         # except TypeError:
         # speed_kmu = len(speed_list) * [None]
@@ -329,7 +386,7 @@ class Sampleparser(Garminfit_parser):
 class Parser(Garminfit_parser):
     def __init__(self, filename: str):
         super().__init__(filename)
-        self.session, self.alaps, self.laps, self.samples = self._fit_parser()
+        self.session, self.laps, self.alaps, self.samples = self._fit_parser()
 
     def fit2json(self):
         json = self.extract_abstract()
