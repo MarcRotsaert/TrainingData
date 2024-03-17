@@ -14,8 +14,21 @@
 
 <body>
 <p>lalala</p>
-<a href="{% url 'loginregister:selectcol' %}" class="btn btn-primary">Go to Home</a>
 <img src="{% static 'images/knmirotterdam_220616_11.png' %}" height="300">
+<form class="login"  method="post">
+    {% url 'loginregister:login' %}
+    {% csrf_token %}
+    <p>
+    <label for="username" placeholder="Username">Username!</label>
+        <input type="text" name="username" >
+    </p>
+    <p>    
+        <label for="username" placeholder="password">Password!</label>
+    <input type="password" name="password">
+    </p>
+<input type="submit" value="submit">
+</form>
+
 </div>
 </body>
 </html>

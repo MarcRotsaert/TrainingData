@@ -17,9 +17,10 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from django.conf.urls import include
-import loginregister
+from loginregister import views
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("clienthandling/", include("loginregister.urls")),
+    # path("home/", views.logout),
 ]

@@ -21,7 +21,7 @@
 
 {% else %}
 <h1>Register here!</h1>
-<form method="POST" enctype="multipart/form-data">
+<form method="POST" action='{% url "loginregister:register" %}'enctype="multipart/form-data">
     {% csrf_token %}
     {{ userform.as_p }}
     {{ profileform.as_p }}
