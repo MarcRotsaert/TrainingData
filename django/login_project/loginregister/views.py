@@ -6,6 +6,7 @@ from django.contrib.auth.backends import ModelBackend
 # Create your views here.
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpRequest, HttpResponseRedirect
+from django.urls import reverse
 
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
@@ -58,6 +59,10 @@ def logout_user(request: HttpRequest) -> HttpResponse:
 #     return user, None  # Authentication successful, no reason for failure
 
 
+def base(request: HttpRequest) -> HttpResponse:
+    return render(request, "base.html")
+
+
 def login_user(request: HttpRequest) -> HttpResponse:
 
     if request.method == "POST":
@@ -99,9 +104,9 @@ def login_user(request: HttpRequest) -> HttpResponse:
         if user:
             if user.is_active:
                 login(request, user)
-                # asyncio.run(startpolar.main())
+                asyncio.run(startpolar.main())
                 # startpolar.main()
-                return HttpResponseRedirect("/clienthandling/login")
+                return HttpResponseRedirect(reverse("base"))
             else:
                 HttpResponse("ACCOUNT NOT ACTIVE")
         else:

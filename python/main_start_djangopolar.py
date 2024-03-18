@@ -1,22 +1,40 @@
 import os
+import subprocess
 import webbrowser
 import asyncio
 from pathlib import Path
 
 
 async def runserver():
-    path = Path(__file__).parent.parent.resolve()
-    print(path)
-    settingfile = " 'django/test_project2/settings.py' "
-    # settingfile = " settings.py "
+    rootpath = Path(__file__).parent.parent.parent.resolve()
+    polarpath = Path(__file__).parent.parent.resolve()
 
-    os.chdir(path)
+    # os.chdir(polarpath)
+    # print(os.path.exists(os.path.join(rootpath, "env_polar\Scripts")))
+
+    settingfile = "test_project2.settings"
+
     # os.system(
-    #     "python django/test_project2/manage.py runserver --setting"
+    #     "python django/test_project2/manage.py runserver "
+    #     + "--settings="
     #     + settingfile
+    #     + " "
     #     + "8001"
     # )
-    os.system("python django/test_project2/manage.py runserver " + settingfile + "8001")
+    process = subprocess.Popen(
+        [
+            # os.path.join(rootpath, "polar_env/Scripts/activate"),
+            "python",
+            "django/test_project2/manage.py",
+            "runserver",
+            "--settings=" + settingfile,
+            "8001",
+        ],
+        shell=True,
+        stdout=open("C:/temp/stdout", "w"),
+        stderr=open("C:/temp/stdout", "w"),
+    )
+    print(process.poll())
 
 
 def openproject():

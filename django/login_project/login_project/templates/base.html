@@ -1,6 +1,12 @@
+
+
 <div>
-    <label for=regis>Registreer!!</label>
-    <a href= { url "loginregister:register"} value="regis"> </a>
-    <label for=>Login!!</label>
-    <a href= { url "loginregister:login"} value="login"> </a>
+    <p>
+    <label for="regis">Registreer!!</label>
+    <a href="{% url 'loginregister:register' %}" id="regis">Click here</a>
+    </p>
+    <p>
+    <label for="login">Login!!</label>
+    <a href="{% url 'loginregister:login' %}" id="login">Click here</a>
+    </p>
 </div>
