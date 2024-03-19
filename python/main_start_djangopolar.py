@@ -28,6 +28,7 @@ async def runserver():
             "django/test_project2/manage.py",
             "runserver",
             "--settings=" + settingfile,
+            "--noreload",
             "8001",
         ],
         shell=True,

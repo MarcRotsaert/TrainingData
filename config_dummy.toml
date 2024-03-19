@@ -29,7 +29,7 @@ sport="sport"
 database = "{{databasename}}"
 password = "{{password}}"
 loginname = "{{inlogname}}"
-host = "localhost:27017"
+host = "{{host}}:{{port}}"
 timeout=3000
 [mongodb.level]
 database = "person"
@@ -60,12 +60,14 @@ overall_param = ["distance", "speed", "heartRate",
                  "cadence","startTime", "stopTime", 
                  "sport" ]
 lap_param = ["distance", "duration", "cadence", "heartRate", "speed", "ascent", "descent"]
+sample_param = ["altitude", "heartRate", "speed", "distance", "recordedRoute"]																			  
 
 trainingtypes = ["easy", "interval", "road race", "sprint", "climax"]
-lap_paces.maxeasy = 13.8
-lap_paces.minroadrace = 15.3
-lap_paces.maxruninout = 13.8
-lap_paces.dspeedinterval = 2.5
+[running.lap_paces]
+maxeasy = 14
+minroadrace = 15.3
+maxruninout = 13.8
+dspeedinterval = 3
 
 sample_param = ["altitude", "heartRate", "speed", "distance", "recordedRoute"]
 

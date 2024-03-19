@@ -14,9 +14,9 @@
 
 <body>
 <p>lalala</p>
-<img src="{% static 'images/knmirotterdam_220616_11.png' %}" height="300">
+{% comment %} <img src="{% static 'images/knmirotterdam_220616_11.png' %}" height="300"> {% endcomment %}
 <form class="login"  method="post">
-    {% url 'loginregister:login' %}
+    {% comment %} {% url 'loginregister:login' %}  {% endcomment %}
     {% csrf_token %}
     <p>
     <label for="username" placeholder="Username">Username!</label>
