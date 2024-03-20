@@ -140,6 +140,8 @@ config.toml
 config_barrie.toml
 config_marc.toml
 docker/makeaiwork3_files
+django/test_project2/test_project2/settings.py
+
 
 
 # node/js

@@ -87,15 +87,15 @@ WSGI_APPLICATION = "test_project2.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "djongo",
-        "NAME": "polartest",
+        "NAME": "{{databasename}}",
         "ENFORCE_SCHEMA": False,
         "CLIENT": {
-            "host": "localhost",  # local
+            "host": "{{host}}",  # local
             # "host": "127.0.0.1", # local
             # "host": "polardb",  # docker container
-            "port": 27017,
-            "username": "student",
-            "password": "miw3",
+            "port": {{port}},
+            "username": "{{inlogname}}",
+            "password": "{{password}}",
             "authMechanism": "DEFAULT",
             "authSource": "admin",
         },
