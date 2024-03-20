@@ -10,7 +10,7 @@ class UserProfile(models.Model):
     user = models.OneToOneField(User, null=True, on_delete=models.SET_NULL)
     portfolio = models.URLField(blank=True)
     inlogname = models.TextField(default="")
-    databasename = models.TextField(default="polartest")
+    databasename = models.TextField(default="")
     password = models.TextField(default="")
     host = models.TextField(default="localhost")
     port = models.IntegerField(default=27017)
@@ -20,9 +20,7 @@ class UserProfile(models.Model):
 
     @classmethod
     def get_entry(cls, idnr):
-        print(cls.objects)
-        # print(cls.objects.get(pk=idnr))
-        # cls.objects.
-        # print(cls.objects.filter(user_id=idnr))
-        print(cls.objects.filter(user_id=idnr))
-        return cls.objects.filter(user_id=idnr)
+        try:
+            return cls.objects.get(user_id=idnr)
+        except cls.DoesNotExist:
+            return None
