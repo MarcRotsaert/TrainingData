@@ -39,7 +39,6 @@ def show_polar(request: HttpRequest) -> HttpResponse:
             collection = request.GET["dtable"]
             print(collection)
             PolarModel.set_dtable(collection)
-            print(PolarModel.check())
 
         if "ttypes" not in request.GET:
             trainingen = PolarModel._return_trainrunning()

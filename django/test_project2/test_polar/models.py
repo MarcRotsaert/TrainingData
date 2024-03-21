@@ -196,6 +196,11 @@ class PolarModel(mongomod.Model):
     @classmethod
     def set_dtable(cls, tablename: str):
         cls._meta.db_table = tablename
+        for fi in cls._meta.fields:
+            try:
+                del fi.cached_col
+            except AttributeError:
+                pass
 
     @classmethod
     def return_lapdata(cls, fname: str) -> list[Optional[dict]]:
