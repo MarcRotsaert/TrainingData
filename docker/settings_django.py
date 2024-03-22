@@ -9,6 +9,7 @@ https://docs.djangoproject.com/en/4.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
+
 import sys
 from pathlib import Path
 
@@ -16,6 +17,13 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
 TEMP_DIR = Path(__file__).resolve().parent.joinpath("templates")
 STATIC_DIR = Path(__file__).parent.joinpath("static")
+
+PYTHON_DIR = Path(BASE_DIR).resolve().parent.parent.joinpath("python")
+sys.path.append(PYTHON_DIR)
+sys.path.append(Path(PYTHON_DIR).joinpath("analyzer"))
+# sys.path.append(r"C:\Users\marcr\Polar\Polar")
+
+
 # STATIC_ROOT = "C:/TEMP/css"
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
@@ -90,7 +98,7 @@ DATABASES = {
             "password": "miw3",
             "authMechanism": "DEFAULT",
             "authSource": "admin",
-        }
+        },
         # "CLIENT": {"host": "mongodb://student:miw3@127.0.0.1:27017/?authMechanism=DEFAULT&authSource=admin"},
         # "SERVER_PROTOCOL":"x",
     },
@@ -142,7 +150,3 @@ STATICFILES_DIRS = [STATIC_DIR]
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-
-# sys.path.append(r"C:\Users\marcr\Polar\Polar")
-sys.path.append(r"C:\Users\marcr\Polar\Polar\python")
-sys.path.append(r"C:\Users\marcr\Polar\Polar\python\analyzer")
