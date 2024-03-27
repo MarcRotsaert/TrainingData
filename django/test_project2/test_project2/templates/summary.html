@@ -24,7 +24,9 @@
         {% if lapdata %}
         <h3> {{ lapdate|slice:10 }}</h3>
         {% comment %} <h3><LAPDATA</h3> {% endcomment %}
-        <table>
+        <table value={{fname}}>
+            
+            <th>Lapnr</th> 
             <th>Dur</th> 
             <th>Dist.</th> 
             <th>V avg</th> 
@@ -32,7 +34,8 @@
             <th>HR avg</th> 
             <th>HR max</th> 
         {% for lap in lapdata %}
-            <tr><td>{{lap.duration|duration2min }}</td>
+            <tr><td>{{ forloop.counter }}</td>
+                <td>{{lap.duration|duration2min }}</td>
                 <td>{{lap.distance|floatformat:0}}</td> 
                 <td>{{lap.speed.avg|kmh2minkm }}</td> 
                 <td>{{lap.speed.avg_corr|kmh2minkm }}</td> 
