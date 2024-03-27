@@ -84,12 +84,12 @@ class AbstractLapArray(mongomod.Model):
         abstract = True
 
 
-class AbstractLaps(AbstractLapArray):
-    class Meta:
-        abstract = True
+# class AbstractLaps(AbstractLapArray):
+#     class Meta:
+#         abstract = True
 
 
-class Laps(AbstractLaps):
+class Laps(AbstractLapArray):
     _id = mongomod.ObjectIdField(primary_key=True)
 
     class Meta:
@@ -127,12 +127,6 @@ class TrainingDescription(AbstractTrainingDescr):
 
     class Meta:
         abstract = False
-
-
-# class TrainingDescriptionForm(forms.ModelForm):
-#     class Meta:
-#         model = TrainingDescription
-#         fields = "__all__"
 
 
 class PolarModel(mongomod.Model):
@@ -332,11 +326,8 @@ class PolarModel(mongomod.Model):
             },
         )
 
-    # @classmethod
-    # def using_mongo(cls):
-    #     return cls.objects.using("default")
 
-
+"""
 class FormModel(mongomod.Model):
     _id = mongomod.ObjectIdField(primary_key=True)
     fname = mongomod.CharField(max_length=80)
@@ -369,3 +360,4 @@ def _create_ttype_dict(request: HttpRequest) -> dict:
                 new_val = True
         ttype_db.update({tt: new_val})
     return ttype_db
+"""

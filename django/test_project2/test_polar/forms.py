@@ -3,9 +3,9 @@ from django import forms
 from test_polar.models import PolarModel  # , FormModel, TrainingDescription
 
 
-class formType(forms.Form):
-    # def __init__(self, inittext):
-    ttype = forms.CharField(max_length=20)
+# class formType(forms.Form):
+#     # def __init__(self, inittext):
+#     ttype = forms.CharField(max_length=20)
 
 
 class adaptForm(forms.ModelForm):
