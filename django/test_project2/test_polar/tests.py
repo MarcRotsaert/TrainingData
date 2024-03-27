@@ -9,13 +9,15 @@ import unittest
 from datetime import datetime, timedelta
 from djongo import models as mongomod
 
+# from djongo.connections import connections
+
+from django.core.management import call_command
+
 # print(settings)
 from django.conf import settings
 from django.test import TestCase
 
-from .models import (
-    PolarModel,
-)
+from .models import PolarModel, UnittestModel
 from .forms import adaptForm
 
 # from python.nosql_adapter import MongoPolar, MongoForerunner
@@ -27,8 +29,14 @@ from analyzer import polar_analyzer as pol_an
 
 
 # @unittest.skip
-class TestPolarModel(unittest.TestCase):
+class TestPolarModel(TestCase):
     def setUp(self):
+
+        with open("C:/temp/unittest.json", "r") as file:
+            fixture_data = json.load(file)
+
+        for data in fixture_data:
+            PolarModel.objects.create(**data)
 
         config = tomli.load(open("config.toml", "rb"))
         path = config["polar_json"]["datapath"]
@@ -37,8 +45,12 @@ class TestPolarModel(unittest.TestCase):
             os.path.join(path, "training-session-" + str(year) + "-*.json")
         )
         print(path)
-        fields = PolarModel._meta.fields
-        PolarModel._meta.db_table = "dummy"
+
+        # PolarModel._meta.db_name = "unittest"
+        # PolarModel._meta.db_table = "unittest"
+        # print(UnittestModel._meta.db_tablespace)
+        print(UnittestModel._meta.db_table)
+        UnittestModel.objects.all()
         field_names = [
             field.name
             for field in fields

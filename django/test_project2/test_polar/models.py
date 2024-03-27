@@ -132,6 +132,18 @@ class TrainingDescription(AbstractTrainingDescr):
 
 class PolarModel(mongomod.Model):
     _id = mongomod.ObjectIdField(primary_key=True)
+    exportVersion = mongomod.CharField(
+        max_length=80,
+        default=" ",
+        null=True,
+        blank=True,
+    )
+    kiloCalories = mongomod.IntegerField(
+        max_length=10,
+        default=None,
+        null=True,
+        blank=True,
+    )
     sport = mongomod.CharField(max_length=256, default="RUNNING")
     fname = mongomod.CharField(max_length=80, default=" ")
     location = mongomod.CharField(
@@ -329,6 +341,13 @@ class PolarModel(mongomod.Model):
     # @classmethod
     # def using_mongo(cls):
     #     return cls.objects.using("default")
+
+
+class UnittestModel(PolarModel):
+
+    class Meta:
+        db_table = "unittest"
+        managed = False
 
 
 class FormModel(mongomod.Model):
