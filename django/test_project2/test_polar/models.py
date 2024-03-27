@@ -14,12 +14,11 @@ from nosql_adapter import MongoPolar
 
 # Create your models here.
 class AbstractSpeedModel(mongomod.Model):
-    _id = mongomod.ObjectIdField(primary_key=False)
-    avg = mongomod.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
-    max = mongomod.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
-    avg_corr = mongomod.DecimalField(
-        max_digits=5, decimal_places=2, null=True, blank=True
-    )
+    # mongomod.
+    # _id = mongomod.ObjectIdField(primary_key=False)
+    avg = mongomod.FloatField(null=True, blank=True, default=None)
+    max = mongomod.FloatField(null=True, blank=True, default=None)
+    avg_corr = mongomod.FloatField(null=True, blank=True, default=None)
 
     class Meta:
         abstract = True
@@ -33,9 +32,9 @@ class SpeedModel(AbstractSpeedModel):
 
 
 class AbstractHeartrateModel(mongomod.Model):
-    avg = mongomod.FloatField(null=True, blank=True)
-    max = mongomod.FloatField(null=True, blank=True)
-    min = mongomod.FloatField(null=True, blank=True)
+    avg = mongomod.FloatField(null=True, blank=True, default=None)
+    max = mongomod.FloatField(null=True, blank=True, default=None)
+    min = mongomod.FloatField(null=True, blank=True, default=None)
 
     class Meta:
         abstract = True
@@ -68,15 +67,9 @@ class AbstractLapArray(mongomod.Model):
     splitTime = mongomod.CharField(max_length=50)
     heartRate = mongomod.EmbeddedField(HeartrateModel, null=True, blank=True)
     speed = mongomod.EmbeddedField(SpeedModel, null=True, blank=True)
-    distance = mongomod.DecimalField(
-        max_digits=10, decimal_places=2, null=True, blank=True
-    )
-    ascent = mongomod.DecimalField(
-        max_digits=10, decimal_places=2, null=True, blank=True
-    )
-    descent = mongomod.DecimalField(
-        max_digits=10, decimal_places=2, null=True, blank=True
-    )
+    distance = mongomod.FloatField(null=True, blank=True)
+    ascent = mongomod.FloatField(null=True, blank=True)
+    descent = mongomod.FloatField(null=True, blank=True)
     cadence = mongomod.EmbeddedField(CadenceModel, null=True, blank=True)
     power = mongomod.EmbeddedField(PowerModel, null=True, blank=True)
 
@@ -98,7 +91,7 @@ class Laps(AbstractLaps):
 
 class AbstractTrainingtype(mongomod.Model):
     easyrun = mongomod.BooleanField(null=True)
-    interval = mongomod.CharField(max_length=50, blank=True)
+    interval = mongomod.CharField(max_length=50, blank=True, default=None)
     roadrace = mongomod.BooleanField(null=True)
     sprint = mongomod.BooleanField(null=True)
     climax = mongomod.BooleanField(null=True)
@@ -124,6 +117,8 @@ class AbstractTrainingDescr(mongomod.Model):
 
 class TrainingDescription(AbstractTrainingDescr):
     _id = mongomod.ObjectIdField()
+    # description = mongomod.TextField(max_length=256, null=True, blank=True)
+    # type = mongomod.CharField(max_length=20, null=True, blank=True)
 
     class Meta:
         abstract = False
@@ -138,21 +133,18 @@ class TrainingDescription(AbstractTrainingDescr):
 class PolarModel(mongomod.Model):
     _id = mongomod.ObjectIdField(primary_key=True)
     sport = mongomod.CharField(max_length=256, default="RUNNING")
-    fname = mongomod.CharField(max_length=80)
-    location = mongomod.CharField(max_length=30, blank=True)
-    distance = mongomod.IntegerField()
-    duration = mongomod.DecimalField(
-        decimal_places=1, max_digits=5, null=True, blank=True
+    fname = mongomod.CharField(max_length=80, default=" ")
+    location = mongomod.CharField(
+        max_length=30,
+        blank=True,
     )
-    startTime = mongomod.CharField(max_length=20)
-    stopTime = mongomod.CharField(max_length=20)
+    distance = mongomod.IntegerField(default=0)
+    duration = mongomod.FloatField(null=True, blank=True, default=None)
+    startTime = mongomod.CharField(max_length=20, default=" ")
+    stopTime = mongomod.CharField(max_length=20, default=" ")
 
-    latitude = mongomod.DecimalField(
-        decimal_places=6, max_digits=8, null=True, blank=True
-    )
-    longitude = mongomod.DecimalField(
-        decimal_places=6, max_digits=8, null=True, blank=True
-    )
+    latitude = mongomod.FloatField(null=True, blank=True)
+    longitude = mongomod.FloatField(null=True, blank=True)
     speed = mongomod.EmbeddedField(model_container=SpeedModel, null=True, blank=True)
     maximumHeartRate = mongomod.IntegerField(null=True, blank=True)
     averageHeartRate = mongomod.IntegerField(null=True, blank=True)
@@ -178,10 +170,12 @@ class PolarModel(mongomod.Model):
         model_container=TrainingDescription,
         # model_form_class=TrainingDescriptionForm,
         model_form_kwargs={"initial": {"description": "Initial Description"}},
+        blank=True,
+        null=True,
     )
 
     # db_table = mongomod.CharField(max_length=28, default="polar2019")
-    db_table = mongomod.CharField(max_length=28)
+    # db_table = mongomod.CharField(max_length=28)
 
     objects = mongomod.DjongoManager()
 
