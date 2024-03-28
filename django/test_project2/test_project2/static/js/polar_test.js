@@ -22,6 +22,16 @@ function showAdapt(cell) {
 }
 
 
+function showAdaptLap(cell) {
+    var fname = cell.parentNode.parentNode.getAttribute("value")
+    var url = cell.parentNode.parentNode.getAttribute("data-url")
+    var lapnr = cell.cells[0].textContent
+    console.log(lapnr)
+    make_xhr("POST", fname, url, { "lapnr": lapnr })
+    toHeadofpage()
+}
+
+
 function showLapdata(cell) {
     var fname = cell.parentNode.getAttribute("value")
     var url = cell.parentNode.getAttribute("data-url")
@@ -33,7 +43,7 @@ function showLapdata(cell) {
     toHeadofpage()
 }
 
-function make_xhr(hmethod, fname, url) {
+function make_xhr(hmethod, fname, url, data) {
     var xhr = new XMLHttpRequest(value = fname);
     if (hmethod === "GET") {
         xhr.open("GET", url, true);
@@ -65,7 +75,11 @@ function make_xhr(hmethod, fname, url) {
 
         }
     };
-    var jsonData = JSON.stringify({ "fname": fname });
+    var requestData = { "fname": fname }
+    if (data) {
+        Object.assign(requestData, data)
+    }
+    var jsonData = JSON.stringify(requestData);
     xhr.send(jsonData);
 }
 

@@ -7,7 +7,7 @@ from django.http import HttpResponse, HttpRequest, HttpResponseBadRequest, JsonR
 from django.core.exceptions import ValidationError
 
 # from django.db.models.query import QuerySet
-from test_polar.forms import adaptForm  # , formType
+from test_polar.forms import adaptForm, adaptFormLaps  # , formType
 from test_polar.models import PolarModel  # , PolarModel_test  # , Testpage
 
 from django.conf import settings
@@ -120,7 +120,7 @@ def show_adapt(request: HttpRequest, fname: str):
         PolarModel.delete_training(request)
         trainingen = PolarModel._return_trainrunning()
         _set_cache_trainingdata(trainingen, 360)
-
+        # xx
         return render(
             request,
             "adapt.html",
@@ -137,16 +137,46 @@ def show_adapt(request: HttpRequest, fname: str):
         lapdata = PolarModel.return_lapdata(fname)
         ldate = PolarModel._return_trainingdate(fname)
         initdict, hackdict = PolarModel._return_training_adaptdata(fname)
-        # adaptform = _set_form_initial(adaptForm, initdict, hackdict)
         adaptform = adaptForm().set_form_initial(initdict, hackdict)
 
         return render(
             request,
             "adapt.html",
             context={
+                "fname": fname,
                 "lapdate": ldate,
                 "lapdata": lapdata,
                 "adaptform": adaptform,
+                "update_checked": True,
+                "delete_checked": False,
+            },
+        )
+
+
+def show_adaptlap(request: HttpRequest, fname: str):
+    if request.method == "POST":
+        data = json.loads(request.body.decode("utf-8"))
+        # fname = data.pop("fname", None)
+        lapnr = data.pop("lapnr", None)
+        if lapnr:
+            lapnr = int(lapnr)
+        lapdata = PolarModel.return_lapdata(fname)
+        ldate = PolarModel._return_trainingdate(fname)
+
+        data = {"distance": 1, "lapNumber": lapnr}
+        form = adaptFormLaps(data=data, initial={"distance": 0, "lapNumber": 0})
+
+        if not form.is_valid():  # Validate the form
+            print(form.fields["distance"].error_messages)
+        return render(
+            request,
+            "adapt.html",
+            context={
+                "fname": fname,
+                "lapdate": ldate,
+                "lapdata": lapdata,
+                # "adaptform": adaptform,
+                "adaptlapform": form,
                 "update_checked": True,
                 "delete_checked": False,
             },
@@ -165,6 +195,7 @@ def show_lapdata(request: HttpRequest, fname: str) -> Union[HttpResponse, JsonRe
             request,
             "summary.html",
             context={
+                "fname": fname,
                 "lapdate": ldate,
                 "lapdata": lapdata,
                 "ttypes": ttypes,

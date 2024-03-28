@@ -6,9 +6,18 @@
 {% load table_filters %}
 
 {% block adapt_block %}
-  {% if adaptform %}
 
   
+  {% if adaptlapform %}
+  <form method="POST", enctype="multipart/form-data">
+  {{ adaptlapform.as_div }}
+  {% csrf_token %}
+  <input type="submit" class="btn btn-primary", value="Commit" method="POST">
+  </form>
+  {% endif %} 
+
+  
+  {% if adaptform %}
   <div class="container">
     <div class="row">
       <div class="col">
@@ -24,14 +33,32 @@
   </div>
   {% endif %} 
   {% endblock %}
-  
+
   
   {% block traintab_block %}
+  {%if lapdata%}
+  <table class="shortlaptable" value={{fname}} data-url="{% url 'test_polar:showadaptlap' fname %}">
+            
+    <th>Lapnr</th> 
+    <th>Dist.</th> 
+    {% for lap in lapdata %}
+    <tr onclick=showAdaptLap(this)><td>{{ forloop.counter }}</td>
+        <td>{{lap.distance|floatformat:0}}</td> 
+{% endfor %}
+    {% endif %}
+  </table>
+  <h3>LLLLLLLL</h3>
+  
+
+  {% comment %} {% endif %} {% endcomment %}
+
   <div class="btn-group-vertical">
     <label for="rb_delete"  value="Delete">Delete training active</label><input type="radio" class="btn btn-primary" id="rb_delete" name="group1" {% if delete_checked %} checked {% endif %}> 
     <label for="rb_update" value="Update" >Update training active</label><input type="radio" class="btn btn-primary"id="rb_update" name="group1" {% if update_checked %} checked {% endif %}>
   </div>
   
+
+
   <table name="traindata">
     <tr>
             <th>Date</th>
@@ -56,7 +83,7 @@
             class="interval"
             {% elif training.trainingtype.climax %}
             class="climax"
-
+            
             {% endif %}
             data-url="{% url 'test_polar:showadapt' training.fname %}"
             onclick="showAdapt(this)">
