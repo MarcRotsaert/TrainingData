@@ -29,14 +29,26 @@ class adaptForm(forms.ModelForm):
 
 
 class adaptFormLaps(forms.ModelForm):
+    fname = forms.CharField(max_length=300, required=False)
 
     class Meta:
         model = Laps
         # fields = ("distance", "lapNumber")
-        fields = ("lapNumber", "distance")
+        fields = (
+            "fname",
+            "lapNumber",
+            "distance",
+        )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        if "fname" in self.fields:
+            self.fields["fname"].widget = forms.TextInput(
+                attrs={
+                    "readonly": "readonly",
+                    "style": "border: none; background-color: transparent;",
+                }
+            )
 
         if "lapNumber" in self.fields:
             self.fields["lapNumber"].widget = forms.TextInput(

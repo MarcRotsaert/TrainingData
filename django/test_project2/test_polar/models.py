@@ -300,6 +300,39 @@ class PolarModel(mongomod.Model):
         # trainingen = cls._return_trainrunning()
 
     @classmethod
+    def _set_database_adaptlap(
+        cls,
+        request: HttpRequest,
+    ):
+
+        # new_trainingtype = _create_ttype_dict(request)
+        # new_description = request.POST["trainingdescription-description"]
+        # new_location = request.POST["location"]
+        # new_sport = request.POST["sport"]
+        fname = request.POST["fname"]
+        lapnr = int(request.POST["lapNumber"]) - 1
+        dist_new = int(request.POST["distance"])
+        print(fname)
+
+        training = cls._return_trainingdata(fname)
+        lapdata = training["laps"]
+        dist_old = lapdata[lapnr]["distance"]
+        vavg = lapdata[lapnr]["speed"]["avg"]
+        vavg_corr = vavg * dist_new / dist_old
+        lapdata[lapnr]["speed"]["avg_corr"] = vavg_corr
+
+        obj_id = training["_id"]
+        database = settings.DATABASES["default"]["NAME"]
+        db_table = cls._meta.db_table
+        mongpol = MongoPolar(database, db_table)
+        mongpol.updateOne(
+            obj_id,
+            {
+                "laps": lapdata,
+            },
+        )
+
+    @classmethod
     def _set_database_adapt(cls, request: HttpRequest):
         new_trainingtype = _create_ttype_dict(request)
         new_description = request.POST["trainingdescription-description"]

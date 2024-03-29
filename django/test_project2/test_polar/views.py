@@ -30,7 +30,7 @@ def select_collections(request: HttpRequest) -> HttpResponse:
 
 def redirect_to_home(request: HttpRequest) -> HttpResponse:
     print(request)
-    return redirect("home/")
+    return redirect("/home/")
 
 
 def show_polar(request: HttpRequest) -> HttpResponse:
@@ -82,6 +82,22 @@ def start_adapt(request: HttpRequest) -> HttpResponse:
     )
 
 
+def adapt_distance(request: HttpRequest) -> HttpResponse:
+    print(request.POST)
+    PolarModel._set_database_adaptlap(request)
+    # fname = request.POST.get("fname")
+    # lapnr = int(request.POST.get("lapNumber")) - 1
+    # dist_new = int(request.POST.get("distance"))
+
+    # training = PolarModel.objects.filter(fname=fname).first()
+    # lapdata = PolarModel.return_lapdata(fname)
+    # dist_old = lapdata[lapnr]["distance"]
+    # vavg = lapdata[lapnr]["speed"]["avg"]
+    # vavg_corr = vavg * dist_new / dist_old
+    # print(vavg_corr)
+    return redirect_to_home(request)
+
+
 def start_analyze(request: HttpRequest) -> HttpResponse:
     # ttype = request.GET["ttypes"]
     trainingen = trainingen = PolarModel._return_trainrunning()
@@ -121,7 +137,7 @@ def show_adapt(request: HttpRequest, fname: str):
         trainingen = PolarModel._return_trainrunning()
         _set_cache_trainingdata(trainingen, 360)
         # xx
-        return render(
+        return redirect(
             request,
             "adapt.html",
             context={
@@ -162,9 +178,10 @@ def show_adaptlap(request: HttpRequest, fname: str):
             lapnr = int(lapnr)
         lapdata = PolarModel.return_lapdata(fname)
         ldate = PolarModel._return_trainingdate(fname)
-
-        data = {"distance": 1, "lapNumber": lapnr}
-        form = adaptFormLaps(data=data, initial={"distance": 0, "lapNumber": 0})
+        data = {"distance": 1, "lapNumber": lapnr, "fname": fname}
+        form = adaptFormLaps(
+            data=data, initial={"distance": 0, "lapNumber": 0, "fname": "no"}
+        )
 
         if not form.is_valid():  # Validate the form
             print(form.fields["distance"].error_messages)

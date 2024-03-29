@@ -7,12 +7,11 @@
 
 {% block adapt_block %}
 
-  
   {% if adaptlapform %}
-  <form method="POST", enctype="multipart/form-data">
+  <form method="POST" action='{% url "test_polar:adaptlapdistance" %}' enctype="multipart/form-data">
   {{ adaptlapform.as_div }}
   {% csrf_token %}
-  <input type="submit" class="btn btn-primary", value="Commit" method="POST">
+  <input type="submit" class="btn btn-primary", value="Commit" method="POST" onclick=showAdaptLap(this)>
   </form>
   {% endif %} 
 
