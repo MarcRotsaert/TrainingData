@@ -316,7 +316,7 @@ class PolarModel(mongomod.Model):
 
     @classmethod
     def _set_database_adapt(cls, request: HttpRequest):
-        # new_trainingtype = _create_ttype_dict(request)
+        new_trainingtype = _create_ttype_dict(request)
         new_description = request.POST["trainingdescription-description"]
         new_location = request.POST["location"]
         new_sport = request.POST["sport"]
@@ -358,6 +358,7 @@ class FormModel(mongomod.Model):
         # db_table = "polar2022"
         # app_label = "test_training2"
         managed = False
+"""
 
 
 def _create_ttype_dict(request: HttpRequest) -> dict:
@@ -375,4 +376,3 @@ def _create_ttype_dict(request: HttpRequest) -> dict:
                 new_val = True
         ttype_db.update({tt: new_val})
     return ttype_db
-"""
