@@ -1,6 +1,9 @@
 from typing import Union
 import json
 
+# from urllib.parse import urlencode
+
+
 # Create your views here.
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpRequest, HttpResponseBadRequest, JsonResponse
@@ -85,21 +88,39 @@ def start_adapt(request: HttpRequest) -> HttpResponse:
 def adapt_distance(request: HttpRequest) -> HttpResponse:
     print(request.POST)
     PolarModel._set_database_adaptlap(request)
-    # fname = request.POST.get("fname")
-    # lapnr = int(request.POST.get("lapNumber")) - 1
-    # dist_new = int(request.POST.get("distance"))
+    fname = request.POST.get("fname")
+    lapdata = PolarModel.return_lapdata(fname)
+    ldate = PolarModel._return_trainingdate(fname)
+    initdict, hackdict = PolarModel._return_training_adaptdata(fname)
+    adaptform = adaptForm().set_form_initial(initdict, hackdict)
 
-    # training = PolarModel.objects.filter(fname=fname).first()
-    # lapdata = PolarModel.return_lapdata(fname)
-    # dist_old = lapdata[lapnr]["distance"]
-    # vavg = lapdata[lapnr]["speed"]["avg"]
-    # vavg_corr = vavg * dist_new / dist_old
-    # print(vavg_corr)
-    return redirect_to_home(request)
+    # Simulate a POST request to show_adapt view
+    # post_request = HttpRequest()
+    # post_request.method = "POST"
+    # post_request._body = request.body
+    # post_request.content_type = request.content_type
+    # post_request._encoding = request.encoding
+    # post_request.POST = request.POST
+    # return show_adapt(request, fname=fname)
+
+    # redirect_url = "/adapt/?" + urlencode(request.POST)
+    # return redirect(redirect_url)
+
+    return render(
+        request,
+        "adapt.html",
+        context={
+            "fname": fname,
+            "lapdate": ldate,
+            "lapdata": lapdata,
+            "adaptform": adaptform,
+            "update_checked": True,
+            "delete_checked": False,
+        },
+    )
 
 
 def start_analyze(request: HttpRequest) -> HttpResponse:
-    # ttype = request.GET["ttypes"]
     trainingen = trainingen = PolarModel._return_trainrunning()
 
     context = {
@@ -110,10 +131,6 @@ def start_analyze(request: HttpRequest) -> HttpResponse:
 
 def plot_analyze(request, fname):
     if request.method == "GET":
-        # fname = request.GET.get(
-        #     "fname"
-        # )  # Get the "fname" parameter from the GET request
-
         if fname is not None:
             lapdata = PolarModel.return_lapdata(fname)
             ldate = PolarModel._return_trainingdate(fname)
@@ -129,14 +146,12 @@ def plot_analyze(request, fname):
 
 def show_adapt(request: HttpRequest, fname: str):
     # connection = PolarModel.objects.using("default")
-    # print(__name__)
     if request.method == "GET":
         return request
     elif request.method == "DELETE":
         PolarModel.delete_training(request)
         trainingen = PolarModel._return_trainrunning()
         _set_cache_trainingdata(trainingen, 360)
-        # xx
         return redirect(
             request,
             "adapt.html",
@@ -148,8 +163,9 @@ def show_adapt(request: HttpRequest, fname: str):
         )
 
     elif request.method == "POST":
-        data = json.loads(request.body.decode("utf-8"))
-        fname = data.pop("fname", None)
+        # try:
+        # data = json.loads(request.body.decode("utf-8"))
+        # fname = data.pop("fname", None)
         lapdata = PolarModel.return_lapdata(fname)
         ldate = PolarModel._return_trainingdate(fname)
         initdict, hackdict = PolarModel._return_training_adaptdata(fname)
@@ -181,6 +197,9 @@ def show_adaptlap(request: HttpRequest, fname: str):
         data = {"distance": 1, "lapNumber": lapnr, "fname": fname}
         form = adaptFormLaps(
             data=data, initial={"distance": 0, "lapNumber": 0, "fname": "no"}
+        )
+        form = adaptFormLaps(
+            data=data,
         )
 
         if not form.is_valid():  # Validate the form
