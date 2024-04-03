@@ -170,7 +170,6 @@ def show_adapt(request: HttpRequest, fname: str):
         ldate = PolarModel._return_trainingdate(fname)
         initdict, hackdict = PolarModel._return_training_adaptdata(fname)
         adaptform = adaptForm().set_form_initial(initdict, hackdict)
-
         return render(
             request,
             "adapt.html",
@@ -189,15 +188,15 @@ def show_adaptlap(request: HttpRequest, fname: str):
     if request.method == "POST":
         data = json.loads(request.body.decode("utf-8"))
         # fname = data.pop("fname", None)
-        lapnr = data.pop("lapnr", None)
+        lapnr = data.get("lapnr", None)
         if lapnr:
             lapnr = int(lapnr)
         lapdata = PolarModel.return_lapdata(fname)
         ldate = PolarModel._return_trainingdate(fname)
         data = {"distance": 1, "lapNumber": lapnr, "fname": fname}
-        form = adaptFormLaps(
-            data=data, initial={"distance": 0, "lapNumber": 0, "fname": "no"}
-        )
+        # form = adaptFormLaps(
+        #     data=data, initial={"distance": 0, "lapNumber": 0, "fname": "no"}
+        # )
         form = adaptFormLaps(
             data=data,
         )
@@ -211,7 +210,7 @@ def show_adaptlap(request: HttpRequest, fname: str):
                 "fname": fname,
                 "lapdate": ldate,
                 "lapdata": lapdata,
-                # "adaptform": adaptform,
+                "adaptform": None,
                 "adaptlapform": form,
                 "update_checked": True,
                 "delete_checked": False,

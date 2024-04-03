@@ -32,11 +32,11 @@ def get_collections_name() -> list[str]:
     print(collections)
     try:
         collections.remove("__schema__")
-    except ValueError: 
+    except ValueError:
         print("not present")
     try:
         collections.remove("django_migrations")
-    except ValueError: 
+    except ValueError:
         print("not present")
 
     return collections
