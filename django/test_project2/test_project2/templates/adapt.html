@@ -1,14 +1,46 @@
 <!DOCTYPE html>
-{% extends "summary.html" %}
+{% extends "base.html" %}
+{% comment %} <!DOCTYPE html> {% endcomment %}
 {% comment %} {% extends "base.html" %} {% endcomment %}
 {% load static %}
 {% load cache %}
 {% load table_filters %}
 
 {% block adapt_block %}
-  {% if adaptform %}
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>summary</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <link rel="stylesheet" href="{% static "css/test_polar.css" %}">
+    
+</head>
+<body>
+  <script src={% static  "js/polar_test.js" %}></script>
+{% comment %} <label for="to_adapt">to adapt page</label> {% endcomment %}
+{% if adaptlapform %}
+<form method="POST" action='{% url "test_polar:adaptlapdistance" %}' enctype="multipart/form-data">
+  {{ adaptlapform.as_div }}
+  {% csrf_token %}
+  
+  <div class="container">
+    <div class="row">
+      <div class="col">
+        <input type="submit" class="btn btn-primary", value="Commit" method="POST" onclick=showAdaptLap(this)>
+      </div>
+    </div>
+  </form>
+  {% endif %} 
+</div>
+    {% comment %} </div> {% endcomment %}
+    {% if adaptlapform %}
+    {% comment %} <input type="submit" id="to_adapt" class="btn btn-primary", value="To adapt" method="GET" onclick="window.location.href = '/adapt/'"> {% endcomment %}
+    {% endif %} 
+    <button id="to_adapt" class="btn btn-primary" onclick="window.location.href = '/adapt'">To adapt</button>
 
   
+  {% if adaptform %}
   <div class="container">
     <div class="row">
       <div class="col">
@@ -24,14 +56,35 @@
   </div>
   {% endif %} 
   {% endblock %}
-  
+
   
   {% block traintab_block %}
+  {%if lapdata%}
+  <h3> {{ lapdate|slice:10 }}</h3>
+
+  <table class="shortlaptable" value={{fname}} data-url="{% url 'test_polar:showadaptlap' fname %}">
+            
+    <th>Lapnr</th><th>Dist.</th><th>Dur.</th><th>Vavg.</th><th>Vavgcorr.</th> 
+    {% for lap in lapdata %}
+    <tr onclick=showAdaptLap(this)><td>{{ forloop.counter }}</td>
+        <td>{{lap.distance|floatformat:0}}</td>
+        <td>{{lap.duration|duration2min }}</td>
+        <td>{{lap.speed.avg|kmh2minkm }}</td> 
+        <td>{{lap.speed.avg_corr|kmh2minkm }}</td>  
+{% endfor %}
+    {% endif %}
+  </table>
+  
+
+  {% comment %} {% endif %} {% endcomment %}
+
   <div class="btn-group-vertical">
     <label for="rb_delete"  value="Delete">Delete training active</label><input type="radio" class="btn btn-primary" id="rb_delete" name="group1" {% if delete_checked %} checked {% endif %}> 
     <label for="rb_update" value="Update" >Update training active</label><input type="radio" class="btn btn-primary"id="rb_update" name="group1" {% if update_checked %} checked {% endif %}>
   </div>
   
+
+
   <table name="traindata">
     <tr>
             <th>Date</th>
@@ -56,7 +109,7 @@
             class="interval"
             {% elif training.trainingtype.climax %}
             class="climax"
-
+            
             {% endif %}
             data-url="{% url 'test_polar:showadapt' training.fname %}"
             onclick="showAdapt(this)">
