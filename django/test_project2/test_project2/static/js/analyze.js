@@ -17,6 +17,29 @@ function plotLapdata(cell) {
         .catch(error => console.error('Error:', error));
 }
 
+// function _createDatasetPoint(valArray, duration) {
+//     const pointDatasets = [];
+//     for (let i = 0; i < valArray.length; i++) {
+//         const points = [];
+//         const durationSum = duration.slice(0, i + 1).reduce((total, duration) => total + duration, 0);
+//         for (let j = 0; j < durationSum; j++) {
+//             points.push(valArray[i]);
+//         }
+//         pointDatasets.push({
+//             label: 'L ' + (i + 1) + ' points',
+//             data: points,
+//             backgroundColor: 'rgba(255, 99, 132, 0.2)',
+//             borderWidth: 3,
+//             barPercentage: barPercentages[i] * 6,
+//             categoryPercentage: 0.95,
+//             skipNull: false,
+//         });
+//     }
+//     return pointDatasets;
+
+
+// }
+
 function _createDataset(valArray, duration) {
     const totalDuration = duration.reduce((total, duration) => total + duration, 0);
     const barPercentages = duration.map(duration => duration / totalDuration);
@@ -55,7 +78,8 @@ function _creatOptions() {
     const options = {
         scales: {
             y: {
-                beginAtZero: false
+                beginAtZero: false,
+                max: 200,
             },
         },
         plugins: {
@@ -82,10 +106,12 @@ function _creatOptions() {
 function _data2array(data) {
     var lapdata = data["lapdata"]
     const ldate = data["ldate"]
-    const heartarr = lapdata.map(lap => parseFloat(lap.heartRate.max));
+    const heartarr = lapdata.map(lap => parseFloat(lap.heartRate.avg));
+    const heartmaxarr = lapdata.map(lap => parseFloat(lap.heartRate.avg));
+
     const speedarr = lapdata.map(lap => parseFloat(lap.speed.avg));
     const duration = lapdata.map(lap => parseInt(lap.duration));
-    return { speedarr, heartarr, duration, ldate };
+    return { speedarr, heartarr, heartmaxarr, duration, ldate };
 }
 
 
@@ -93,11 +119,15 @@ function plotje(data) {
     const ctxS = document.getElementById('ChartS1').getContext('2d');
     const ctxH = document.getElementById('ChartH1').getContext('2d');
 
-    const { speedarr, heartarr, duration, ldate } = _data2array(data);
+    const { speedarr, heartarr, heartmaxarr, duration, ldate } = _data2array(data);
     console.log(ldate)
 
+
+
     if (!window.ChartS1 || !(window.ChartS1 instanceof Chart)) {
+        console.log(window.ChartS1.options)
         createPlot(data, 1)
+
     }
 
     else {
@@ -131,7 +161,7 @@ function createPlot(data, nr) {
     const ctxS = document.getElementById('ChartS' + nr).getContext('2d');
     const ctxH = document.getElementById('ChartH' + nr).getContext('2d');
 
-    const { speedarr, heartarr, duration, ldate } = _data2array(data);
+    const { speedarr, heartarr, heartmaxarr, duration, ldate } = _data2array(data);
 
     datasets_speed = _createDataset(speedarr, duration)
     datasets_hr = _createDataset(heartarr, duration)
