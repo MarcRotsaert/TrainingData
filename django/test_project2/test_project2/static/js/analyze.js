@@ -79,7 +79,7 @@ function _creatOptions() {
         scales: {
             y: {
                 beginAtZero: false,
-                max: 200,
+                // max: 200,
             },
         },
         plugins: {
@@ -107,11 +107,12 @@ function _data2array(data) {
     var lapdata = data["lapdata"]
     const ldate = data["ldate"]
     const heartarr = lapdata.map(lap => parseFloat(lap.heartRate.avg));
-    const heartmaxarr = lapdata.map(lap => parseFloat(lap.heartRate.avg));
-
-    const speedarr = lapdata.map(lap => parseFloat(lap.speed.avg));
+    // const heartmaxarr = lapdata.map(lap => parseFloat(lap.heartRate.avg));
+    // const speedarrcorr = lapdata.map(lap => parseFloat(lap.speed.avg_corr));
+    const speedarr = lapdata.map(lap => parseFloat(lap.speed.avg_corr ? lap.speed.avg_corr : lap.speed.avg));
     const duration = lapdata.map(lap => parseInt(lap.duration));
-    return { speedarr, heartarr, heartmaxarr, duration, ldate };
+    // return { speedarr, heartarr, heartmaxarr, duration, ldate };
+    return { speedarr, heartarr, duration, ldate };
 }
 
 
@@ -119,7 +120,8 @@ function plotje(data) {
     const ctxS = document.getElementById('ChartS1').getContext('2d');
     const ctxH = document.getElementById('ChartH1').getContext('2d');
 
-    const { speedarr, heartarr, heartmaxarr, duration, ldate } = _data2array(data);
+    // const { speedarr, heartarr, heartmaxarr, duration, ldate } = _data2array(data);
+    const { speedarr, heartarr, duration, ldate } = _data2array(data);
     console.log(ldate)
 
 
@@ -154,14 +156,14 @@ function resetgraphs() {
     elem.textContent = ""
     elem = document.getElementById("ldate2")
     elem.textContent = ""
-
 }
 
 function createPlot(data, nr) {
     const ctxS = document.getElementById('ChartS' + nr).getContext('2d');
     const ctxH = document.getElementById('ChartH' + nr).getContext('2d');
 
-    const { speedarr, heartarr, heartmaxarr, duration, ldate } = _data2array(data);
+    // const { speedarr, heartarr, heartmaxarr, duration, ldate } = _data2array(data);
+    const { speedarr, heartarr, duration, ldate } = _data2array(data);
 
     datasets_speed = _createDataset(speedarr, duration)
     datasets_hr = _createDataset(heartarr, duration)
