@@ -19,20 +19,14 @@
 </head>
 
     <body>
-        <script src={% static  "js/polar_test.js" %}></script>
-        {% comment %} <a href={% url 'test_polar:selectcol' %}> {% endcomment %}
-            {% comment %} <div id="trainingcollections"> {% endcomment %}
-                <form id="collectionform" action="/summary/" method="get">
-                    <select id="dtable" name="dtable" size="15">
-                        {% for tab in dbtables %}
-                        <option value={{ tab }}>{{ tab }}</option>
-                        {% endfor %}
-                    </select>
-                    <input type="submit" id="to_addtt" value="to next page" onclick="toHeadofpage()">
-                </form> 
-            {% comment %} </div>             {% endcomment %}
+        <form id="collectionform" action="/summary/" method="get">
+            <select id="dtable" name="dtable" size="15">
+                {% for tab in dbtables %}
+                <option value={{ tab }}>{{ tab }}</option>
+                {% endfor %}
+            </select>
+            <input type="submit" id="to_addtt" value="to next page" onclick="toHeadofpage()">
+        </form> 
     {% endblock %}
-                    
-                
-                </body>
-                </html>
+</body>
+</html>

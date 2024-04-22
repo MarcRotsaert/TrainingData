@@ -1,6 +1,6 @@
 function plotLapdata(cell) {
-    var fname = cell.getAttribute("value");
-    var url = cell.getAttribute("data-url");
+    const fname = cell.getAttribute("value");
+    const url = cell.getAttribute("data-url");
     console.log(fname)
     console.log(url)
 
@@ -135,7 +135,7 @@ function _destroygraph(graphid) {
 }
 
 function resetgraphs() {
-    graphids = ["ChartS1", "ChartS2", "ChartH1", "ChartH2"]
+    const graphids = ["ChartS1", "ChartS2", "ChartH1", "ChartH2"]
     for (let i of graphids) {
         _destroygraph(i)
     }
@@ -165,7 +165,7 @@ function _returnPlotVariables(parameter, data) {
 
 
 function _createPlot(data, parameter, nr) {
-    var { arr, duration, chart_id, tick } = _returnPlotVariables(parameter, data)
+    let { arr, duration, chart_id, tick } = _returnPlotVariables(parameter, data)
     chart_h = chart_id + nr
 
     yaxlim = _getYaxisLimit(chart_id, arr)
@@ -220,30 +220,3 @@ function createPlotsTraining(data, nr) {
 }
 
 
-function toHeadofpage() {
-    window.scrollTo(0, 0);
-}
-
-
-// function _createDatasetPoint(valArray, duration) {
-//     const pointDatasets = [];
-//     for (let i = 0; i < valArray.length; i++) {
-//         const points = [];
-//         const durationSum = duration.slice(0, i + 1).reduce((total, duration) => total + duration, 0);
-//         for (let j = 0; j < durationSum; j++) {
-//             points.push(valArray[i]);
-//         }
-//         pointDatasets.push({
-//             label: 'L ' + (i + 1) + ' points',
-//             data: points,
-//             backgroundColor: 'rgba(255, 99, 132, 0.2)',
-//             borderWidth: 3,
-//             barPercentage: barPercentages[i] * 6,
-//             categoryPercentage: 0.95,
-//             skipNull: false,
-//         });
-//     }
-//     return pointDatasets;
-
-
-// }
