@@ -17,36 +17,14 @@ function plotLapdata(cell) {
         .catch(error => console.error('Error:', error));
 }
 
-// function _createDatasetPoint(valArray, duration) {
-//     const pointDatasets = [];
-//     for (let i = 0; i < valArray.length; i++) {
-//         const points = [];
-//         const durationSum = duration.slice(0, i + 1).reduce((total, duration) => total + duration, 0);
-//         for (let j = 0; j < durationSum; j++) {
-//             points.push(valArray[i]);
-//         }
-//         pointDatasets.push({
-//             label: 'L ' + (i + 1) + ' points',
-//             data: points,
-//             backgroundColor: 'rgba(255, 99, 132, 0.2)',
-//             borderWidth: 3,
-//             barPercentage: barPercentages[i] * 6,
-//             categoryPercentage: 0.95,
-//             skipNull: false,
-//         });
-//     }
-//     return pointDatasets;
-
-
-// }
 
 function _createDataset(valArray, duration) {
     const totalDuration = duration.reduce((total, duration) => total + duration, 0);
     const barPercentages = duration.map(duration => duration / totalDuration);
 
-    let durationMin = duration.map(d => (d / 60).toFixed(1));
+    const durationMin = duration.map(d => (d / 60).toFixed(1));
 
-    const datasets = []
+    let datasets = []
     for (let i = 0; i < valArray.length; i++) {
         datasets[i] = {
             label: 'L ' + (i + 1) + "\nduration:" + durationMin[i] + 'min\n',
@@ -62,7 +40,7 @@ function _createDataset(valArray, duration) {
 }
 
 
-function _bardatainp(datasets, duration) {
+function _createBarDatainp(datasets, duration) {
     const datainp = {
         labels: [""],
         // labels: [duration],
@@ -74,13 +52,28 @@ function _bardatainp(datasets, duration) {
 }
 
 
-function _creatOptions() {
-    const options = {
+function _getYaxisLimit(chartid, arr) {
+    arr_min = Math.min(...arr)
+    arr_max = Math.max(...arr)
+    handle = chartid + "1"
+    if (window[handle] && window[handle] instanceof Chart) {
+        window[handle].scales.y.min < arr_min ? ymin = window[handle].scales.y.min : ymin = arr_min
+        window[handle].scales.y.max > arr_max ? ymax = window[handle].scales.y.max : ymax = arr_max
+        return [ymin, ymax]
+    }
+
+}
+
+function _createOptions(customOptions = {}) {
+    const defaultOptions = {
+        clip: true,
+        aspectRatio: 2.5,
         scales: {
             y: {
                 beginAtZero: false,
                 // max: 200,
             },
+            alignToPixels: false,
         },
         plugins: {
             legend: { display: false },
@@ -99,43 +92,38 @@ function _creatOptions() {
         }
     };
 
+    const options = { ...defaultOptions, ...customOptions };
+
     return options
 }
 
 
 function _data2array(data) {
-    var lapdata = data["lapdata"]
+    const lapdata = data["lapdata"]
     const ldate = data["ldate"]
     const heartarr = lapdata.map(lap => parseFloat(lap.heartRate.avg));
-    // const heartmaxarr = lapdata.map(lap => parseFloat(lap.heartRate.avg));
-    // const speedarrcorr = lapdata.map(lap => parseFloat(lap.speed.avg_corr));
     const speedarr = lapdata.map(lap => parseFloat(lap.speed.avg_corr ? lap.speed.avg_corr : lap.speed.avg));
     const duration = lapdata.map(lap => parseInt(lap.duration));
-    // return { speedarr, heartarr, heartmaxarr, duration, ldate };
     return { speedarr, heartarr, duration, ldate };
 }
 
 
 function plotje(data) {
-    const ctxS = document.getElementById('ChartS1').getContext('2d');
-    const ctxH = document.getElementById('ChartH1').getContext('2d');
+    // const ctxS = document.getElementById('ChartS1').getContext('2d');
+    // const ctxH = document.getElementById('ChartH1').getContext('2d');
 
     // const { speedarr, heartarr, heartmaxarr, duration, ldate } = _data2array(data);
-    const { speedarr, heartarr, duration, ldate } = _data2array(data);
-    console.log(ldate)
-
-
+    // const { speedarr, heartarr, duration, ldate } = _data2array(data);
+    // console.log(ldate)
 
     if (!window.ChartS1 || !(window.ChartS1 instanceof Chart)) {
-        console.log(window.ChartS1.options)
-        createPlot(data, 1)
-
+        // console.log(window.ChartS1.options)
+        createPlotsTraining(data, 1)
     }
-
     else {
         _destroygraph("ChartS2")
         _destroygraph("ChartH2")
-        createPlot(data, 2)
+        createPlotsTraining(data, 2)
     }
 }
 
@@ -158,47 +146,104 @@ function resetgraphs() {
     elem.textContent = ""
 }
 
-function createPlot(data, nr) {
-    const ctxS = document.getElementById('ChartS' + nr).getContext('2d');
-    const ctxH = document.getElementById('ChartH' + nr).getContext('2d');
-
-    // const { speedarr, heartarr, heartmaxarr, duration, ldate } = _data2array(data);
+function _returnPlotVariables(parameter, data) {
     const { speedarr, heartarr, duration, ldate } = _data2array(data);
+    let arr, chart_id, tick;
+    if (parameter == "heartRate") {
+        arr = heartarr
+        chart_id = "ChartH"
+        tick = { stepSize: 10 }
+    }
 
-    datasets_speed = _createDataset(speedarr, duration)
-    datasets_hr = _createDataset(heartarr, duration)
+    else if (parameter == "speed") {
+        arr = speedarr
+        chart_id = "ChartS"
+        tick = { stepSize: 1 }
+    }
+    return { arr, duration, chart_id, tick };
+}
 
-    datainp_speed = _bardatainp(datasets_speed)
-    datainp_hr = _bardatainp(datasets_hr)
 
-    options = _creatOptions()
+function _createPlot(data, parameter, nr) {
+    var { arr, duration, chart_id, tick } = _returnPlotVariables(parameter, data)
+    chart_h = chart_id + nr
 
-    const myChartS = new Chart(ctxS, {
+    yaxlim = _getYaxisLimit(chart_id, arr)
+    if (yaxlim) {
+        extraoptions = {
+            scales: {
+                y: {
+                    beginAtZero: false, min: yaxlim[0], max: yaxlim[1],
+                    ticks: tick,
+                }
+            }
+        }
+        window[chart_id + "1"].config.options.scales.y.min = yaxlim[0]
+        window[chart_id + "1"].config.options.scales.y.max = yaxlim[1]
+        window[chart_id + "1"].update()
+    }
+    else {
+        extraoptions = {
+            scales: {
+                y: {
+                    beginAtZero: false,
+                    ticks: tick
+                }
+            }
+        }
+    }
+    options = _createOptions(extraoptions)
+    dataset = _createDataset(arr, duration)
+    datainp = _createBarDatainp(dataset)
+    const ctx = document.getElementById(chart_h).getContext('2d');
+    var myChart = new Chart(ctx, {
         type: 'bar',
-        data: datainp_speed,
+        data: datainp,
         options: options
     });
-
-    let propertyNameS = 'ChartS' + nr;
+    let propertyNameS = chart_h;
     // window.ChartS2 = myChartS;
-    window[propertyNameS] = myChartS;
+    window[propertyNameS] = myChart;
 
-    const myChartH = new Chart(ctxH, {
-        type: 'bar',
-        data: datainp_hr,
-        options: options
-    });
-    let propertyNameH = 'ChartH' + nr;
-    // window.ChartS2 = myChartS;
-    window[propertyNameH] = myChartH;
-    // window.ChartH2 = myChartH;
+}
+
+
+function createPlotsTraining(data, nr) {
+    const { dummy1, dummy2, duration, ldate } = _data2array(data);
+    _createPlot(data, "speed", nr)
+    _createPlot(data, "heartRate", nr)
 
     elem = document.getElementById("ldate" + nr)
     elem.innerHTML = ldate;
     toHeadofpage()
+
 }
 
 
 function toHeadofpage() {
     window.scrollTo(0, 0);
 }
+
+
+// function _createDatasetPoint(valArray, duration) {
+//     const pointDatasets = [];
+//     for (let i = 0; i < valArray.length; i++) {
+//         const points = [];
+//         const durationSum = duration.slice(0, i + 1).reduce((total, duration) => total + duration, 0);
+//         for (let j = 0; j < durationSum; j++) {
+//             points.push(valArray[i]);
+//         }
+//         pointDatasets.push({
+//             label: 'L ' + (i + 1) + ' points',
+//             data: points,
+//             backgroundColor: 'rgba(255, 99, 132, 0.2)',
+//             borderWidth: 3,
+//             barPercentage: barPercentages[i] * 6,
+//             categoryPercentage: 0.95,
+//             skipNull: false,
+//         });
+//     }
+//     return pointDatasets;
+
+
+// }
