@@ -18,7 +18,7 @@ function plotLapdata(cell) {
 }
 
 
-function _createDataset(valArray, duration) {
+function _createDataset(valArray, duration, backgroundColor) {
     const totalDuration = duration.reduce((total, duration) => total + duration, 0);
     const barPercentages = duration.map(duration => duration / totalDuration);
 
@@ -29,8 +29,8 @@ function _createDataset(valArray, duration) {
         datasets[i] = {
             label: 'L ' + (i + 1) + "\nduration:" + durationMin[i] + 'min\n',
             data: [valArray[i]],
-            backgroundColor: 'rgba(255, 99, 132, 0.2)',
-            borderWidth: 3,
+            backgroundColor: backgroundColor,
+            borderWidth: 2,
             barPercentage: barPercentages[i] * 6, // Adjust barPercentage to control the width of the first bar
             categoryPercentage: 0.95,
             skipNull: false,
@@ -167,15 +167,15 @@ function _returnPlotVariables(parameter, data) {
 function _createPlot(data, parameter, nr) {
     let { arr, duration, chart_id, tick } = _returnPlotVariables(parameter, data)
     chart_h = chart_id + nr
+    extraoptions = {}
+    // extraoptions = { plugins: {}, legend: { display: false } }
 
     yaxlim = _getYaxisLimit(chart_id, arr)
     if (yaxlim) {
-        extraoptions = {
-            scales: {
-                y: {
-                    beginAtZero: false, min: yaxlim[0], max: yaxlim[1],
-                    ticks: tick,
-                }
+        extraoptions.scales = {
+            y: {
+                beginAtZero: false, min: yaxlim[0], max: yaxlim[1],
+                ticks: tick,
             }
         }
         window[chart_id + "1"].config.options.scales.y.min = yaxlim[0]
@@ -183,17 +183,24 @@ function _createPlot(data, parameter, nr) {
         window[chart_id + "1"].update()
     }
     else {
-        extraoptions = {
-            scales: {
-                y: {
-                    beginAtZero: false,
-                    ticks: tick
-                }
+        extraoptions.scales = {
+            y: {
+                beginAtZero: false,
+                ticks: tick
             }
         }
     }
+
+    if (parameter == "speed") {
+        backgroundColor = 'rgba(200, 0, 0, 0.2)'
+    }
+    else if (parameter == "heartRate") {
+        backgroundColor = 'rgba(0, 200, 0, 0.2)'
+    }
+
+
     options = _createOptions(extraoptions)
-    dataset = _createDataset(arr, duration)
+    dataset = _createDataset(arr, duration, backgroundColor)
     datainp = _createBarDatainp(dataset)
     const ctx = document.getElementById(chart_h).getContext('2d');
     var myChart = new Chart(ctx, {
