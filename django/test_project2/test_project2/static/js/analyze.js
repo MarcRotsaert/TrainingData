@@ -18,6 +18,27 @@ function plotLapdata(cell) {
 }
 
 
+
+function _destroygraph(graphid) {
+    if (window[graphid] && window[graphid] instanceof Chart) {
+        window[graphid].destroy()
+        window[graphid] = undefined
+    }
+}
+
+function resetgraphs() {
+    const graphids = ["ChartS1", "ChartS2", "ChartH1", "ChartH2"]
+    for (let i of graphids) {
+        _destroygraph(i)
+    }
+
+    elem = document.getElementById("ldate1")
+    elem.textContent = ""
+    elem = document.getElementById("ldate2")
+    elem.textContent = ""
+}
+
+
 function _createDataset(valArray, duration, backgroundColor) {
     const totalDuration = duration.reduce((total, duration) => total + duration, 0);
     const barPercentages = duration.map(duration => duration / totalDuration);
@@ -39,7 +60,6 @@ function _createDataset(valArray, duration, backgroundColor) {
     return datasets
 }
 
-
 function _createBarDatainp(datasets, duration) {
     const datainp = {
         labels: [""],
@@ -49,6 +69,16 @@ function _createBarDatainp(datasets, duration) {
         duration: duration,
     }
     return datainp
+}
+
+
+function _data2array(data) {
+    const lapdata = data["lapdata"]
+    const ldate = data["ldate"]
+    const heartarr = lapdata.map(lap => parseFloat(lap.heartRate.avg));
+    const speedarr = lapdata.map(lap => parseFloat(lap.speed.avg_corr ? lap.speed.avg_corr : lap.speed.avg));
+    const duration = lapdata.map(lap => parseInt(lap.duration));
+    return { speedarr, heartarr, duration, ldate };
 }
 
 
@@ -64,88 +94,6 @@ function _getYaxisLimit(chartid, arr) {
 
 }
 
-function _createOptions(customOptions = {}) {
-    const defaultOptions = {
-        clip: true,
-        aspectRatio: 2.5,
-        scales: {
-            y: {
-                beginAtZero: false,
-                // max: 200,
-            },
-            alignToPixels: false,
-        },
-        plugins: {
-            legend: { display: false },
-            tooltip: {
-                backgroundColor: 'rgba(200, 0, 0, 0.5)',
-                // callbacks: {
-                //     label: function (tooltipItems, data) {
-                //         console.log(data)
-                //         // const text = chartData[tooltipItems.datasetIndex]
-                //         return tooltipItems.datasetIndex;
-                //     },
-
-                // }
-            },
-
-        }
-    };
-
-    const options = { ...defaultOptions, ...customOptions };
-
-    return options
-}
-
-
-function _data2array(data) {
-    const lapdata = data["lapdata"]
-    const ldate = data["ldate"]
-    const heartarr = lapdata.map(lap => parseFloat(lap.heartRate.avg));
-    const speedarr = lapdata.map(lap => parseFloat(lap.speed.avg_corr ? lap.speed.avg_corr : lap.speed.avg));
-    const duration = lapdata.map(lap => parseInt(lap.duration));
-    return { speedarr, heartarr, duration, ldate };
-}
-
-
-function plotje(data) {
-    // const ctxS = document.getElementById('ChartS1').getContext('2d');
-    // const ctxH = document.getElementById('ChartH1').getContext('2d');
-
-    // const { speedarr, heartarr, heartmaxarr, duration, ldate } = _data2array(data);
-    // const { speedarr, heartarr, duration, ldate } = _data2array(data);
-    // console.log(ldate)
-
-    if (!window.ChartS1 || !(window.ChartS1 instanceof Chart)) {
-        // console.log(window.ChartS1.options)
-        createPlotsTraining(data, 1)
-    }
-    else {
-        _destroygraph("ChartS2")
-        _destroygraph("ChartH2")
-        createPlotsTraining(data, 2)
-    }
-}
-
-function _destroygraph(graphid) {
-    if (window[graphid] && window[graphid] instanceof Chart) {
-        window[graphid].destroy()
-        window[graphid] = undefined
-    }
-}
-
-function resetgraphs() {
-    const graphids = ["ChartS1", "ChartS2", "ChartH1", "ChartH2"]
-    for (let i of graphids) {
-        _destroygraph(i)
-    }
-
-    elem = document.getElementById("ldate1")
-    elem.textContent = ""
-    elem = document.getElementById("ldate2")
-    elem.textContent = ""
-}
-
 function _returnPlotVariables(parameter, data) {
     const { speedarr, heartarr, duration, ldate } = _data2array(data);
     let arr, chart_id, tick;
@@ -158,37 +106,64 @@ function _returnPlotVariables(parameter, data) {
     else if (parameter == "speed") {
         arr = speedarr
         chart_id = "ChartS"
-        tick = { stepSize: 1 }
+        tick = {
+            stepSize: 1,
+            callback: function (value, index, values) {
+                minkm = 60 / value
+                minute = Math.floor(minkm)
+                seconds = Math.floor(60 * (minkm - minute))
+                return minute + ':' + String(seconds).padStart(2, '0');
+            }
+        }
     }
     return { arr, duration, chart_id, tick };
 }
 
+function _createOptions(customOptions = {}) {
+    const defaultOptions = {
+        clip: true,
+        aspectRatio: 2.5,
+        plugins: {
+            legend: { display: false },
+            tooltip: {
+                backgroundColor: 'rgba(200, 0, 0, 0.5)',
+                // callbacks: {
+                //     label: function (tooltipItems, data) {
+                //         console.log(data)
+                //         // const text = chartData[tooltipItems.datasetIndex]
+                //         return tooltipItems.datasetIndex;
+                //     },
+                // }
+            },
 
-function _createPlot(data, parameter, nr) {
+        }
+    };
+    const options = { ...customOptions, ...defaultOptions };
+
+    return options
+}
+
+
+function createPlot(data, parameter, nr) {
     let { arr, duration, chart_id, tick } = _returnPlotVariables(parameter, data)
     chart_h = chart_id + nr
     extraoptions = {}
     // extraoptions = { plugins: {}, legend: { display: false } }
 
+    extraoptions.scales = {
+        y: {
+            alignToPixels: false,
+            beginAtZero: false,
+            ticks: tick,
+        }
+    }
     yaxlim = _getYaxisLimit(chart_id, arr)
     if (yaxlim) {
-        extraoptions.scales = {
-            y: {
-                beginAtZero: false, min: yaxlim[0], max: yaxlim[1],
-                ticks: tick,
-            }
-        }
+        extraoptions.scales.y.min = yaxlim[0]
+        extraoptions.scales.y.max = yaxlim[1]
         window[chart_id + "1"].config.options.scales.y.min = yaxlim[0]
         window[chart_id + "1"].config.options.scales.y.max = yaxlim[1]
         window[chart_id + "1"].update()
-    }
-    else {
-        extraoptions.scales = {
-            y: {
-                beginAtZero: false,
-                ticks: tick
-            }
-        }
     }
 
     if (parameter == "speed") {
@@ -197,7 +172,6 @@ function _createPlot(data, parameter, nr) {
     else if (parameter == "heartRate") {
         backgroundColor = 'rgba(0, 200, 0, 0.2)'
     }
-
 
     options = _createOptions(extraoptions)
     dataset = _createDataset(arr, duration, backgroundColor)
@@ -208,17 +182,16 @@ function _createPlot(data, parameter, nr) {
         data: datainp,
         options: options
     });
-    let propertyNameS = chart_h;
-    // window.ChartS2 = myChartS;
-    window[propertyNameS] = myChart;
+    let propertyName = chart_h;
+    window[propertyName] = myChart;   // window.ChartS2 = myChartS;
 
 }
 
 
 function createPlotsTraining(data, nr) {
     const { dummy1, dummy2, duration, ldate } = _data2array(data);
-    _createPlot(data, "speed", nr)
-    _createPlot(data, "heartRate", nr)
+    createPlot(data, "speed", nr)
+    createPlot(data, "heartRate", nr)
 
     elem = document.getElementById("ldate" + nr)
     elem.innerHTML = ldate;
@@ -227,3 +200,13 @@ function createPlotsTraining(data, nr) {
 }
 
 
+function plotje(data) {
+    if (!window.ChartS1 || !(window.ChartS1 instanceof Chart)) {
+        createPlotsTraining(data, 1)
+    }
+    else {
+        _destroygraph("ChartS2")
+        _destroygraph("ChartH2")
+        createPlotsTraining(data, 2)
+    }
+}
