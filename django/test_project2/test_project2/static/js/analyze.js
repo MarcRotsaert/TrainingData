@@ -46,7 +46,8 @@ function _createDataset(valArray, duration, backgroundColor) {
     const durationMin = duration.map(d => (d / 60).toFixed(1));
 
     let datasets = []
-    for (let i = 0; i < valArray.length; i++) {
+    vallength = valArray.length
+    for (let i = 0; i < vallength; i++) {
         datasets[i] = {
             label: 'L ' + (i + 1) + "\nduration:" + durationMin[i] + 'min\n',
             data: [valArray[i]],
@@ -100,7 +101,10 @@ function _returnPlotVariables(parameter, data) {
     if (parameter == "heartRate") {
         arr = heartarr
         chart_id = "ChartH"
-        tick = { stepSize: 10 }
+        tick = {
+            stepSize: 10,
+            autoSkip: false
+        }
     }
 
     else if (parameter == "speed") {
@@ -108,6 +112,7 @@ function _returnPlotVariables(parameter, data) {
         chart_id = "ChartS"
         tick = {
             stepSize: 1,
+            autoSkip: false,
             callback: function (value, index, values) {
                 minkm = 60 / value
                 minute = Math.floor(minkm)
