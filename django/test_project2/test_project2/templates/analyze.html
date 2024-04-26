@@ -56,7 +56,21 @@
 
 
     </table>
+    <p>{{ ttypes }}</p>
+    {% if ttypes %}
+    <form id="trainingForm" action="/analyze/?" method="get">
+        {% comment %} {% csrf_token %} {% endcomment %}
+        <select id="trainingtype" name="ttypes" size="6" onclick="" >
+        {% for type_name in ttypes %}
+            <option value={{type_name}}>{{type_name}}</option>
+        {% endfor %}
+      
+    </select>
+    <input type="submit" id="to_addtt" value="to next page" onclick="toHeadofpage()"> </input>
+    </form>
+    {% endif %}
     {% endblock %}
+
 {% block traintab_block %}
 <table name="traindata">
     <tr>

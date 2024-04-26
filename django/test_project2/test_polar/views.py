@@ -70,7 +70,6 @@ def start_adapt(request: HttpRequest) -> HttpResponse:
         print("GET action_adapt")
     elif request.method == "POST":
         print(request.POST)
-        # xx
         PolarModel._set_database_adapt(request)
         trainingen = PolarModel._return_trainrunning()
     _set_cache_trainingdata(trainingen, 360)
@@ -121,10 +120,18 @@ def adapt_distance(request: HttpRequest) -> HttpResponse:
 
 
 def start_analyze(request: HttpRequest) -> HttpResponse:
-    trainingen = trainingen = PolarModel._return_trainrunning()
+
+    ttypes = _return_configttype()
+    if "ttypes" not in request.GET:
+        trainingen = PolarModel._return_trainrunning()
+    else:
+        ttype = request.GET["ttypes"]
+        trainingen = PolarModel._return_trainttype(ttype)
+    _set_cache_trainingdata(trainingen, 360)
 
     context = {
         "trainingen": trainingen,
+        "ttypes": ttypes,
     }
     return render(request, "analyze.html", context)
 
@@ -148,7 +155,8 @@ def show_adapt(request: HttpRequest, fname: str):
     # connection = PolarModel.objects.using("default")
     if request.method == "GET":
         return request
-    elif request.method == "DELETE":
+
+    if request.method == "DELETE":
         PolarModel.delete_training(request)
         trainingen = PolarModel._return_trainrunning()
         _set_cache_trainingdata(trainingen, 360)
@@ -162,7 +170,7 @@ def show_adapt(request: HttpRequest, fname: str):
             },
         )
 
-    elif request.method == "POST":
+    if request.method == "POST":
         # try:
         # data = json.loads(request.body.decode("utf-8"))
         # fname = data.pop("fname", None)
@@ -220,7 +228,7 @@ def show_adaptlap(request: HttpRequest, fname: str):
 
 def show_lapdata(request: HttpRequest, fname: str) -> Union[HttpResponse, JsonResponse]:
     if request.method == "GET":
-        print(dir(PolarModel))
+        # print(dir(PolarModel))
         lapdata = PolarModel.return_lapdata(fname)
         # print(lapdata)
         ttypes = _return_configttype()
